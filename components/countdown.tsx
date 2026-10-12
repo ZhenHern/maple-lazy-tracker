@@ -1,8 +1,8 @@
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
-const ENDING_SOON = 3 * DAY;
+export const ENDING_SOON = 3 * DAY;
 
-function formatRemaining(ms: number): string {
+export function formatRemaining(ms: number): string {
   const days = Math.floor(ms / DAY);
   const hours = Math.floor((ms % DAY) / HOUR);
   if (days > 0) return `${days}d ${hours}h left`;

@@ -1,19 +1,20 @@
 import { Suspense } from "react";
+import { PixelSprite } from "@/components/pixel-sprite";
 import { QuestLog } from "@/components/quest-log";
+import { Scenery } from "@/components/scenery";
 import { getOngoing } from "@/lib/tracker";
 
 export default function Home() {
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-10">
+    // The bottom padding leaves room for the status bar pinned to the screen.
+    <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:pt-10">
+      <Scenery />
+
       <header className="mb-6 flex items-center gap-3">
-        <LeafIcon />
+        <PixelSprite name="leaf" className="logo-leaf h-14 w-14 shrink-0" />
         <div>
-          <h1 className="font-pixel text-3xl leading-none text-wood-dark sm:text-4xl">
-            Lazy Tracker
-          </h1>
-          <p className="mt-1 text-sm font-bold text-wood-dark">
-            Play less. Miss nothing. Everything worth doing in GMS right now.
-          </p>
+          <h1 className="logo text-4xl leading-none sm:text-5xl">Lazy Tracker</h1>
+          <p className="tagline">Play less. Miss nothing.</p>
         </div>
       </header>
 
@@ -23,7 +24,7 @@ export default function Home() {
         </Suspense>
       </main>
 
-      <footer className="mt-8 text-center text-xs font-bold text-wood-dark">
+      <footer className="footnote">
         Fan project, not affiliated with Nexon. Tiers and time estimates are AI-generated from the
         official patch notes and can be wrong. MapleStory and all related images belong to Nexon.
       </footer>
@@ -31,34 +32,11 @@ export default function Home() {
   );
 }
 
-// Original pixel art: an 8x8 leaf drawn as rows of rectangles.
-function LeafIcon() {
-  const rows: [number, number, number][] = [
-    [3, 0, 2],
-    [1, 1, 1],
-    [3, 1, 2],
-    [6, 1, 1],
-    [1, 2, 6],
-    [0, 3, 8],
-    [1, 4, 6],
-    [2, 5, 4],
-    [3, 6, 2],
-  ];
-  return (
-    <svg viewBox="0 0 8 8" className="h-12 w-12 shrink-0" shapeRendering="crispEdges" aria-hidden>
-      {rows.map(([x, y, width]) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width={width} height={1} fill="#d8501a" />
-      ))}
-      <rect x={3} y={7} width={1} height={1} fill="#4e2f14" />
-    </svg>
-  );
-}
-
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="panel">
-      <h2 className="panel-title">{title}</h2>
-      <p className="panel-body">{children}</p>
+    <section className="window">
+      <h2 className="window-title">{title}</h2>
+      <p className="window-body">{children}</p>
     </section>
   );
 }
@@ -90,11 +68,11 @@ async function Tracker() {
     <div className="grid gap-5">
       <QuestLog items={items} updated={updatedAt ? formatDay(updatedAt) : null} />
 
-      <section className="panel">
-        <h2 className="panel-title">Sources</h2>
-        <div className="panel-body">
+      <section className="window">
+        <h2 className="window-title">Notice Board</h2>
+        <div className="window-body">
           <p className="mb-3 text-sm">The official posts this list was built from:</p>
-          <ul className="grid gap-3 text-sm sm:grid-cols-2">
+          <ul className="grid gap-2 text-sm sm:grid-cols-2">
             {sources.map((source) => (
               <li key={source.sourceId}>
                 <a href={source.url} target="_blank" rel="noreferrer" className="notice">

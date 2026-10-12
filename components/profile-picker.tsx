@@ -1,17 +1,18 @@
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
 import type { Priority, Profile } from "@/lib/types";
+import { PixelSprite, type SpriteName } from "./pixel-sprite";
 
-const PROFILE_INFO: Record<Profile, { name: string; hint: string }> = {
-  new: { name: "New", hint: "Still leveling a first main" },
-  casual: { name: "Casual", hint: "30-60 min a day" },
-  endgame: { name: "Endgame", hint: "Bossing and progression" },
-  returning: { name: "Returning", hint: "Back after a break" },
+export const PROFILE_INFO: Record<Profile, { name: string; hint: string; sprite: SpriteName }> = {
+  new: { name: "Beginner", hint: "Still leveling a first main", sprite: "sprout" },
+  casual: { name: "Casual", hint: "30-60 min a day", sprite: "cup" },
+  endgame: { name: "Endgame", hint: "Bossing and progression", sprite: "sword" },
+  returning: { name: "Returning", hint: "Back after a break", sprite: "door" },
 };
 
-const PRIORITY_INFO: Record<Priority, { name: string; hint: string }> = {
-  progression: { name: "Progression", hint: "Getting stronger" },
-  limited: { name: "Limited items", hint: "Rewards that may never return" },
-  cosmetic: { name: "Cosmetics", hint: "Looks and collections" },
+const PRIORITY_INFO: Record<Priority, { name: string; hint: string; sprite: SpriteName }> = {
+  progression: { name: "Progression", hint: "Getting stronger", sprite: "arrow" },
+  limited: { name: "Limited items", hint: "May never return", sprite: "hourglass" },
+  cosmetic: { name: "Cosmetics", hint: "Looks and collections", sprite: "hat" },
 };
 
 interface ProfilePickerProps {
@@ -36,45 +37,49 @@ export function ProfilePicker({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-5">
       <fieldset>
-        <legend className="label">I am a...</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <legend className="label">Choose your job</legend>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {PROFILES.map((each) => (
             <button
               key={each}
               type="button"
-              className="btn"
+              className="pick pick-job"
               aria-pressed={each === profile}
               onClick={() => onProfileChange(each)}
             >
-              <span className="block font-bold">{PROFILE_INFO[each].name}</span>
-              <span className="block text-xs opacity-80">{PROFILE_INFO[each].hint}</span>
+              <PixelSprite name={PROFILE_INFO[each].sprite} className="pick-sprite h-10 w-10" />
+              <span className="block font-extrabold">{PROFILE_INFO[each].name}</span>
+              <span className="block text-xs text-ink-soft">{PROFILE_INFO[each].hint}</span>
             </button>
           ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="label">I care about...</legend>
-        <div className="grid gap-2">
+        <legend className="label">What do you care about?</legend>
+        <div className="grid gap-2 sm:grid-cols-3">
           {PRIORITIES.map((each) => (
             <button
               key={each}
               type="button"
-              className="btn text-left"
+              className="pick pick-skill"
               aria-pressed={priorities.includes(each)}
               onClick={() => togglePriority(each)}
             >
-              <span className="font-bold">{PRIORITY_INFO[each].name}</span>
-              <span className="ml-2 text-xs opacity-80">{PRIORITY_INFO[each].hint}</span>
+              <PixelSprite name={PRIORITY_INFO[each].sprite} className="pick-sprite h-7 w-7" />
+              <span className="min-w-0 text-left">
+                <span className="block font-extrabold">{PRIORITY_INFO[each].name}</span>
+                <span className="block text-xs text-ink-soft">{PRIORITY_INFO[each].hint}</span>
+              </span>
             </button>
           ))}
         </div>
-        <p className="mt-2 text-xs text-ink-soft">
+        <p className="mt-2 text-xs font-bold text-ink-soft">
           {priorities.length === 0
             ? "Nothing picked, so all three count."
-            : "Pick any mix. An item ranks by its best match."}
+            : "Pick any mix. A quest ranks by its best match."}
         </p>
       </fieldset>
     </div>

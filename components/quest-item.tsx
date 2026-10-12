@@ -1,5 +1,7 @@
+import type { CSSProperties } from "react";
 import type { Profile, Tier, TrackerItem } from "@/lib/types";
-import { Countdown } from "./countdown";
+import { Countdown, ENDING_SOON } from "./countdown";
+import { PixelSprite } from "./pixel-sprite";
 
 const CATEGORY_LABEL: Record<TrackerItem["category"], string> = {
   event: "Event",
@@ -13,10 +15,16 @@ const TIER_WORD: Record<Tier, string> = {
   skip: "skip",
 };
 
+const TIER_STARS: Record<Tier, number> = { must_do: 3, if_free: 2, skip: 1 };
+
+const EFFORT_LABEL = { low: "Low effort", medium: "Medium effort", high: "High effort" };
+
 interface QuestItemProps {
   item: TrackerItem;
   profile: Profile;
   now: number | null;
+  /** Position in the list, used to stagger the entrance animation. */
+  index: number;
 }
 
 function TimeEstimate({ estimate }: { estimate: TrackerItem["timeEstimate"] }) {
@@ -47,82 +55,156 @@ function NexonImage({ src, alt, className }: { src: string; alt: string; classNa
   );
 }
 
-export function QuestItem({ item, profile, now }: QuestItemProps) {
+// How much of the event's run has already passed, 0-100, or null when unknown.
+function elapsedPercent(item: TrackerItem, now: number | null): number | null {
+  if (now === null || !item.startsAt || !item.endsAt) return null;
+  const start = Date.parse(item.startsAt);
+  const end = Date.parse(item.endsAt);
+  if (end <= start) return null;
+  return Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
+}
+
+export function QuestItem({ item, profile, now, index }: QuestItemProps) {
   const ratings: [string, Tier][] = [
     ["Progression", item.value.progression[profile]],
     ["Limited", item.value.limited],
     ["Cosmetic", item.value.cosmetic],
   ];
   const [preview, ...gallery] = item.images;
+  const icons = item.rewardImages.filter((icon) => icon !== null);
+  const elapsed = elapsedPercent(item, now);
+  const urgent =
+    now !== null && item.endsAt !== null && Date.parse(item.endsAt) - now < ENDING_SOON;
 
   return (
-    <li className={`quest ${preview ? "quest-with-preview" : ""}`}>
-      {preview && (
-        <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
-      )}
+    <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
+      <details className="quest group">
+        <summary className="quest-head">
+          <span className="quest-icon">
+            {preview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+            ) : (
+              <PixelSprite name="bulb" className="h-8" />
+            )}
+          </span>
 
-      <div className="grid min-w-0 gap-2">
-        <div>
-          <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="quest-title">{item.title}</span>
-            <span className="chip chip-quiet">{CATEGORY_LABEL[item.category]}</span>
-            <Countdown endsAt={item.endsAt} now={now} />
-          </h3>
-          <p className="mt-1 text-sm">{item.summary}</p>
-        </div>
-
-        {item.rewards.length > 0 && (
-          <ul className="flex flex-wrap gap-1.5" aria-label="Rewards">
-            {item.rewards.map((reward, index) => {
-              const icon = item.rewardImages[index];
-              return (
-                <li key={reward + index} className="chip chip-reward">
-                  {icon && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={icon}
-                      alt=""
-                      className="reward-icon"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                    />
-                  )}
-                  {reward}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        {gallery.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {gallery.map((src, index) => (
-              <NexonImage
-                key={src}
-                src={src}
-                alt={`${item.title} image ${index + 2}`}
-                className="quest-thumb"
-              />
-            ))}
-          </div>
-        )}
-
-        <TimeEstimate estimate={item.timeEstimate} />
-        <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
-          {ratings.map(([axis, tier]) => (
-            <span key={axis}>
-              <span className={`dot dot-${tier}`} aria-hidden="true" />
-              {axis}: {TIER_WORD[tier]}
+          <div className="grid min-w-0 gap-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h3 className="quest-title">{item.title}</h3>
+              <Countdown endsAt={item.endsAt} now={now} />
+            </div>
+            <span className="line-clamp-2 text-sm text-ink-soft group-open:hidden">
+              {item.summary}
             </span>
-          ))}
-        </p>
-        <p className="text-xs text-ink-soft">
-          From{" "}
-          <a href={item.source.url} target="_blank" rel="noreferrer" className="underline">
-            {item.source.title}
-          </a>
-        </p>
-      </div>
+            {icons.length > 0 && (
+              <span className="flex gap-1 group-open:hidden" aria-hidden="true">
+                {icons.slice(0, 6).map((icon, position) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={icon + position}
+                    src={icon}
+                    alt=""
+                    className="reward-icon"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                ))}
+              </span>
+            )}
+          </div>
+
+          <span className="quest-chevron" aria-hidden="true">
+            ▾
+          </span>
+
+          {elapsed !== null && (
+            <span
+              className={`gauge quest-gauge ${urgent ? "gauge-urgent" : ""}`}
+              aria-hidden="true"
+            >
+              <span className="gauge-fill" style={{ width: `${elapsed}%` }} />
+            </span>
+          )}
+        </summary>
+
+        <div className="quest-body">
+          {preview && (
+            <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
+          )}
+
+          <p className="text-sm">{item.summary}</p>
+
+          <p className="flex flex-wrap gap-1.5">
+            <span className="chip chip-quiet">{CATEGORY_LABEL[item.category]}</span>
+            {item.timeEstimate?.effort && (
+              <span className="chip chip-quiet">{EFFORT_LABEL[item.timeEstimate.effort]}</span>
+            )}
+            {elapsed !== null && (
+              <span className="chip chip-quiet">{Math.round(elapsed)}% of the event has passed</span>
+            )}
+          </p>
+
+          {item.rewards.length > 0 && (
+            <div>
+              <h4 className="label">Rewards</h4>
+              <ul className="flex flex-wrap gap-2">
+                {item.rewards.map((reward, position) => {
+                  const icon = item.rewardImages[position];
+                  return (
+                    <li key={reward + position} className="slot">
+                      <span className="slot-icon" aria-hidden="true">
+                        {icon ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={icon} alt="" loading="lazy" referrerPolicy="no-referrer" />
+                        ) : (
+                          "★"
+                        )}
+                      </span>
+                      {reward}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {gallery.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {gallery.map((src, position) => (
+                <NexonImage
+                  key={src}
+                  src={src}
+                  alt={`${item.title} image ${position + 2}`}
+                  className="quest-thumb"
+                />
+              ))}
+            </div>
+          )}
+
+          <TimeEstimate estimate={item.timeEstimate} />
+
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-ink-soft">
+            {ratings.map(([axis, tier]) => (
+              <li key={axis}>
+                {axis}{" "}
+                <span className="stars" aria-hidden="true">
+                  {"★".repeat(TIER_STARS[tier])}
+                  <span className="stars-off">{"★".repeat(3 - TIER_STARS[tier])}</span>
+                </span>
+                <span className="sr-only">: {TIER_WORD[tier]}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p className="text-xs text-ink-soft">
+            From{" "}
+            <a href={item.source.url} target="_blank" rel="noreferrer" className="underline">
+              {item.source.title}
+            </a>
+          </p>
+        </div>
+      </details>
     </li>
   );
 }

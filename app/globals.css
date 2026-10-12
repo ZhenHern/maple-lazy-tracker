@@ -2,17 +2,19 @@
 
 /* Design tokens. Change a colour here and every component follows. */
 @theme {
-  --color-parchment: #fbf0d4;
-  --color-parchment-deep: #f1dfb4;
-  --color-paper: #fffaf0;
-  --color-wood: #8a5a2b;
-  --color-wood-dark: #4e2f14;
-  --color-ink: #3b2714;
-  --color-ink-soft: #6b5237;
-  --color-maple: #c2470f;
-  --color-must: #b93217;
-  --color-free: #2a6fa8;
-  --color-skip: #6f6657;
+  --color-cream: #fffdf3;
+  --color-panel: #e8eefb;
+  --color-line: #c3cfe6;
+  --color-ink: #1d2b55;
+  --color-ink-soft: #4d5b82;
+  --color-frame: #3b62c4;
+  --color-frame-dark: #16224a;
+  --color-maple: #f2711c;
+  --color-gold: #ffc531;
+  --color-must: #d12c43;
+  --color-free: #1b6fc2;
+  --color-skip: #646d80;
+  --color-ended: #474e5e;
 }
 
 @theme inline {
@@ -20,95 +22,385 @@
   --font-pixel: var(--font-pixel-face);
 }
 
-/* Sky with two rolling hills, drawn entirely in CSS (no image assets). */
 body {
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
-  background:
-    radial-gradient(ellipse 60% 16% at 18% 100%, #6cbf4b 0 99%, transparent 100%),
-    radial-gradient(ellipse 70% 12% at 82% 100%, #58ad3d 0 99%, transparent 100%),
-    linear-gradient(#69bff2, #c9ecff 70%, #e9f8ff);
+  background: linear-gradient(#4fb0f3, #a9defd 55%, #e3f6ff);
   background-attachment: fixed;
 }
 
 :focus-visible {
-  outline: 3px solid #1d4ed8;
+  outline: 3px solid var(--color-frame-dark);
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px #ffffff;
 }
 
-/* Window frame, like an in-game UI panel. */
-.panel {
+/* ---------- Backdrop: clouds, hills and falling leaves, all CSS ---------- */
+
+.scenery {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   overflow: hidden;
-  border: 4px solid var(--color-wood-dark);
-  border-radius: 12px;
-  background: var(--color-parchment);
-  box-shadow:
-    inset 0 0 0 3px #d9a35c,
-    0 6px 0 rgb(78 47 20 / 0.35);
+  pointer-events: none;
 }
 
-.panel-title {
-  padding: 0.6rem 1rem;
-  border-bottom: 4px solid var(--color-wood-dark);
-  background: linear-gradient(#b0733a, var(--color-wood));
-  color: #fff3d6;
+.cloud {
+  position: absolute;
+  left: -12rem;
+  width: 9rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  background: #ffffff;
+  opacity: 0.9;
+  animation: drift var(--speed) linear var(--delay) infinite;
+}
+
+.cloud::before,
+.cloud::after {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  content: "";
+}
+
+.cloud::before {
+  top: -1.8rem;
+  left: 1.2rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.cloud::after {
+  top: -1.1rem;
+  left: 4.4rem;
+  width: 3rem;
+  height: 3rem;
+}
+
+.hills {
+  position: absolute;
+  inset: auto 0 0;
+  height: 30vh;
+  background:
+    radial-gradient(ellipse 55% 70% at 15% 100%, #6fc94a 0 99%, transparent 100%),
+    radial-gradient(ellipse 60% 55% at 85% 100%, #58b530 0 99%, transparent 100%),
+    radial-gradient(ellipse 70% 40% at 50% 100%, #86d85f 0 99%, transparent 100%);
+}
+
+.leaf-fall {
+  position: absolute;
+  top: -2rem;
+  width: 1rem;
+  opacity: 0.85;
+  animation: fall var(--speed) linear var(--delay) infinite;
+}
+
+/* ---------- Header ---------- */
+
+.logo {
+  color: #ffa51f;
   font-family: var(--font-pixel), monospace;
-  font-size: 1.15rem;
-  letter-spacing: 0.04em;
-  text-shadow: 2px 2px 0 var(--color-wood-dark);
+  letter-spacing: 0.02em;
+  text-shadow:
+    2px 0 #ffffff,
+    -2px 0 #ffffff,
+    0 2px #ffffff,
+    0 -2px #ffffff,
+    2px 2px #ffffff,
+    -2px -2px #ffffff,
+    2px -2px #ffffff,
+    -2px 2px #ffffff,
+    0 6px 0 var(--color-frame-dark);
 }
 
-.panel-body {
+.logo-leaf {
+  filter: drop-shadow(0 3px 0 rgb(22 34 74 / 0.35));
+  animation: sway 3.5s ease-in-out infinite;
+  transform-origin: 40% 100%;
+}
+
+.tagline {
+  display: inline-block;
+  margin-top: 0.7rem;
+  padding: 0.1rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.footnote {
+  margin-top: 2rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- Window frame, like an in-game UI window ---------- */
+
+.window {
+  overflow: hidden;
+  border: 3px solid var(--color-frame-dark);
+  border-radius: 14px;
+  background: var(--color-cream);
+  box-shadow:
+    inset 0 0 0 2px #9db6ee,
+    0 6px 0 rgb(22 34 74 / 0.3);
+}
+
+.window-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 3px solid var(--color-frame-dark);
+  background: linear-gradient(#5d8df0, var(--color-frame));
+  color: #ffffff;
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px 0 var(--color-frame-dark);
+}
+
+.window-note {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+.window-body {
   padding: 1rem;
 }
 
 .label {
   display: block;
   margin-bottom: 0.5rem;
-  color: var(--color-wood-dark);
+  color: var(--color-ink);
   font-family: var(--font-pixel), monospace;
   font-size: 1.05rem;
   letter-spacing: 0.03em;
 }
 
+/* ---------- Buttons ---------- */
+
 /* Chunky button that presses down when clicked. */
 .btn {
-  padding: 0.5rem 0.75rem;
-  border: 3px solid var(--color-wood);
+  padding: 0.35rem 0.9rem;
+  border: 2px solid var(--color-frame-dark);
   border-radius: 8px;
-  background: var(--color-paper);
-  box-shadow: 0 3px 0 var(--color-wood);
+  background: linear-gradient(#ffffff, #dfe7f7);
+  box-shadow: 0 3px 0 var(--color-frame-dark);
   color: var(--color-ink);
-  line-height: 1.25;
+  font-size: 0.875rem;
+  font-weight: 800;
   cursor: pointer;
   transition:
     transform 80ms,
     box-shadow 80ms,
-    background-color 120ms;
+    filter 120ms;
 }
 
 .btn:hover {
-  background: #ffffff;
+  filter: brightness(1.06);
 }
 
 .btn:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--color-wood);
+  box-shadow: 0 1px 0 var(--color-frame-dark);
 }
 
-.btn[aria-pressed="true"] {
-  border-color: var(--color-wood-dark);
-  background: var(--color-maple);
-  box-shadow: 0 3px 0 var(--color-wood-dark);
-  color: #ffffff;
+.btn-go {
+  background: linear-gradient(#ffe07a, #ffb21f);
+  color: #3d2200;
 }
 
-/* Tier sections. */
-.tier {
-  overflow: hidden;
-  border: 3px solid var(--tier-color);
+/* A selectable card: jobs and priorities. */
+.pick {
+  position: relative;
+  border: 2px solid var(--color-line);
   border-radius: 10px;
-  background: var(--color-parchment-deep);
+  background: #ffffff;
+  box-shadow: 0 3px 0 var(--color-line);
+  cursor: pointer;
+  transition:
+    transform 120ms,
+    border-color 120ms,
+    box-shadow 120ms,
+    background-color 120ms;
+}
+
+.pick:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-2px);
+}
+
+.pick:hover .pick-sprite {
+  animation: hop 450ms ease-out;
+}
+
+.pick:active {
+  transform: translateY(1px);
+}
+
+.pick[aria-pressed="true"] {
+  border-color: #c9820a;
+  background: #fff4c7;
+  box-shadow:
+    0 3px 0 #c9820a,
+    0 0 0 3px rgb(255 197 49 / 0.45);
+}
+
+/* Tick in the corner of a chosen card. */
+.pick[aria-pressed="true"]::after {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.4rem;
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 2px solid var(--color-frame-dark);
+  border-radius: 50%;
+  background: #6fc94a;
+  color: var(--color-frame-dark);
+  font-size: 0.7rem;
+  font-weight: 900;
+  content: "✓";
+  animation: pop 220ms ease-out;
+}
+
+.pick-job {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pick-skill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  line-height: 1.25;
+}
+
+.pick-sprite {
+  flex-shrink: 0;
+}
+
+/* ---------- NPC chat ---------- */
+
+.npc {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.npc-sprite {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.npc-name {
+  padding: 0.05rem 0.5rem;
+  border-radius: 6px;
+  background: var(--color-frame-dark);
+  color: #ffe07a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.npc-text {
+  font-weight: 700;
+  line-height: 1.45;
+  cursor: default;
+}
+
+.bob {
+  display: block;
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+.hop {
+  display: block;
+  animation: hop 380ms ease-out;
+}
+
+/* Damage number that floats up from the NPC when poked. */
+.dmg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  color: #ff8a00;
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow:
+    2px 0 #ffffff,
+    -2px 0 #ffffff,
+    0 2px #ffffff,
+    0 -2px #ffffff,
+    0 4px 0 var(--color-frame-dark);
+  pointer-events: none;
+  animation: float-up 800ms ease-out forwards;
+}
+
+/* ---------- Quest log: search, filters, tabs ---------- */
+
+.search {
+  width: 100%;
+  padding: 0.45rem 0.8rem;
+  border: 2px solid var(--color-line);
+  border-radius: 8px;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.search::placeholder {
+  color: #6a7797;
+}
+
+.search:focus {
+  border-color: var(--color-frame);
+}
+
+.filter {
+  padding: 0.25rem 0.7rem;
+  border: 2px solid var(--color-line);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+.filter:hover {
+  border-color: var(--color-frame);
+}
+
+.filter[aria-pressed="true"] {
+  border-color: var(--color-frame-dark);
+  background: var(--color-frame);
+  color: #ffffff;
 }
 
 .tier-must_do {
@@ -121,85 +413,172 @@ body {
   --tier-color: var(--color-skip);
 }
 .tier-ended {
-  --tier-color: #5d564b;
+  --tier-color: var(--color-ended);
 }
 
-.tier-head {
+.tabs {
   display: flex;
+  gap: 0.25rem;
+  padding: 0 0.4rem;
+  overflow-x: auto;
+}
+
+.tab {
+  display: flex;
+  flex: 1;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.75rem;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border: 3px solid var(--tier-color);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: #ffffff;
+  color: var(--tier-color);
+  font-family: var(--font-pixel), monospace;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    margin-top 120ms,
+    padding-bottom 120ms,
+    background-color 120ms;
+}
+
+.tab:hover {
+  background: color-mix(in srgb, var(--tier-color) 12%, #ffffff);
+}
+
+/* The chosen tab rises to meet the panel and takes its colour. */
+.tab[aria-selected="true"] {
+  margin-top: 0;
+  padding-bottom: 0.8rem;
   background: var(--tier-color);
   color: #ffffff;
+}
+
+.tab-count {
+  min-width: 1.6rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tier-color) 16%, #ffffff);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.tab[aria-selected="true"] .tab-count {
+  background: rgb(0 0 0 / 0.28);
+}
+
+.tab-panel {
+  padding: 0.75rem;
+  border: 3px solid var(--tier-color);
+  border-radius: 10px;
+  background: var(--color-panel);
+}
+
+.empty {
+  padding: 1.5rem 1rem;
+  border: 2px dashed var(--color-line);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- One quest ---------- */
+
+.quest-enter {
+  animation: rise 260ms ease-out both;
+  animation-delay: calc(var(--order) * 35ms);
+}
+
+.quest {
+  overflow: hidden;
+  border: 2px solid var(--color-line);
+  border-radius: 10px;
+  background: #ffffff;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+.quest:hover {
+  border-color: var(--color-gold);
+}
+
+.quest[open] {
+  border-color: var(--tier-color);
+  box-shadow: 0 3px 0 rgb(22 34 74 / 0.18);
+}
+
+.quest-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 0.75rem;
   cursor: pointer;
   list-style: none;
 }
 
-.tier-head::-webkit-details-marker {
+.quest-head::-webkit-details-marker {
   display: none;
 }
 
-.tier-head::before {
-  content: "▸";
-  transition: transform 120ms;
-}
-
-.tier[open] > .tier-head::before {
-  transform: rotate(90deg);
-}
-
-.tier-name {
-  font-family: var(--font-pixel), monospace;
-  font-size: 1.05rem;
-  letter-spacing: 0.03em;
-}
-
-.tier-blurb {
-  flex: 1;
-  font-size: 0.85rem;
-  opacity: 0.92;
-}
-
-.tier-count {
-  min-width: 1.9rem;
-  padding: 0.05rem 0.5rem;
-  border-radius: 999px;
-  background: rgb(0 0 0 / 0.28);
-  font-weight: 800;
-  text-align: center;
-}
-
-/* One quest. */
-.quest {
-  padding: 0.75rem;
-  border: 2px solid #d9b97a;
-  border-radius: 8px;
-  background: var(--color-paper);
-}
-
 .quest-title {
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 800;
+  line-height: 1.25;
 }
 
-/* Images come from Nexon's CDN at unknown sizes: big screenshots shrink to fit,
-   small item icons keep their size and stay crisp instead of being blown up. */
-.quest-with-preview {
+/* Images come from Nexon's CDN at unknown sizes, so every frame fixes its own
+   size and the image is fitted inside it. */
+.quest-icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  overflow: hidden;
+  border: 2px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-panel);
+}
+
+.quest-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.quest-chevron {
+  color: var(--color-ink-soft);
+  font-size: 1.2rem;
+  transition: transform 150ms;
+}
+
+.quest[open] .quest-chevron {
+  transform: rotate(180deg);
+}
+
+/* Thin bar under a quest: how much of the event's run has passed. */
+.gauge.quest-gauge {
+  grid-column: 1 / -1;
+  height: 0.35rem;
+  background: #d5dceb;
+  box-shadow: none;
+}
+
+.quest-body {
   display: grid;
   gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .quest-with-preview {
-    grid-template-columns: 11rem 1fr;
-  }
-}
-
-.quest-preview,
-.quest-thumb {
-  border: 2px solid #d9b97a;
-  border-radius: 6px;
-  background: var(--color-parchment-deep);
+  padding: 0.75rem;
+  border-top: 2px dashed var(--color-line);
+  animation: rise 200ms ease-out;
 }
 
 .quest-preview,
@@ -207,16 +586,13 @@ body {
   display: grid;
   place-items: center;
   overflow: hidden;
+  border: 2px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-panel);
 }
 
 .quest-preview {
-  height: 9rem;
-}
-
-@media (min-width: 640px) {
-  .quest-preview {
-    height: 7.5rem;
-  }
+  height: 11rem;
 }
 
 .quest-thumb {
@@ -231,30 +607,181 @@ body {
   object-fit: contain;
 }
 
+.reward-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* A reward, shown like an inventory slot with its name beside it. */
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.65rem 0.25rem 0.25rem;
+  border: 2px solid #e3bf4d;
+  border-radius: 8px;
+  background: #fff6cf;
+  color: #4d3600;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.slot-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid #8996b5;
+  border-radius: 6px;
+  background: linear-gradient(#f6f8fd, #cfd8ea);
+  color: #c9820a;
+}
+
+.slot-icon img {
+  max-width: 1.75rem;
+  max-height: 1.75rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.stars {
+  color: #e39b00;
+  letter-spacing: 0.05em;
+}
+
+.stars-off {
+  color: #cdd5e6;
+}
+
+/* ---------- Gauge, like an HP bar ---------- */
+
+.gauge {
+  display: block;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-frame-dark);
+  box-shadow: inset 0 0 0 1px var(--color-frame-dark);
+}
+
+.gauge-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(#bfe4ff, var(--gauge-color, #3d9be9));
+  transition: width 400ms ease-out;
+}
+
+.gauge-urgent {
+  --gauge-color: #e8344a;
+}
+
+.gauge-urgent .gauge-fill {
+  background: linear-gradient(#ffc0c6, var(--gauge-color));
+}
+
+/* ---------- Status bar pinned to the bottom ---------- */
+
+.statusbar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom));
+  border-top: 3px solid var(--color-frame-dark);
+  background: linear-gradient(#4a5d96, #26335e);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.25);
+  color: #ffffff;
+}
+
+.statusbar-job {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border: 2px solid var(--color-frame-dark);
+  border-radius: 8px;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.statusbar-gauge {
+  display: grid;
+  flex: 1;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.25rem 0.5rem 0.35rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    transform 80ms;
+  --gauge-color: var(--tier-color);
+}
+
+.statusbar-gauge:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.statusbar-gauge:active {
+  transform: translateY(1px);
+}
+
+.statusbar-gauge[aria-current="true"] {
+  border-color: var(--color-gold);
+  background: rgb(255 255 255 / 0.12);
+}
+
+.statusbar-gauge .gauge-fill {
+  background: linear-gradient(rgb(255 255 255 / 0.75), var(--gauge-color) 60%);
+}
+
+.statusbar-gauge.tier-skip {
+  --gauge-color: #aab3c7;
+}
+
+.statusbar :focus-visible {
+  outline-color: var(--color-gold);
+  box-shadow: none;
+}
+
+/* ---------- Notice board ---------- */
+
 .notice {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.4rem;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+.notice:hover {
+  border-color: var(--color-gold);
+  background: #fff6cf;
 }
 
 .notice img {
   width: 5.5rem;
   flex-shrink: 0;
   aspect-ratio: 540 / 304;
-  border: 2px solid #d9b97a;
+  border: 2px solid var(--color-line);
   border-radius: 6px;
   object-fit: cover;
 }
 
-.reward-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  margin: 0.1rem 0.35rem 0.1rem -0.2rem;
-  object-fit: contain;
-  image-rendering: pixelated;
-}
+/* ---------- Small labels ---------- */
 
-/* Small labels. */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -262,20 +789,20 @@ body {
   border: 2px solid;
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
 .chip-quiet {
-  border-color: #d9c08a;
-  background: #efe2c0;
+  border-color: var(--color-line);
+  background: var(--color-panel);
   color: var(--color-ink-soft);
 }
 
 .chip-time {
   border-color: #8fc1ea;
   background: #dff0ff;
-  color: #1d5a8c;
+  color: #17507f;
 }
 
 .chip-urgent {
@@ -285,30 +812,7 @@ body {
   animation: nudge 1.6s ease-in-out infinite;
 }
 
-.chip-reward {
-  border-color: #e3bf4d;
-  background: #fff3c4;
-  color: #6b4a00;
-  white-space: normal;
-}
-
-.dot {
-  display: inline-block;
-  width: 0.55rem;
-  height: 0.55rem;
-  margin-right: 0.3rem;
-  border-radius: 50%;
-}
-
-.dot-must_do {
-  background: var(--color-must);
-}
-.dot-if_free {
-  background: var(--color-free);
-}
-.dot-skip {
-  background: #b9ae9b;
-}
+/* ---------- Motion ---------- */
 
 @keyframes nudge {
   50% {
@@ -316,13 +820,89 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .chip-urgent {
-    animation: none;
-  }
-  .btn,
-  .tier-head::before {
-    transition: none;
+@keyframes bob {
+  50% {
+    transform: translateY(-4px);
   }
 }
 
+@keyframes hop {
+  35% {
+    transform: translateY(-14px) scale(1.06, 0.94);
+  }
+  70% {
+    transform: translateY(0) scale(0.96, 1.04);
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes float-up {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(0.6);
+  }
+  20% {
+    transform: translate(-50%, -18px) scale(1.15);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -64px) scale(1);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translateX(calc(100vw + 24rem));
+  }
+}
+
+@keyframes fall {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(3rem, 55vh) rotate(180deg);
+  }
+  to {
+    transform: translate(-1rem, 112vh) rotate(360deg);
+  }
+}
+
+/* Visitors who ask their device for less motion get a still page. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .leaf-fall {
+    display: none;
+  }
+
+  .cloud {
+    left: var(--rest);
+  }
+}
