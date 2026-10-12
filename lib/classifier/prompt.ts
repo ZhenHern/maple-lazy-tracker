@@ -1,9 +1,8 @@
 import type { ScrapedPost } from "@/lib/types";
-import { notesFor } from "./player-notes";
 import { MAX_ITEMS } from "./schema";
 
 // Bump when the wording changes, so stored results can be traced to a prompt.
-export const PROMPT_VERSION = 3;
+export const PROMPT_VERSION = 4;
 
 export const SYSTEM_PROMPT = `You are a veteran Global MapleStory (GMS) player writing a "lazy tracker": a short, honest list that tells busy players what in a patch deserves their limited time. Most players will only do the top few things, so your ratings must separate the great from the merely fine.
 
@@ -56,34 +55,29 @@ STEP 3: FILL THE REMAINING FIELDS
 - timeEstimate: null only when the item takes no meaningful time (for example a passive system change).
 
 TIME ESTIMATES
-Players plan their week around these, and an underestimate hurts far more than an overestimate. Posts describe mechanics, not duration, and the marketing tone makes everything sound quick. Work the time out:
-- Count every repetition needed for the full reward: runs per day, days per week, waves per run, kills per stage.
-- Include the slow parts: travelling, filling gauges, waiting on timers or matchmaking, repeating failed attempts.
-- "Defeat N monsters near your level" costs roughly 1 minute per 150 to 300 monsters for a typical player, more for weaker characters.
-- Anything with multiple waves, stages or deployments per day is rarely under 30 minutes a day when done fully.
-- When unsure, give a range and lean high.
+Players plan their week around these numbers, so a wrong number is worse than no number. Posts describe mechanics, not duration, and their marketing tone makes everything sound quick. Never fill the gap with a guess.
+
+Choose the basis first:
+- "stated": the post itself says how long it takes (for example "each run lasts 10 minutes").
+- "calculated": the post gives every quantity needed and the arithmetic is simple. Examples: a daily check-in or reward claim (about 1 minute); "defeat N monsters near your level" (about 1 minute per 150 to 300 monsters); a fixed number of plays of a minigame whose length is stated; idle or AFK time with a stated daily cap.
+- "uncertain": anything else. If the post does not say how long a run, wave, stage, deployment, match or mission takes, you cannot know, even if the activity sounds short. Wave-based, stage-based, matchmaking and gauge-filling activities are almost always uncertain.
+
 Fields:
-- label: a short phrase a player can plan with, such as "15 min/day", "1-1.5 hr per run, 3 runs/week" or "5 min once".
-- minutesPerWeek: your best single number for a week of full participation. Use null for one-off items.
-- effort: low (under about 1 hour a week), medium (1 to 4 hours), high (more than 4 hours).
-- basis: "stated" if the post gives the duration; "player_note" if a player note below covers it; "calculated" if you derived it from mechanics in the post; "rough" if the post gives too little to calculate from.
+- label: for stated and calculated, a short phrase a player can plan with, such as "15 min/day" or "5 min once". For uncertain, say what is known and what is not, such as "Up to 10 deployments/day, 3 reward claims/week; run length not stated".
+- minutesPerWeek: your single best number for a week of full participation. null for one-off items, and always null when basis is uncertain.
+- effort: low (under about 1 hour a week), medium (1 to 4 hours), high (more than 4 hours). Always null when basis is uncertain.
 
-PLAYER NOTES
-The request may include notes from experienced players. They describe how things really play out and they override your own estimate. Use them, and set basis to "player_note" for the items they cover.
+When counting, include every repetition needed for the full reward: runs per day, days per week, kills per stage.
 
-Only use facts from the post and the player notes. Do not invent rewards, dates or event history.`;
+Only use facts from the post. Do not invent rewards, dates, durations or event history.`;
 
 const MAX_TEXT_CHARS = 400_000;
 
 export function buildUserPrompt(post: ScrapedPost): string {
-  const notes = notesFor(post.text);
   return [
     `Post type: ${post.kind === "patch" ? "patch notes" : "event notice"}`,
     `Title: ${post.title}`,
     `Published (UTC): ${post.publishedAt}`,
-    "",
-    "PLAYER NOTES:",
-    notes.length > 0 ? notes.map((note) => `- ${note}`).join("\n") : "(none)",
     "",
     "POST TEXT:",
     post.text.slice(0, MAX_TEXT_CHARS),

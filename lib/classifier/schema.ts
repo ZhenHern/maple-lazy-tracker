@@ -41,9 +41,10 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
       .object({
         label: z.string().min(1),
         minutesPerWeek: z.number().nonnegative().nullable(),
-        effort: z.enum(["low", "medium", "high"]),
-        // How the estimate was reached, so the UI can show how far to trust it.
-        basis: z.enum(["stated", "player_note", "calculated", "rough"]),
+        effort: z.enum(["low", "medium", "high"]).nullable(),
+        // How the estimate was reached. "uncertain" means the post does not
+        // give enough to work it out, and no number is shown.
+        basis: z.enum(["stated", "calculated", "uncertain"]),
       })
       .nullable(),
   });

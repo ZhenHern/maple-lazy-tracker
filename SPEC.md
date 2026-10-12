@@ -70,7 +70,8 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 7. **Model list in an env var.** `GEMINI_MODEL` is an ordered, comma-separated list. If a model is overloaded, rate limited or retired, the next is tried, and the row records which one answered.
 8. **Priorities are resolved in code, not by prompting per user.** Players pick what they care about: `progression`, `limited` items, `cosmetic` (any combination). Gemini rates every item once on all three axes (progression once per profile), and `resolveTier()` in `lib/tiering.ts` returns the best rating among the chosen priorities. Switching priorities is instant and costs no AI calls.
 9. **Gemini scores, code decides tiers.** Gemini returns a 0-100 score per axis. `lib/classifier/calibrate.ts` maps scores to tiers: `must_do` needs a score of 70+ and a place in the top quarter of the post for that axis; 35+ is `if_free`; the rest is `skip`. Models rank far more reliably than they follow "be strict", so this keeps `must_do` rare whichever model answers.
-10. **Time estimates carry their basis.** Posts describe mechanics, not duration, so each estimate records how it was reached: `stated`, `player_note`, `calculated` or `rough`. `lib/classifier/player-notes.ts` holds facts from experienced players (for example how long an event took on KMS/TMS/JMS) that are injected into the prompt and override the model's guess.
+10. **No guessed time estimates.** Posts describe mechanics, not duration, and a wrong number is worse than none. Each estimate records its basis: `stated` (the post gives the duration), `calculated` (the post gives every quantity needed), or `uncertain`. An uncertain estimate says what is known and never carries a number; the code strips one if the model sends it anyway.
+11. **Community research (planned, not built).** To replace `uncertain` with real figures, a research step will look up how an event played out for players and on other servers (KMS, TMS, JMS, MSEA), and estimates from it will carry a `community` basis with source links. Nothing is hard-coded per event. Every candidate source needs a credential: Reddit blocks anonymous requests (official API app required), web search across other regions' sites needs Gemini search grounding (billed) or a search API key, and Discord has no public search (a bot invited to a server is the only route).
 
 ### Rules
 
@@ -82,7 +83,7 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 ### Gemini free-tier limits (measured in Phase 1)
 
 - 5 requests per minute and 20 requests per day, per model. Failed requests count. The cron must stay well inside the daily figure, which the hash check and the 3-posts-per-run cap already ensure.
-- Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key. Until then, `player-notes.ts` fills that role by hand.
+- Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key.
 - Gemini rejects the response schema with a bare 400 if it contains `minItems`/`maxItems`, so size and range limits are enforced in our code instead.
 - Full patch notes (about 45k tokens) can take over a minute, and the SDK retries five times with no timeout by default. We set a 120-second timeout and no SDK retries.
 
@@ -119,11 +120,11 @@ interface TrackerItem {
   startsAt: string | null;       // ISO 8601 UTC
   endsAt: string | null;         // ISO 8601 UTC, drives the countdown
   timeEstimate: {
-    label: string;               // e.g. "1-1.5 hr per run, 3 runs/week"
-    minutesPerWeek: number | null;
-    effort: 'low' | 'medium' | 'high';
-    basis: 'stated' | 'player_note' | 'calculated' | 'rough';
-  } | null;
+    label: string;               // e.g. "15 min/day", or what is known when uncertain
+    minutesPerWeek: number | null;           // always null when uncertain
+    effort: 'low' | 'medium' | 'high' | null; // always null when uncertain
+    basis: 'stated' | 'calculated' | 'uncertain';
+  } | null;                      // null = takes no meaningful time
 }
 ```
 

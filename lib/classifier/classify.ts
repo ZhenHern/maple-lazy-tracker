@@ -65,6 +65,11 @@ function normalizeItems(items: TrackerItem[]): TrackerItem[] {
       ...item,
       id: count === 1 ? base : `${base}-${count}`,
       rewards: item.rewards.slice(0, MAX_REWARDS),
+      // An uncertain estimate must never carry a number, whatever the model sent.
+      timeEstimate:
+        item.timeEstimate?.basis === "uncertain"
+          ? { ...item.timeEstimate, minutesPerWeek: null, effort: null }
+          : item.timeEstimate,
     };
   });
 }
