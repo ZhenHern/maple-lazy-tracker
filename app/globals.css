@@ -25,8 +25,10 @@
 body {
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
-  background: linear-gradient(#4fb0f3, #a9defd 55%, #e3f6ff);
-  background-attachment: fixed;
+  /* The sky gradient is painted by .scenery, a fixed layer. Putting it here
+     with background-attachment: fixed repaints the whole page on every
+     scrolled frame, which is a classic cause of scroll stutter. */
+  background: #a9defd;
 }
 
 :focus-visible {
@@ -42,6 +44,7 @@ body {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  background: linear-gradient(#4fb0f3, #a9defd 55%, #e3f6ff);
   pointer-events: none;
 }
 
@@ -496,6 +499,9 @@ body {
 .quest-enter {
   animation: rise 260ms ease-out both;
   animation-delay: calc(var(--order) * 35ms);
+  /* Quests scrolled out of view skip layout and paint until they come back. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 6rem;
 }
 
 .quest {

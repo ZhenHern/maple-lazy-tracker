@@ -216,14 +216,17 @@ export async function ingest({
       report(summary, "failed", messageOf(error));
       continue;
     }
-    const stored = storedById.get(summary.sourceId) ?? null;
+    let stored = storedById.get(summary.sourceId) ?? null;
+    // Done for every stored post, not only up-to-date ones: a post waiting for
+    // quota should not also have to wait for better pictures.
+    if (stored && refreshImages) {
+      stored = { ...stored, items: await withImages(stored.items, scraped, iconPool) };
+      await writePost(stored);
+    }
     const plan = planJob(scraped, stored);
     if (plan) {
       jobs.push({ summary, scraped, stored, text: scraped.text, ...plan });
       continue;
-    }
-    if (stored && refreshImages) {
-      await writePost({ ...stored, items: await withImages(stored.items, scraped, iconPool) });
     }
     report(summary, "unchanged");
   }

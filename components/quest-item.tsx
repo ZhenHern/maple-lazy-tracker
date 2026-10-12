@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { isAnimated } from "@/lib/images";
 import type { Profile, Tier, TrackerItem } from "@/lib/types";
 import { Countdown, ENDING_SOON } from "./countdown";
 import { PixelSprite } from "./pixel-sprite";
@@ -83,6 +84,10 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
     ["Cosmetic", item.value.cosmetic],
   ];
   const [preview, ...gallery] = item.images;
+  // The small thumbnail in the list is never an animated GIF: dozens of them
+  // playing at once is what made scrolling stutter. GIFs only load once the
+  // quest is opened (a closed <details> does not render its contents).
+  const thumbnail = item.images.find((image) => !isAnimated(image));
   const icons = item.rewardImages.filter((icon) => icon !== null);
   const elapsed = elapsedPercent(item, now);
   const urgent =
@@ -94,9 +99,9 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
       <details className="quest group">
         <summary className="quest-head">
           <span className="quest-icon">
-            {preview ? (
+            {thumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={preview} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+              <img src={thumbnail} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
             ) : (
               <PixelSprite name="bulb" className="h-8" />
             )}

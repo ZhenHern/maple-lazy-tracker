@@ -3,6 +3,7 @@ import { planBatches } from "@/lib/classifier/batch";
 import { findDates, isGroundedDate } from "@/lib/classifier/dates";
 import { groundItems } from "@/lib/classifier/grounding";
 import { parseReply } from "@/lib/classifier/reply";
+import { pickImages } from "@/lib/images";
 import { eventPeriod, rulesClassify } from "@/lib/classifier/rules";
 import type { ScoredItem, ScrapedPost } from "@/lib/types";
 
@@ -232,5 +233,25 @@ describe("parseReply", () => {
     const [only] = parseReply(raw, [post()]).classified.get("45393")!.items;
     expect(only.id).toBe("winter-countdown");
     expect(only.timeEstimate?.minutesPerWeek).toBeNull();
+  });
+});
+
+describe("pickImages", () => {
+  const MB = 1_000_000;
+  const sizes = new Map([
+    ["icon.png", 2_000],
+    ["screenshot.png", 0.5 * MB],
+    ["poster.png", 5 * MB],
+    ["small.gif", 0.2 * MB],
+    ["huge.gif", 80 * MB],
+  ]);
+
+  it("leads with a reasonable still, puts GIFs last and drops huge ones", () => {
+    expect(pickImages([...sizes.keys()], sizes)).toEqual([
+      "screenshot.png",
+      "icon.png",
+      "poster.png",
+      "small.gif",
+    ]);
   });
 });

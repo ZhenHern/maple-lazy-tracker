@@ -52,8 +52,18 @@ export async function getOngoing(): Promise<OngoingTracker> {
     .sort(byPreference);
   const showImages = nexonImagesEnabled();
 
+  // Permanent content and system changes have no end date, so without a rule
+  // they would sit in the list for months. They are news of the current patch:
+  // once newer patch notes exist, the older patch's permanent items drop out.
+  const latestPatch = posts
+    .filter((post) => post.kind === "patch")
+    .map((post) => post.publishedAt)
+    .sort()
+    .at(-1);
+
   const kept: (StoredItem & { source: TrackerItem["source"] })[] = [];
   for (const post of posts) {
+    const superseded = post.kind === "patch" && post.publishedAt !== latestPatch;
     const source = {
       sourceId: post.sourceId,
       title: post.title,
@@ -62,7 +72,15 @@ export async function getOngoing(): Promise<OngoingTracker> {
     };
     for (const item of post.items) {
       if (item.endsAt !== null && Date.parse(item.endsAt) <= now) continue;
-      if (kept.some((existing) => sameTitle(existing.title, item.title))) continue;
+      if (item.endsAt === null && superseded) continue;
+      // A repeat is the same title in ANOTHER post (the patch notes and the
+      // event's own notice). Inside one post, "Operation: Dive" and
+      // "Operation: Dive Dungeon" are two activities and both stay.
+      const repeat = kept.some(
+        (existing) =>
+          existing.source.sourceId !== post.sourceId && sameTitle(existing.title, item.title),
+      );
+      if (repeat) continue;
       kept.push({
         ...(showImages ? item : stripImages(item)),
         // Item ids are unique per post only, so the post id is added.

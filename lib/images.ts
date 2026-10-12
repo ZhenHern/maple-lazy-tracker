@@ -44,15 +44,35 @@ export function sectionImages(
   return itemCount === 1 ? sections.flatMap((each) => each.images) : [];
 }
 
+/** Animated GIFs are the heavy ones: Nexon posts some of 10 to 90 MB. */
+export function isAnimated(url: string): boolean {
+  return url.toLowerCase().split("?")[0].endsWith(".gif");
+}
+
+// A still picture up to this size makes a good preview. Bigger ones are kept
+// but rank lower, because the preview is also the small thumbnail in the list.
+const PREVIEW_MAX_BYTES = 1_500_000;
+// A GIF above this is left out altogether: it costs too much data and CPU.
+const GIF_MAX_BYTES = 6_000_000;
+
 /**
- * Picks the pictures to show for an item, biggest file first. Sections often
- * open with a tiny item icon, so file size is a better guide than page order
- * to which picture is the screenshot worth using as the preview.
+ * Picks the pictures to show for an item. The first one is the preview.
+ *
+ * Still pictures come first, the largest reasonable file leading: sections
+ * often open with a tiny item icon, so file size is a better guide than page
+ * order to which picture is the screenshot. Animated GIFs come last, smallest
+ * first. A list of quests whose thumbnails are multi-megabyte GIFs makes the
+ * whole page stutter, because the browser keeps decoding every frame.
  */
 export function pickImages(candidates: string[], sizes: Map<string, number>): string[] {
-  return [...candidates]
-    .sort((a, b) => (sizes.get(b) ?? 0) - (sizes.get(a) ?? 0))
-    .slice(0, MAX_IMAGES_PER_ITEM);
+  const size = (url: string) => sizes.get(url) ?? 0;
+  const stills = candidates.filter((url) => !isAnimated(url));
+  const light = stills.filter((url) => size(url) <= PREVIEW_MAX_BYTES).sort((a, b) => size(b) - size(a));
+  const heavy = stills.filter((url) => size(url) > PREVIEW_MAX_BYTES).sort((a, b) => size(a) - size(b));
+  const gifs = candidates
+    .filter((url) => isAnimated(url) && size(url) <= GIF_MAX_BYTES)
+    .sort((a, b) => size(a) - size(b));
+  return [...light, ...heavy, ...gifs].slice(0, MAX_IMAGES_PER_ITEM);
 }
 
 // Words that appear in Nexon's icon filenames or reward text but say nothing

@@ -236,6 +236,15 @@ The home page shows everything running now in one list, so players do not open p
 - **Scores are stored, tiers are computed on read.** Gemini's 0-100 scores are saved as they are. `getOngoing()` ranks the combined ongoing list, so items from different posts compete for the same must-do slots. Ranking inside each post would crown the only item of every single-event notice.
 - **Duplicates.** The same event often appears in the patch notes and in its own notice. Items with matching titles are merged; the dedicated notice wins, then the newer post.
 - **Ended items** are dropped on the server at read time, and the client moves anything that expires while the page is open into an "Ended" section.
+- **Permanent items** (new content and system changes, which have no end date) are shown only for the latest patch notes. Once a newer patch is stored, the older patch's permanent items leave the home page; they stay in the archive.
+
+### What the prompt knows about progression
+
+The same reward is worth different amounts to different players, so the prompt (version 6) carries a short model of the game, built from current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
+
+### Picking pictures
+
+Still pictures come first and animated GIFs last; a GIF over 6 MB is left out. The small thumbnail in the list is never a GIF. Nexon posts GIFs of 10 to 90 MB, and using the largest file as the thumbnail (the first rule tried) made the page download about 140 MB and stutter while scrolling.
 
 ### Reward icons
 

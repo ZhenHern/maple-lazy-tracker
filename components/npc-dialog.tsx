@@ -21,7 +21,12 @@ function Typewriter({ text }: { text: string }) {
   useEffect(() => {
     const instant = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timer = window.setInterval(() => {
-      setShown((count) => Math.min(text.length, instant ? text.length : count + 2));
+      setShown((count) => {
+        const next = Math.min(text.length, instant ? text.length : count + 2);
+        // Stop ticking once the whole line is out, instead of 40 times a second forever.
+        if (next >= text.length) window.clearInterval(timer);
+        return next;
+      });
     }, 24);
     return () => window.clearInterval(timer);
   }, [text]);
