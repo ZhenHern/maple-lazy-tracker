@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const TIERS = ["must_do", "if_free", "skip"] as const;
 export const PROFILES = ["new", "casual", "endgame", "returning"] as const;
+export const PRIORITIES = ["progression", "limited", "cosmetic"] as const;
 export const MAX_ITEMS = 40;
 export const MAX_REWARDS = 5;
 
@@ -13,34 +14,51 @@ const isoDate = z
   .string()
   .refine((value) => !Number.isNaN(Date.parse(value)), "not a parseable date");
 
-export const trackerItemSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  summary: z.string().min(1),
-  tiers: z.object({
-    new: tier,
-    casual: tier,
-    endgame: tier,
-    returning: tier,
-  }),
-  rewards: z.array(z.string()),
-  startsAt: isoDate.nullable(),
-  endsAt: isoDate.nullable(),
-  timeEstimate: z
-    .object({
-      label: z.string().min(1),
-      effort: z.enum(["low", "medium", "high"]),
-    })
-    .nullable(),
-});
+// The item shape is the same for Gemini's reply and for what we store; only the
+// rating type differs (a 0-100 score from Gemini, a tier once calibrated).
+function itemSchema<Rating extends z.ZodType>(rating: Rating) {
+  return z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    category: z.enum(["event", "content", "system"]),
+    summary: z.string().min(1),
+    // One rating per reason a player might care. The player's chosen priorities
+    // decide which of these count (see lib/tiering.ts).
+    value: z.object({
+      progression: z.object({
+        new: rating,
+        casual: rating,
+        endgame: rating,
+        returning: rating,
+      }),
+      limited: rating,
+      cosmetic: rating,
+    }),
+    rewards: z.array(z.string()),
+    startsAt: isoDate.nullable(),
+    endsAt: isoDate.nullable(),
+    timeEstimate: z
+      .object({
+        label: z.string().min(1),
+        minutesPerWeek: z.number().nonnegative().nullable(),
+        effort: z.enum(["low", "medium", "high"]),
+        // How the estimate was reached, so the UI can show how far to trust it.
+        basis: z.enum(["stated", "player_note", "calculated", "rough"]),
+      })
+      .nullable(),
+  });
+}
+
+export const trackerItemSchema = itemSchema(tier);
+export const scoredItemSchema = itemSchema(z.number());
 
 export const classificationSchema = z.object({
-  items: z.array(trackerItemSchema).min(1),
+  items: z.array(scoredItemSchema).min(1),
 });
 
-// Gemini rejects this schema with a bare 400 when it carries string-length or
-// array-size keywords, so they are removed from the copy it receives. Zod still
-// checks minimums on the reply, and classify.ts trims arrays to their caps.
+// Gemini rejects this schema with a bare 400 when it carries string-length,
+// array-size or numeric-range keywords, so they are removed from the copy it
+// receives. Zod still checks them on the reply, and classify.ts trims arrays.
 export const geminiResponseSchema: Record<string, unknown> = z.toJSONSchema(
   classificationSchema,
   {
@@ -48,6 +66,7 @@ export const geminiResponseSchema: Record<string, unknown> = z.toJSONSchema(
       delete jsonSchema.minLength;
       delete jsonSchema.minItems;
       delete jsonSchema.maxItems;
+      delete jsonSchema.minimum;
     },
   },
 );

@@ -1,13 +1,17 @@
 import type { z } from "zod";
 import type {
+  PRIORITIES,
   PROFILES,
+  scoredItemSchema,
   TIERS,
   trackerItemSchema,
 } from "@/lib/classifier/schema";
 
 export type Tier = (typeof TIERS)[number];
 export type Profile = (typeof PROFILES)[number];
+export type Priority = (typeof PRIORITIES)[number];
 export type TrackerItem = z.infer<typeof trackerItemSchema>;
+export type ScoredItem = z.infer<typeof scoredItemSchema>;
 
 export type PostKind = "patch" | "event";
 

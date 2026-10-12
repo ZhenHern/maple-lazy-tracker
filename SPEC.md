@@ -11,6 +11,7 @@ Lazy Tracker tells Global MapleStory (GMS) players what in the latest patch is w
 | Topic | Decision |
 |---|---|
 | Tiering | 4 preset profiles: `new`, `casual`, `endgame`, `returning` |
+| Priorities | Players pick any of `progression`, `limited`, `cosmetic`; the tier shown is the best rating among those picked |
 | Refresh | Daily Vercel Cron; visitors only ever read cache |
 | Checklist | Tick-off saved in `localStorage`, no accounts |
 | Content | Major patch notes + standalone event notices + browsable archive |
@@ -66,7 +67,10 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 4. **Stable item IDs.** Checkboxes are keyed by item ID in the browser, so IDs must survive re-classification. On re-runs, the previous items (id + title) are passed to Gemini with an instruction to reuse IDs for the same item.
 5. **Supabase is server-only.** Row Level Security (Postgres rules for who can read which rows) is enabled with no public policies. Only server code using the service-role key touches the DB; the browser never gets a Supabase key.
 6. **Supabase over a key-value store.** A KV cache (Upstash, Vercel Blob) would be less setup, but the archive needs listing and sorting by date, which SQL does naturally. One table with a `jsonb` column keeps it close to "cached JSON".
-7. **Model name in an env var.** `GEMINI_MODEL` (a Flash-tier model) can be upgraded without a code change.
+7. **Model list in an env var.** `GEMINI_MODEL` is an ordered, comma-separated list. If a model is overloaded, rate limited or retired, the next is tried, and the row records which one answered.
+8. **Priorities are resolved in code, not by prompting per user.** Players pick what they care about: `progression`, `limited` items, `cosmetic` (any combination). Gemini rates every item once on all three axes (progression once per profile), and `resolveTier()` in `lib/tiering.ts` returns the best rating among the chosen priorities. Switching priorities is instant and costs no AI calls.
+9. **Gemini scores, code decides tiers.** Gemini returns a 0-100 score per axis. `lib/classifier/calibrate.ts` maps scores to tiers: `must_do` needs a score of 70+ and a place in the top quarter of the post for that axis; 35+ is `if_free`; the rest is `skip`. Models rank far more reliably than they follow "be strict", so this keeps `must_do` rare whichever model answers.
+10. **Time estimates carry their basis.** Posts describe mechanics, not duration, so each estimate records how it was reached: `stated`, `player_note`, `calculated` or `rough`. `lib/classifier/player-notes.ts` holds facts from experienced players (for example how long an event took on KMS/TMS/JMS) that are injected into the prompt and override the model's guess.
 
 ### Rules
 
@@ -74,6 +78,13 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 - Caching uses Next 16 Cache Components (on by default in new projects): data functions are marked `'use cache'` with `cacheLife('hours')` as a fallback to the explicit revalidation in step 5. This replaces the older `export const revalidate` page setting.
 - At most 3 posts are classified per cron run, to stay inside the function time limit. Any backlog drains on later runs.
 - If scraping, Gemini or validation fails, the row keeps its previous `items` and records `error`. Nothing live is ever replaced by a bad result.
+
+### Gemini free-tier limits (measured in Phase 1)
+
+- 5 requests per minute and 20 requests per day, per model. Failed requests count. The cron must stay well inside the daily figure, which the hash check and the 3-posts-per-run cap already ensure.
+- Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key. Until then, `player-notes.ts` fills that role by hand.
+- Gemini rejects the response schema with a bare 400 if it contains `minItems`/`maxItems`, so size and range limits are enforced in our code instead.
+- Full patch notes (about 45k tokens) can take over a minute, and the SDK retries five times with no timeout by default. We set a 120-second timeout and no SDK retries.
 
 ### Data source (resolved in Phase 1)
 
@@ -92,18 +103,31 @@ This API is undocumented and could change without notice, so every response is v
 ```ts
 type Tier = 'must_do' | 'if_free' | 'skip';
 type Profile = 'new' | 'casual' | 'endgame' | 'returning';
+type Priority = 'progression' | 'limited' | 'cosmetic';
 
 interface TrackerItem {
   id: string;                    // stable slug, e.g. "sunny-sunday-oct-18"
   title: string;
+  category: 'event' | 'content' | 'system';
   summary: string;               // one or two sentences
-  tiers: Record<Profile, Tier>;
+  value: {
+    progression: Record<Profile, Tier>;
+    limited: Tier;               // rewards that may never return
+    cosmetic: Tier;              // appearance and collection value
+  };
   rewards: string[];             // max 5 short strings
   startsAt: string | null;       // ISO 8601 UTC
   endsAt: string | null;         // ISO 8601 UTC, drives the countdown
-  timeEstimate: { label: string; effort: 'low' | 'medium' | 'high' } | null;
+  timeEstimate: {
+    label: string;               // e.g. "1-1.5 hr per run, 3 runs/week"
+    minutesPerWeek: number | null;
+    effort: 'low' | 'medium' | 'high';
+    basis: 'stated' | 'player_note' | 'calculated' | 'rough';
+  } | null;
 }
 ```
+
+Gemini returns the same shape with 0-100 scores in place of tiers; calibration converts them before anything is stored.
 
 ### Supabase table
 
@@ -132,6 +156,7 @@ alter table posts enable row level security;    -- no policies: service role onl
 | Key | Value |
 |---|---|
 | `lazy-tracker:profile` | `Profile` |
+| `lazy-tracker:priorities` | `Priority[]` (empty means all three count) |
 | `lazy-tracker:done:v1` | `{ "<source_id>:<item_id>": true }` |
 
 ### Environment variables

@@ -2,6 +2,7 @@ import "server-only";
 import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import type { ScrapedPost, TrackerItem } from "@/lib/types";
+import { calibrate } from "./calibrate";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
 import {
   classificationSchema,
@@ -10,7 +11,7 @@ import {
   MAX_REWARDS,
 } from "./schema";
 
-const DEFAULT_MODELS = "gemini-3.6-flash,gemini-3.5-flash-lite";
+const DEFAULT_MODELS = "gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash-lite";
 
 /** Models to try, in order. GEMINI_MODEL is a comma-separated list. */
 function geminiModels(): string[] {
@@ -56,7 +57,7 @@ function slugify(value: string): string {
 // Array caps are applied here because Gemini cannot be given them in the schema.
 function normalizeItems(items: TrackerItem[]): TrackerItem[] {
   const seen = new Map<string, number>();
-  return items.slice(0, MAX_ITEMS).map((item) => {
+  return items.map((item) => {
     const base = slugify(item.id);
     const count = (seen.get(base) ?? 0) + 1;
     seen.set(base, count);
@@ -98,7 +99,7 @@ function parseItems(raw: string, post: ScrapedPost): TrackerItem[] {
       `Gemini output failed validation for post ${post.sourceId}: ${z.prettifyError(parsed.error)}`,
     );
   }
-  return normalizeItems(parsed.data.items);
+  return normalizeItems(calibrate(parsed.data.items.slice(0, MAX_ITEMS)));
 }
 
 export async function classifyPost(
@@ -113,6 +114,7 @@ export async function classifyPost(
       if (!shouldTryNextModel(error)) throw error;
       const reason = error instanceof ApiError ? `HTTP ${error.status}` : String(error);
       failures.push(`${model}: ${reason}`);
+      console.warn(`[classify] ${model} failed for post ${post.sourceId}: ${reason}`);
       continue;
     }
     return { items: parseItems(raw, post), model };
