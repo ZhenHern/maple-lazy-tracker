@@ -1,24 +1,22 @@
 import "server-only";
 import { ApiError, GoogleGenAI } from "@google/genai";
-import { z } from "zod";
-import type { ScoredItem, ScrapedPost } from "@/lib/types";
+import type { ScrapedPost } from "@/lib/types";
+import { fallbackModels, primaryModels } from "./models";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
 import {
-  classificationSchema,
-  geminiResponseSchema,
-  MAX_ITEMS,
-  MAX_REWARDS,
-} from "./schema";
+  isAvailable,
+  parseRateLimit,
+  recordCall,
+  recordRateLimit,
+  waitBeforeCall,
+  type QuotaLedger,
+} from "./quota";
+import { parseReply, type PostClassification } from "./reply";
+import { geminiResponseSchema } from "./schema";
 
-const DEFAULT_MODELS = "gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash-lite";
-
-/** Models to try, in order. GEMINI_MODEL is a comma-separated list. */
-function geminiModels(): string[] {
-  return (process.env.GEMINI_MODEL || DEFAULT_MODELS)
-    .split(",")
-    .map((model) => model.trim())
-    .filter(Boolean);
-}
+// A per-minute refusal clears within a minute. Waiting that long for the good
+// model beats an instant answer from a weaker one.
+const MAX_RETRY_WAIT = 70_000;
 
 // Created on first use, so importing this file never fails when the key is missing.
 let client: GoogleGenAI | undefined;
@@ -28,7 +26,7 @@ function getClient(): GoogleGenAI {
     throw new Error("GEMINI_API_KEY is not set. Add it to .env.local (see .env.example).");
   }
   // The SDK defaults to 5 retries with no timeout, which can hang for minutes
-  // when a model is overloaded. Fail fast and move on to the next model instead.
+  // when a model is overloaded, and every retry spends quota. We retry ourselves.
   client ??= new GoogleGenAI({
     apiKey,
     httpOptions: { timeout: 120_000, retryOptions: { attempts: 1 } },
@@ -36,92 +34,121 @@ function getClient(): GoogleGenAI {
   return client;
 }
 
-// A bad request or a rejected key fails the same way on every model, so only
-// other failures (overloaded, rate limited, retired model, timeout) fall through.
-function shouldTryNextModel(error: unknown): boolean {
-  return !(error instanceof ApiError && [400, 401, 403].includes(error.status));
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function slugify(value: string): string {
-  return (
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 60) || "item"
-  );
-}
-
-// IDs must be clean and unique per post. Array caps are applied here because
-// Gemini cannot be given them in the schema.
-function normalizeItems(items: ScoredItem[]): ScoredItem[] {
-  const seen = new Map<string, number>();
-  return items.map((item) => {
-    const base = slugify(item.id);
-    const count = (seen.get(base) ?? 0) + 1;
-    seen.set(base, count);
-    return {
-      ...item,
-      id: count === 1 ? base : `${base}-${count}`,
-      rewards: item.rewards.slice(0, MAX_REWARDS),
-      // An uncertain estimate must never carry a number, whatever the model sent.
-      timeEstimate:
-        item.timeEstimate?.basis === "uncertain"
-          ? { ...item.timeEstimate, minutesPerWeek: null, effort: null }
-          : item.timeEstimate,
-    };
-  });
-}
-
-async function generate(model: string, post: ScrapedPost): Promise<string> {
+async function generate(model: string, posts: ScrapedPost[]): Promise<string> {
   const response = await getClient().models.generateContent({
     model,
-    contents: buildUserPrompt(post),
+    contents: buildUserPrompt(posts),
     config: {
       systemInstruction: SYSTEM_PROMPT,
       responseMimeType: "application/json",
       responseJsonSchema: geminiResponseSchema,
     },
   });
-  if (!response.text) {
-    throw new Error(`Gemini (${model}) returned no text for post ${post.sourceId}`);
-  }
+  if (!response.text) throw new Error(`Gemini (${model}) returned no text`);
   return response.text;
 }
 
-function parseItems(raw: string, post: ScrapedPost): ScoredItem[] {
-  let json: unknown;
-  try {
-    json = JSON.parse(raw);
-  } catch {
-    throw new Error(`Gemini returned invalid JSON for post ${post.sourceId}`);
-  }
-
-  const parsed = classificationSchema.safeParse(json);
-  if (!parsed.success) {
-    throw new Error(
-      `Gemini output failed validation for post ${post.sourceId}: ${z.prettifyError(parsed.error)}`,
-    );
-  }
-  return normalizeItems(parsed.data.items.slice(0, MAX_ITEMS));
+export interface BatchOutcome {
+  /** The model that answered, or null when none could be reached. */
+  model: string | null;
+  /** Posts that came back valid, by source id. */
+  classified: Map<string, PostClassification>;
+  /** Posts the model answered badly, by source id, with the reason. */
+  rejected: Map<string, string>;
+  /** Requests spent, including refused ones (they count against the quota). */
+  requests: number;
+  /** Why each model that was tried did not answer. */
+  failures: string[];
 }
 
-export async function classifyPost(
-  post: ScrapedPost,
-): Promise<{ items: ScoredItem[]; model: string }> {
-  const failures: string[] = [];
-  for (const model of geminiModels()) {
-    let raw: string;
-    try {
-      raw = await generate(model, post);
-    } catch (error) {
-      if (!shouldTryNextModel(error)) throw error;
-      const reason = error instanceof ApiError ? `HTTP ${error.status}` : String(error);
-      failures.push(`${model}: ${reason}`);
-      console.warn(`[classify] ${model} failed for post ${post.sourceId}: ${reason}`);
-      continue;
+export interface QuotaTracker {
+  ledger: QuotaLedger;
+  /** Persists the ledger. Called after every request, so a crash loses nothing. */
+  save: () => Promise<void>;
+}
+
+interface ClassifyOptions {
+  /** "primary": trusted models only. "fallback": the weaker backup models. */
+  tier: "primary" | "fallback";
+  quota: QuotaTracker;
+  /** Give up waiting (for rate limits) past this time, in ms. */
+  deadline: number;
+}
+
+/**
+ * Sends `posts` to Gemini in ONE request and returns each post's items.
+ *
+ * Models of the chosen tier are tried in order. A model the ledger knows to be
+ * out of quota is skipped without spending a request. A per-minute refusal is
+ * waited out and retried once on the same model; a per-day refusal moves on.
+ */
+export async function classifyBatch(
+  posts: ScrapedPost[],
+  { tier, quota, deadline }: ClassifyOptions,
+): Promise<BatchOutcome> {
+  const outcome: BatchOutcome = {
+    model: null,
+    classified: new Map(),
+    rejected: new Map(),
+    requests: 0,
+    failures: [],
+  };
+  const models = tier === "primary" ? primaryModels() : fallbackModels();
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      if (!isAvailable(quota.ledger, model, Date.now())) {
+        if (attempt === 0) outcome.failures.push(`${model}: out of quota (skipped, no request spent)`);
+        break;
+      }
+      const wait = waitBeforeCall(quota.ledger, model, Date.now());
+      if (Date.now() + wait > deadline) {
+        outcome.failures.push(`${model}: no time left to wait for the rate limit`);
+        return outcome;
+      }
+      if (wait > 0) await sleep(wait);
+
+      quota.ledger = recordCall(quota.ledger, model, Date.now());
+      outcome.requests += 1;
+      await quota.save();
+
+      let raw: string;
+      try {
+        raw = await generate(model, posts);
+      } catch (error) {
+        // A bad request or a rejected key fails the same way on every model.
+        if (error instanceof ApiError && [400, 401, 403].includes(error.status)) throw error;
+
+        if (error instanceof ApiError && error.status === 429) {
+          const limit = parseRateLimit(error.message);
+          quota.ledger = recordRateLimit(quota.ledger, model, limit, Date.now());
+          await quota.save();
+          outcome.failures.push(`${model}: rate limited (${limit.scope})`);
+          const canWait =
+            limit.scope === "minute" &&
+            attempt === 0 &&
+            limit.retryMs <= MAX_RETRY_WAIT &&
+            Date.now() + limit.retryMs < deadline;
+          if (canWait) {
+            await sleep(limit.retryMs + 500);
+            continue;
+          }
+          break;
+        }
+
+        // Overloaded, retired model or timeout: the next model may still answer.
+        const reason = error instanceof ApiError ? `HTTP ${error.status}` : String(error);
+        outcome.failures.push(`${model}: ${reason}`);
+        console.warn(`[classify] ${model} failed: ${reason}`);
+        break;
+      }
+
+      return { ...outcome, model, ...parseReply(raw, posts) };
     }
-    return { items: parseItems(raw, post), model };
   }
-  throw new Error(`Every Gemini model failed for post ${post.sourceId} (${failures.join("; ")})`);
+  return outcome;
 }

@@ -805,6 +805,13 @@ body {
   color: #17507f;
 }
 
+/* A rating that is not final yet (backup model, or no AI rating at all). */
+.chip-provisional {
+  border-color: #d9a514;
+  background: #fff3c9;
+  color: #7a5600;
+}
+
 .chip-urgent {
   border-color: #e2674a;
   background: #ffe1d6;

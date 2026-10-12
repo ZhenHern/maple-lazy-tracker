@@ -75,14 +75,32 @@ export const storedPostSchema = z.object({
   model: z.string(),
   promptVersion: z.number(),
   classifiedAt: z.string(),
+  // What the grounding checks corrected in the model's answer (see grounding.ts).
+  warnings: z.array(z.string()).default([]),
+  // The last failed attempt to refresh this post, or null when healthy. The
+  // items above are then the previous good version, still being served.
+  error: z.string().nullable().default(null),
 });
 
 // Kept only so the tier-valued item type can be derived from it.
 export const tieredItemSchema = itemSchema(tier);
 
+// One request can carry several posts, so the reply is grouped by post.
 export const classificationSchema = z.object({
-  items: z.array(scoredItemSchema).min(1),
+  posts: z.array(
+    z.object({
+      sourceId: z.string(),
+      items: z.array(scoredItemSchema),
+    }),
+  ),
 });
+
+// Used to read a reply post by post: one post with a bad item must not sink
+// the others that came back in the same request.
+export const replyEnvelopeSchema = z.object({
+  posts: z.array(z.object({ sourceId: z.string(), items: z.unknown() })),
+});
+export const replyItemsSchema = z.array(scoredItemSchema).min(1);
 
 // Gemini rejects this schema with a bare 400 when it carries string-length,
 // array-size or numeric-range keywords, so they are removed from the copy it

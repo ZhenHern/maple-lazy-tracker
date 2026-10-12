@@ -1,12 +1,15 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { ingest } from "@/lib/ingest";
+import { POSTS_TAG } from "@/lib/tracker";
 
 // Classifying several posts can take a few minutes when models are busy.
 export const maxDuration = 300;
 
-// Local development only. GET /api/dev/ingest?limit=<posts to classify, default 2>
+// Local development only. GET /api/dev/ingest?limit=<Gemini requests to spend, default 2>
+// One request carries several posts, so a small limit goes a long way.
 // Add &images to re-match pictures on unchanged posts (no Gemini calls).
-// Phase 2 turns this into the secured cron endpoint.
+// The scheduled, secured version is app/api/cron/ingest/route.ts.
 export async function GET(request: NextRequest) {
   if (process.env.NODE_ENV === "production") {
     return new NextResponse(null, { status: 404 });
@@ -19,7 +22,10 @@ export async function GET(request: NextRequest) {
 
   try {
     const refreshImages = request.nextUrl.searchParams.has("images");
-    return NextResponse.json({ results: await ingest(limit, refreshImages) });
+    const report = await ingest({ maxRequests: limit, refreshImages });
+    // Tell Next.js the cached list is out of date, so the next visit rebuilds it.
+    revalidateTag(POSTS_TAG, "max");
+    return NextResponse.json(report);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });

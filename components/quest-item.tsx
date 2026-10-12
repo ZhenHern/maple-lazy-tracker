@@ -19,6 +19,18 @@ const TIER_STARS: Record<Tier, number> = { must_do: 3, if_free: 2, skip: 1 };
 
 const EFFORT_LABEL = { low: "Low effort", medium: "Medium effort", high: "High effort" };
 
+// Shown when an item's rating is not from a trusted model (see lib/classifier/models.ts).
+const RATING_NOTE = {
+  backup: {
+    chip: "Rough rating",
+    text: "Rated by a backup AI model because today's quota ran out. It will be re-rated automatically.",
+  },
+  unrated: {
+    chip: "Not rated yet",
+    text: "Listed without an AI rating because today's quota ran out. It will be rated automatically.",
+  },
+};
+
 interface QuestItemProps {
   item: TrackerItem;
   profile: Profile;
@@ -75,6 +87,7 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
   const elapsed = elapsedPercent(item, now);
   const urgent =
     now !== null && item.endsAt !== null && Date.parse(item.endsAt) - now < ENDING_SOON;
+  const ratingNote = item.source.rating === "ai" ? null : RATING_NOTE[item.source.rating];
 
   return (
     <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
@@ -93,6 +106,11 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <h3 className="quest-title">{item.title}</h3>
               <Countdown endsAt={item.endsAt} now={now} />
+              {ratingNote && (
+                <span className="chip chip-provisional" title={ratingNote.text}>
+                  {ratingNote.chip}
+                </span>
+              )}
             </div>
             <span className="line-clamp-2 text-sm text-ink-soft group-open:hidden">
               {item.summary}
@@ -196,6 +214,8 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
               </li>
             ))}
           </ul>
+
+          {ratingNote && <p className="text-xs font-bold text-ink-soft">{ratingNote.text}</p>}
 
           <p className="text-xs text-ink-soft">
             From{" "}

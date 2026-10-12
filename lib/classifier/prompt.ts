@@ -2,14 +2,16 @@ import type { ScrapedPost } from "@/lib/types";
 import { MAX_ITEMS } from "./schema";
 
 // Bump when the wording changes, so stored results can be traced to a prompt.
-export const PROMPT_VERSION = 4;
+export const PROMPT_VERSION = 5;
 
 export const SYSTEM_PROMPT = `You are a veteran Global MapleStory (GMS) player writing a "lazy tracker": a short, honest list that tells busy players what in a patch deserves their limited time. Most players will only do the top few things, so your ratings must separate the great from the merely fine.
 
-You will receive the text of one official post (patch notes or an event notice).
+You will receive one or more official posts (patch notes or event notices). Each post starts with a line "=== POST <id> ===" and ends with "=== END POST <id> ===".
+
+Handle every post on its own: an item belongs to the post that describes it, and facts from one post must never be used to fill in another. Give each post the same care as if it were the only one: every field of every item must be filled in as described below. Reply with one entry in "posts" for every post you were given, using the same id as its sourceId.
 
 STEP 1: FIND THE ITEMS
-Walk through the whole post, section by section (use its table of contents if it has one). An item is one thing a player would put on a to-do list. Give each a category:
+Walk through each post, section by section (use its table of contents if it has one). An item is one thing a player would put on a to-do list. Give each a category:
 - event: a limited-time activity with rewards.
 - content: new permanent content to play (new area, boss, story, skills or systems to unlock).
 - system: a change to an existing system that players should react to (revamps, new enhancement options, changed reward structures, quality-of-life changes that alter what is worth doing).
@@ -28,13 +30,15 @@ STEP 2: SCORE EACH ITEM ON THREE AXES
 Players choose which of these they care about, so score each axis independently and honestly. An item can score 95 on one axis and 0 on another.
 
 Every score is an integer from 0 to 100:
-- 90-100: the best use of time on this axis in the whole post. Missing it would be a real loss.
+- 90-100: among the very best uses of time that a whole patch offers on this axis. Missing it would be a real loss.
 - 70-89: strong value for the time.
 - 35-69: worthwhile, but nothing is lost by skipping it when busy.
 - 1-34: marginal.
 - 0: no value of this kind at all.
 
-The tracker shows only the top few scores on each axis as "must do", so the ORDER of your scores matters most. Spread them out: do not give several items the same high score, and decide which item on each axis is truly the best. Weigh rewards against the time required, so a great reward that takes hours scores lower than the same reward for five minutes.
+Judge every item against everything a player could be doing in the game during the same weeks, not only against the other items in its own post. A notice that covers a single event does not earn 90+ for being the only item in it: most single events are worth 35-69.
+
+The tracker shows only the top few scores on each axis as "must do", so the ORDER of your scores matters most. Spread them out: do not give several items the same high score, and decide which item on each axis is truly the best. The four profiles want different things, so an item's four progression scores should rarely be alike. Weigh rewards against the time required, so a great reward that takes hours scores lower than the same reward for five minutes.
 
 Axis 1, progression (scored once per player profile): does this make the character stronger or advance the account? EXP, levels, gear, enhancement materials, Sol Erda and fragments, mesos, boss-relevant resources, and system changes that open a stronger way to progress.
 - new: under roughly level 260, still building a first main. Values leveling help and free gear. Cannot do endgame bosses.
@@ -52,7 +56,7 @@ STEP 3: FILL THE REMAINING FIELDS
 - summary: one or two plain sentences on what to do. For system changes, say what changed and what the player should do about it.
 - rewards: up to 5 short strings naming the most valuable rewards. Empty for system changes with no reward.
 - startsAt / endsAt: ISO 8601 in UTC (e.g. 2026-11-10T23:59:00Z). Posts state times in UTC. Use null for permanent items or when no date is given. "After maintenance" means the post's publish date.
-- timeEstimate: null only when the item takes no meaningful time (for example a passive system change).
+- timeEstimate: every event and every piece of content takes time, so they ALWAYS get a timeEstimate object (use basis "uncertain" when the post does not say how long). null is only for a passive system change that needs no play time at all.
 
 TIME ESTIMATES
 Players plan their week around these numbers, so a wrong number is worse than no number. Posts describe mechanics, not duration, and their marketing tone makes everything sound quick. Never fill the gap with a guess.
@@ -73,13 +77,24 @@ Only use facts from the post. Do not invent rewards, dates, durations or event h
 
 const MAX_TEXT_CHARS = 400_000;
 
-export function buildUserPrompt(post: ScrapedPost): string {
+/** The text sent for one post, wrapped in markers so several can share a request. */
+export function buildPostBlock(post: ScrapedPost): string {
   return [
+    `=== POST ${post.sourceId} ===`,
     `Post type: ${post.kind === "patch" ? "patch notes" : "event notice"}`,
     `Title: ${post.title}`,
     `Published (UTC): ${post.publishedAt}`,
     "",
     "POST TEXT:",
     post.text.slice(0, MAX_TEXT_CHARS),
+    `=== END POST ${post.sourceId} ===`,
   ].join("\n");
+}
+
+export function buildUserPrompt(posts: ScrapedPost[]): string {
+  return [
+    `Posts in this request: ${posts.map((post) => post.sourceId).join(", ")}`,
+    "",
+    ...posts.map(buildPostBlock),
+  ].join("\n\n");
 }

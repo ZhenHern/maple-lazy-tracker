@@ -1,56 +1,45 @@
 import "server-only";
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { storedPostSchema } from "@/lib/classifier/schema";
 import type { StoredPost } from "@/lib/types";
+import { fileStore, readPostsFrom } from "./file-store";
+import { supabaseStore } from "./supabase-store";
 
-// Local stand-in for the Supabase `posts` table: one JSON file per post.
-// It cannot work on Vercel, whose file system is read-only, so Phase 2 replaces
-// the bodies of these functions with Supabase queries. Callers do not change.
-const STORE_DIR = path.join(process.cwd(), ".data", "posts");
-// Committed sample data, used when nothing has been ingested on this machine.
+/**
+ * Where classified posts are kept. Two implementations share this shape, so
+ * the rest of the app never knows which one it is talking to (the same idea as
+ * a Spring `Repository` interface with two beans behind it).
+ */
+export interface PostStore {
+  name: "file" | "supabase";
+  readAllPosts(): Promise<StoredPost[]>;
+  readPost(sourceId: string): Promise<StoredPost | null>;
+  writePost(post: StoredPost): Promise<void>;
+  /** Notes a failed refresh on a post without touching its items. */
+  recordError(sourceId: string, message: string): Promise<void>;
+  /** Small named JSON values, such as the Gemini quota ledger. */
+  readMeta(key: string): Promise<unknown>;
+  writeMeta(key: string, value: unknown): Promise<void>;
+}
+
+// Committed sample data, shown when nothing has been ingested yet.
 const SEED_DIR = path.join(process.cwd(), "data", "seed");
 
-async function readDir(dir: string): Promise<StoredPost[]> {
-  let files: string[];
-  try {
-    files = (await readdir(dir)).filter((file) => file.endsWith(".json"));
-  } catch {
-    return [];
-  }
-  const posts = await Promise.all(
-    files.map(async (file) => {
-      try {
-        // Files on disk are untrusted input like any other, so they are validated.
-        const parsed = storedPostSchema.safeParse(
-          JSON.parse(await readFile(path.join(dir, file), "utf8")),
-        );
-        return parsed.success ? parsed.data : null;
-      } catch {
-        return null;
-      }
-    }),
-  );
-  return posts.filter((post) => post !== null);
+/** Supabase when it is configured, otherwise JSON files under .data/. */
+export function getStore(): PostStore {
+  return process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? supabaseStore
+    : fileStore;
 }
 
 /** Every stored post. Falls back to the committed seed data when the store is empty. */
 export async function readAllPosts(): Promise<StoredPost[]> {
-  const stored = await readDir(STORE_DIR);
-  return stored.length > 0 ? stored : readDir(SEED_DIR);
+  const stored = await getStore().readAllPosts();
+  return stored.length > 0 ? stored : readPostsFrom(SEED_DIR);
 }
 
-export async function readPost(sourceId: string): Promise<StoredPost | null> {
-  return (await readDir(STORE_DIR)).find((post) => post.sourceId === sourceId) ?? null;
-}
-
-export async function writePost(post: StoredPost): Promise<void> {
+export function writePost(post: StoredPost): Promise<void> {
   if (!/^\d+$/.test(post.sourceId)) {
     throw new Error(`Refusing to store a post with a non-numeric id: ${post.sourceId}`);
   }
-  await mkdir(STORE_DIR, { recursive: true });
-  await writeFile(
-    path.join(STORE_DIR, `${post.sourceId}.json`),
-    `${JSON.stringify(post, null, 2)}\n`,
-  );
+  return getStore().writePost(post);
 }

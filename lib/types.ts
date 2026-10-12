@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import type { Rating } from "@/lib/classifier/models";
 import type {
   PRIORITIES,
   PROFILES,
@@ -9,6 +10,7 @@ import type {
   TIERS,
 } from "@/lib/classifier/schema";
 
+export type { Rating };
 export type Tier = (typeof TIERS)[number];
 export type Profile = (typeof PROFILES)[number];
 export type Priority = (typeof PRIORITIES)[number];
@@ -19,11 +21,16 @@ export type ScoredItem = z.infer<typeof scoredItemSchema>;
 export type StoredItem = z.infer<typeof storedItemSchema>;
 export type StoredPost = z.infer<typeof storedPostSchema>;
 
-/** Which official post an item came from. */
+/** Which official post an item came from, and how far its rating can be trusted. */
 export interface ItemSource {
   sourceId: string;
   title: string;
   url: string;
+  /**
+   * "ai": rated by a trusted model. "backup": rated by a weaker model while the
+   * quota was used up, to be redone. "unrated": listed with no AI rating yet.
+   */
+  rating: Rating;
 }
 
 /** What the UI shows: scores resolved to tiers, plus where the item came from. */
