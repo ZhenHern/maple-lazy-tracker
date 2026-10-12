@@ -128,13 +128,15 @@ export async function classifyBatch(
           quota.ledger = recordRateLimit(quota.ledger, model, limit, Date.now());
           await quota.save();
           outcome.failures.push(`${model}: rate limited (${limit.scope})`);
+          // With no wait given, a per-minute limit is clear after a minute.
+          const waitMs = limit.retryMs ?? 60_000;
           const canWait =
             limit.scope === "minute" &&
             attempt === 0 &&
-            limit.retryMs <= MAX_RETRY_WAIT &&
-            Date.now() + limit.retryMs < deadline;
+            waitMs <= MAX_RETRY_WAIT &&
+            Date.now() + waitMs < deadline;
           if (canWait) {
-            await sleep(limit.retryMs + 500);
+            await sleep(waitMs + 500);
             continue;
           }
           break;

@@ -34,7 +34,7 @@ Profiles:
 Stack: Next.js App Router + TypeScript on Vercel, Supabase (Postgres) for cache, Gemini via `@google/genai`, Tailwind for styling.
 
 ```
-Vercel Cron (daily, 08:30 UTC, just after Gemini's quota resets)
+Vercel Cron (daily, 00:30 UTC, just after Gemini's quota returns)
    └─> GET /api/cron/ingest        (checks Authorization: Bearer CRON_SECRET)
          1. scraper   list recent posts, fetch body, HTML -> clean text, hash
          2. plan      queue posts that are new, changed, or only provisionally rated
@@ -124,7 +124,7 @@ The patch notes carry a preview and reward pictures under each event's heading. 
 
 ### Gemini free-tier limits (measured in Phase 1)
 
-- 5 requests per minute and 20 requests per day, per model. Failed requests count. The daily quota resets at midnight Pacific time (07:00 or 08:00 UTC), which is why the cron runs at 08:30 UTC. The hash check, batching and the 3-requests-per-run cap keep the cron far inside the daily figure; development re-runs are what exhaust it.
+- 5 requests per minute and 20 requests per day, per model. Failed requests count. The daily quota came back at about 00:00 UTC when measured on 2026-10-12 (Google's refusal said "retry in 32779s" at 14:54 UTC), not at midnight Pacific as first assumed, so the cron runs at 00:30 UTC. The ledger never relies on that time: it blocks a refused model for exactly as long as the refusal asks. The hash check, batching and the 3-requests-per-run cap keep the cron far inside the daily figure; development re-runs are what exhaust it.
 - Three short event notices in one request came back in about 5 seconds with every post answered (measured against `flash-lite`).
 - Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key.
 - Gemini rejects the response schema with a bare 400 if it contains `minItems`/`maxItems`, so size and range limits are enforced in our code instead.

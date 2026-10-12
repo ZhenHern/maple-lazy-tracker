@@ -25,7 +25,7 @@ Each post gets a status:
 | `deferred` | Waiting: the request limit was reached, or no trusted model has quota left today |
 | `failed` | An error. The previous version, if any, stays live |
 
-The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day, resetting at midnight Pacific time. The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
+The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day. A refused model is left alone until the time Google's refusal names (about 00:00 UTC when measured). The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
 
 ## Useful URLs
 

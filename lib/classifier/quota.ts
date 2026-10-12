@@ -1,19 +1,26 @@
 import { z } from "zod";
 
 // Gemini's free tier allows a few requests per minute and a small number per
-// day, per model, and FAILED requests count too. This ledger remembers what we
-// have spent and which models have told us to stop, so a run never wastes a
+// day, per model, and FAILED requests count too. This ledger remembers which
+// models have told us to stop and for how long, so a run never wastes a
 // request on a model that is certain to refuse it.
+//
+// The rule it follows was learned the hard way: trust what Google says, not
+// what we assume. An earlier version assumed the daily quota returned at
+// midnight Pacific time and blocked models until then. Google's own refusal
+// said otherwise (its "retry in" pointed at about 00:00 UTC), so the ledger
+// now blocks a model for exactly as long as the refusal asks.
 //
 // Everything here is pure (no I/O): the caller loads and saves the ledger.
 
 const DEFAULT_DAILY_LIMIT = 20;
 const DEFAULT_PER_MINUTE = 5;
 const MINUTE = 60_000;
-const DAY = 86_400_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 const usageSchema = z.object({
-  /** The quota day (Pacific date) that `used` belongs to. */
+  /** The UTC date that `used` belongs to. */
   day: z.string(),
   used: z.number(),
   /** Do not call this model before this time (ISO), or null. */
@@ -33,6 +40,7 @@ function positiveInt(value: string | undefined, fallback: number): number {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+/** The documented daily limit. Shown in reports; it does not block anything. */
 export function dailyLimit(): number {
   return positiveInt(process.env.GEMINI_DAILY_LIMIT, DEFAULT_DAILY_LIMIT);
 }
@@ -43,51 +51,29 @@ export function minGapMs(): number {
   return Math.ceil(MINUTE / perMinute) + 500;
 }
 
-// Google resets daily quotas at midnight Pacific time, not UTC.
-const pacificParts = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Los_Angeles",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hourCycle: "h23",
-});
-
-function pacific(now: number): Record<string, string> {
-  return Object.fromEntries(
-    pacificParts.formatToParts(new Date(now)).map((part) => [part.type, part.value]),
-  );
-}
-
-/** The quota day `now` falls in, as YYYY-MM-DD in Pacific time. */
+/** The day `now` falls in, as YYYY-MM-DD in UTC. Used only to label the count. */
 export function quotaDay(now: number): string {
-  const { year, month, day } = pacific(now);
-  return `${year}-${month}-${day}`;
-}
-
-/** When the daily quota next resets (the coming Pacific midnight), in ms. */
-export function nextQuotaReset(now: number): number {
-  const { hour, minute, second } = pacific(now);
-  const elapsed = (Number(hour) * 60 + Number(minute)) * MINUTE + Number(second) * 1000;
-  return now + (DAY - elapsed);
+  return new Date(now).toISOString().slice(0, 10);
 }
 
 function usage(ledger: QuotaLedger, model: string, now: number) {
   const today = quotaDay(now);
   const entry = ledger.models[model];
-  // A new quota day wipes the count and any block carried over from yesterday.
-  if (!entry || entry.day !== today) {
-    return { day: today, used: 0, blockedUntil: null, lastCallAt: entry?.lastCallAt ?? null };
-  }
-  return entry;
+  if (!entry) return { day: today, used: 0, blockedUntil: null, lastCallAt: null };
+  // A new day restarts the count. A block is NOT cleared here: it ends when
+  // the time Google gave has passed, whatever the date.
+  return entry.day === today ? entry : { ...entry, day: today, used: 0 };
 }
 
-/** True when a call to `model` right now has a chance of being accepted. */
+/**
+ * True when a call to `model` right now has a chance of being accepted.
+ *
+ * Only a refusal from Google blocks a model. Our own count of requests does
+ * not: the real quota is not a counter we can mirror exactly, so the count is
+ * kept for the report and nothing else.
+ */
 export function isAvailable(ledger: QuotaLedger, model: string, now: number): boolean {
   const entry = usage(ledger, model, now);
-  if (entry.used >= dailyLimit()) return false;
   return entry.blockedUntil === null || Date.parse(entry.blockedUntil) <= now;
 }
 
@@ -111,7 +97,8 @@ export function recordCall(ledger: QuotaLedger, model: string, now: number): Quo
 export interface RateLimit {
   /** "day": the daily quota is gone. "minute": too fast, wait and retry. */
   scope: "day" | "minute";
-  retryMs: number;
+  /** How long Google asked us to wait, or null when it did not say. */
+  retryMs: number | null;
 }
 
 /** Notes that `model` refused a request, so later calls skip it until it recovers. */
@@ -122,15 +109,15 @@ export function recordRateLimit(
   now: number,
 ): QuotaLedger {
   const entry = usage(ledger, model, now);
-  const until = limit.scope === "day" ? nextQuotaReset(now) : now + limit.retryMs;
+  // Google's own "retry in" is the best information there is. Without one, a
+  // per-day refusal is rechecked after an hour and a per-minute one after a
+  // minute. Nothing is ever blocked for more than a day.
+  const fallback = limit.scope === "day" ? HOUR : MINUTE;
+  const wait = Math.min(limit.retryMs ?? fallback, DAY);
   return {
     models: {
       ...ledger.models,
-      [model]: {
-        ...entry,
-        used: limit.scope === "day" ? Math.max(entry.used, dailyLimit()) : entry.used,
-        blockedUntil: new Date(until).toISOString(),
-      },
+      [model]: { ...entry, blockedUntil: new Date(now + wait).toISOString() },
     },
   };
 }
@@ -143,11 +130,11 @@ export function recordRateLimit(
  */
 export function parseRateLimit(message: string): RateLimit {
   const delay = /"retryDelay"\s*:\s*"([\d.]+)s"/.exec(message);
-  const retryMs = delay ? Math.ceil(Number(delay[1]) * 1000) : MINUTE;
+  const retryMs = delay ? Math.ceil(Number(delay[1]) * 1000) : null;
   if (/PerDay/i.test(message)) return { scope: "day", retryMs };
   if (/PerMinute/i.test(message)) return { scope: "minute", retryMs };
   // With no quota id at all, a long wait means the daily quota.
-  return { scope: retryMs > 2 * MINUTE ? "day" : "minute", retryMs };
+  return { scope: retryMs !== null && retryMs > 2 * MINUTE ? "day" : "minute", retryMs };
 }
 
 /** A one-line summary for logs and the ingest report. */
@@ -155,8 +142,10 @@ export function describeLedger(ledger: QuotaLedger, models: string[], now: numbe
   return models
     .map((model) => {
       const entry = usage(ledger, model, now);
-      const state = isAvailable(ledger, model, now) ? "ok" : "blocked";
-      return `${model} ${entry.used}/${dailyLimit()} ${state}`;
+      const state = isAvailable(ledger, model, now)
+        ? "ok"
+        : `refused, retry after ${entry.blockedUntil?.slice(0, 16).replace("T", " ")} UTC`;
+      return `${model}: ${entry.used} used today (limit about ${dailyLimit()}), ${state}`;
     })
-    .join(", ");
+    .join("; ");
 }
