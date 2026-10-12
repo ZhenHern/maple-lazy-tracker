@@ -71,13 +71,19 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 ### Rules
 
 - `GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `CRON_SECRET` are server-only. None use the `NEXT_PUBLIC_` prefix.
-- Pages use ISR (Incremental Static Regeneration: pages are cached as static HTML and rebuilt on demand) with `revalidate = 3600` as a fallback to the explicit revalidation in step 5.
+- Caching uses Next 16 Cache Components (on by default in new projects): data functions are marked `'use cache'` with `cacheLife('hours')` as a fallback to the explicit revalidation in step 5. This replaces the older `export const revalidate` page setting.
 - At most 3 posts are classified per cron run, to stay inside the function time limit. Any backlog drains on later runs.
 - If scraping, Gemini or validation fails, the row keeps its previous `items` and records `error`. Nothing live is ever replaced by a bad result.
 
-### Open question (resolve first in Phase 1)
+### Data source (resolved in Phase 1)
 
-The Nexon news site is rendered client-side, so fetching the page HTML will likely return an empty shell. Inspect the browser network tab for the JSON endpoint the site itself calls and scrape that instead. The fallback is a headless browser, which is much heavier to run on Vercel.
+The Nexon news site is a client-rendered shell, so we read the public JSON API it calls instead of scraping HTML pages:
+
+- List: `https://g.nexonstatic.com/maplestory/cms/v1/news` returns every post with `id`, `name`, `category`, `liveDate`, `isMSCW`.
+- Detail: `.../news/{id}` adds an HTML `body`, which is converted to plain text before it goes to Gemini (about 75% smaller).
+- Tracked posts: `category: "update"` with "Patch Notes" in the title is a patch; `category: "events"` is an event. Posts with `isMSCW: true` (Classic World) are ignored.
+
+This API is undocumented and could change without notice, so every response is validated with Zod.
 
 ## 4. Data schema
 

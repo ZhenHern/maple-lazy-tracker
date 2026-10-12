@@ -1,69 +1,102 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import { PROFILES } from "@/lib/classifier/schema";
+import { getClassifiedPost } from "@/lib/pipeline";
+import { listTrackedPosts } from "@/lib/scraper/nexon";
+import type { ClassifiedPost, PostSummary } from "@/lib/types";
 
-export default function Home() {
+// Phase 1 preview: plain markup on purpose. The quest-log UI arrives in Phase 3.
+export default function Home(props: PageProps<"/">) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="mx-auto w-full max-w-6xl p-6">
+      <h1 className="text-2xl font-bold">Lazy Tracker</h1>
+      <p className="mb-6 text-sm">Phase 1 preview: scrape, classify, show raw results.</p>
+      <Suspense fallback={<p>Reading the patch notes. The first load can take a minute.</p>}>
+        <Preview searchParams={props.searchParams} />
+      </Suspense>
+    </main>
+  );
+}
+
+type LoadResult =
+  | { ok: true; post: ClassifiedPost; recent: PostSummary[] }
+  | { ok: false; message: string };
+
+async function load(id: string | undefined): Promise<LoadResult> {
+  try {
+    const [post, tracked] = await Promise.all([getClassifiedPost(id), listTrackedPosts()]);
+    return { ok: true, post, recent: tracked.slice(0, 12) };
+  } catch (error) {
+    return { ok: false, message: error instanceof Error ? error.message : "Unknown error" };
+  }
+}
+
+function formatDate(iso: string | null): string {
+  return iso ? new Date(iso).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "-";
+}
+
+async function Preview({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
+  const { id } = await searchParams;
+  const result = await load(typeof id === "string" && /^\d+$/.test(id) ? id : undefined);
+
+  if (!result.ok) {
+    return <p role="alert">Could not load the tracker: {result.message}</p>;
+  }
+  const { post, recent } = result;
+
+  return (
+    <>
+      <h2 className="text-xl font-semibold">{post.title}</h2>
+      <p className="mb-4 text-sm">
+        {post.kind} · published {formatDate(post.publishedAt)} · {post.items.length} items ·{" "}
+        {post.model} · <a href={post.url}>source</a>
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b">
+              <th className="p-2">Item</th>
+              {PROFILES.map((profile) => (
+                <th key={profile} className="p-2">
+                  {profile}
+                </th>
+              ))}
+              <th className="p-2">Ends</th>
+              <th className="p-2">Rewards</th>
+              <th className="p-2">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {post.items.map((item) => (
+              <tr key={item.id} className="border-b align-top">
+                <td className="p-2">
+                  <strong>{item.title}</strong>
+                  <br />
+                  {item.summary}
+                </td>
+                {PROFILES.map((profile) => (
+                  <td key={profile} className="p-2 whitespace-nowrap">
+                    {item.tiers[profile]}
+                  </td>
+                ))}
+                <td className="p-2 whitespace-nowrap">{formatDate(item.endsAt)}</td>
+                <td className="p-2">{item.rewards.join(", ") || "-"}</td>
+                <td className="p-2">{item.timeEstimate?.label ?? "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mt-8 text-xl font-semibold">Other recent posts</h2>
+      <ul className="list-disc pl-6 text-sm">
+        {recent.map((summary) => (
+          <li key={summary.sourceId}>
+            <Link href={`/?id=${summary.sourceId}`}>{summary.title}</Link> ({summary.kind})
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
