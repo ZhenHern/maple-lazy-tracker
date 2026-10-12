@@ -68,6 +68,7 @@ export async function getOngoing(): Promise<OngoingTracker> {
       sourceId: post.sourceId,
       title: post.title,
       url: post.url,
+      publishedAt: post.publishedAt,
       rating: ratingOf(post.model),
     };
     for (const item of post.items) {
@@ -162,7 +163,13 @@ export async function getArchivedPost(sourceId: string): Promise<ArchivedPost | 
   const now = Date.now();
   const showImages = nexonImagesEnabled();
   const rating = ratingOf(stored.model);
-  const source = { sourceId: stored.sourceId, title: stored.title, url: stored.url, rating };
+  const source = {
+    sourceId: stored.sourceId,
+    title: stored.title,
+    url: stored.url,
+    publishedAt: stored.publishedAt,
+    rating,
+  };
   return {
     post: {
       ...toSummary(stored, showImages),

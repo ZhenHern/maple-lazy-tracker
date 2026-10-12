@@ -22,6 +22,9 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     title: z.string().min(1),
     category: z.enum(["event", "content", "system"]),
     summary: z.string().min(1),
+    // One sentence on who should bother and why. Shown on the card so a
+    // player can judge the rating instead of taking it on trust.
+    why: z.string(),
     // One rating per reason a player might care. The player's chosen priorities
     // decide which of these count (see lib/tiering.ts).
     value: z.object({
@@ -58,6 +61,8 @@ export const scoredItemSchema = itemSchema(z.number());
 // turned into tiers at read time, so items from different posts are ranked
 // against each other.
 export const storedItemSchema = scoredItemSchema.extend({
+  // Posts classified before this field existed have none.
+  why: z.string().default(""),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

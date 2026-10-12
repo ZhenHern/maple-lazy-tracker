@@ -103,6 +103,7 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         title: "An item",
         category: "event",
         summary: "Do it.",
+        why: "",
         value: {
           progression: { new: 1, casual: 2, endgame: 3, returning: 4 },
           limited: 5,

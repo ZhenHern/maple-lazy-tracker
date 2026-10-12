@@ -26,6 +26,8 @@ export interface ItemSource {
   sourceId: string;
   title: string;
   url: string;
+  /** When the post went live. Lets the page mark quests that are new to a visitor. */
+  publishedAt: string;
   /**
    * "ai": rated by a trusted model. "backup": rated by a weaker model while the
    * quota was used up, to be redone. "unrated": listed with no AI rating yet.

@@ -37,6 +37,7 @@ function item(overrides: Partial<ScoredItem> = {}): ScoredItem {
     title: "Winter Countdown",
     category: "event",
     summary: "Log in daily.",
+    why: "A potion a day for one minute.",
     value: {
       progression: { new: 80, casual: 70, endgame: 40, returning: 85 },
       limited: 10,

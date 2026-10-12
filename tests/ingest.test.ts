@@ -56,6 +56,7 @@ function scored(title: string): ScoredItem {
     title,
     category: "event",
     summary: "Do the thing.",
+    why: "",
     value: {
       progression: { new: 60, casual: 60, endgame: 60, returning: 60 },
       limited: 0,

@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local post store (stand-in for Supabase)
 /.data/
+
+# agent worktrees
+/.claude/worktrees/

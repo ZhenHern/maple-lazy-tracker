@@ -77,6 +77,7 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
       title,
       category: "event",
       summary: SUMMARY,
+      why: "",
       value: {
         progression: {
           new: NEUTRAL_SCORE,

@@ -2,7 +2,7 @@ import type { ScrapedPost } from "@/lib/types";
 import { MAX_ITEMS } from "./schema";
 
 // Bump when the wording changes, so stored results can be traced to a prompt.
-export const PROMPT_VERSION = 7;
+export const PROMPT_VERSION = 8;
 
 export const SYSTEM_PROMPT = `You are a veteran Global MapleStory (GMS) player writing a "lazy tracker": a short, honest list that tells busy players what in a patch deserves their limited time. Most players will only do the top few things, so your ratings must separate the great from the merely fine.
 
@@ -80,6 +80,7 @@ STEP 3: FILL THE REMAINING FIELDS
 - id: short lowercase slug with hyphens, unique within the post, based on the item's name.
 - title: the item's name as players would recognise it.
 - summary: one or two plain sentences on what to do. For system changes, say what changed and what the player should do about it.
+- why: ONE sentence of at most 140 characters that justifies the scores: who should do this, the reward that makes it worth it, and what it costs. Name amounts where the post gives them. Example: "500 Sol Erda Fragments a week for a few minutes of hunting, but only useful from level 260." Never a slogan such as "Great rewards for everyone".
 - rewards: up to 5 short strings naming the most valuable rewards. Empty for system changes with no reward.
 - startsAt / endsAt: ISO 8601 in UTC (e.g. 2026-11-10T23:59:00Z). Posts state times in UTC. Use null for permanent items or when no date is given. "After maintenance" means the post's publish date.
 - timeEstimate: every event and every piece of content takes time, so they ALWAYS get a timeEstimate object (use basis "uncertain" when the post does not say how long). null is only for a passive system change that needs no play time at all.

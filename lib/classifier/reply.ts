@@ -28,6 +28,7 @@ function normalizeItems(items: ScoredItem[]): ScoredItem[] {
       ...item,
       id: count === 1 ? base : `${base}-${count}`,
       rewards: item.rewards.slice(0, MAX_REWARDS),
+      why: item.why.trim().slice(0, 220),
       // An uncertain estimate must never carry a number, whatever the model sent.
       timeEstimate:
         item.timeEstimate?.basis === "uncertain"
