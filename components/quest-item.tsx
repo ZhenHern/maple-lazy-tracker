@@ -1,8 +1,9 @@
 import type { CSSProperties } from "react";
 import { isAnimated } from "@/lib/images";
 import type { Profile, Tier, TrackerItem } from "@/lib/types";
-import { Countdown, ENDING_SOON } from "./countdown";
+import { Countdown, ENDING_SOON, formatDate, formatRemaining } from "./countdown";
 import { PixelSprite } from "./pixel-sprite";
+import { PROFILE_INFO } from "./profile-picker";
 
 const CATEGORY_LABEL: Record<TrackerItem["category"], string> = {
   event: "Event",
@@ -11,9 +12,9 @@ const CATEGORY_LABEL: Record<TrackerItem["category"], string> = {
 };
 
 const TIER_WORD: Record<Tier, string> = {
-  must_do: "must do",
-  if_free: "if free",
-  skip: "skip",
+  must_do: "Must do",
+  if_free: "If free",
+  skip: "Skip",
 };
 
 const TIER_STARS: Record<Tier, number> = { must_do: 3, if_free: 2, skip: 1 };
@@ -32,29 +33,15 @@ const RATING_NOTE = {
   },
 };
 
+/** How many reward names the closed card spells out before "+N more". */
+const LOOT_NAMES = 2;
+
 interface QuestItemProps {
   item: TrackerItem;
   profile: Profile;
   now: number | null;
   /** Position in the list, used to stagger the entrance animation. */
   index: number;
-}
-
-function TimeEstimate({ estimate }: { estimate: TrackerItem["timeEstimate"] }) {
-  if (!estimate) return null;
-  if (estimate.basis === "uncertain") {
-    return (
-      <p className="text-sm text-ink-soft">
-        <span className="font-bold text-ink">Time unknown.</span> {estimate.label}
-      </p>
-    );
-  }
-  return (
-    <p className="text-sm text-ink-soft">
-      <span className="font-bold text-ink">Time:</span> {estimate.label}
-      {estimate.basis === "calculated" && " (estimated)"}
-    </p>
-  );
 }
 
 // Images load straight from Nexon's CDN in the visitor's browser. next/image is
@@ -77,6 +64,18 @@ function elapsedPercent(item: TrackerItem, now: number | null): number | null {
   return Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
 }
 
+// The "When" fact of an opened quest: the dates, then how long is left.
+function whenText(item: TrackerItem, now: number | null): string {
+  if (!item.endsAt) return "Permanent. No deadline.";
+  const end = formatDate(item.endsAt);
+  const dates = item.startsAt ? `${formatDate(item.startsAt)} to ${end}` : `Until ${end}`;
+  if (now === null) return `${dates} (UTC)`;
+  const remaining = Date.parse(item.endsAt) - now;
+  return remaining <= 0
+    ? `${dates} (UTC). Ended.`
+    : `${dates} (UTC). ${formatRemaining(remaining)}.`;
+}
+
 export function QuestItem({ item, profile, now, index }: QuestItemProps) {
   const ratings: [string, Tier][] = [
     ["Progression", item.value.progression[profile]],
@@ -88,15 +87,22 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
   // playing at once is what made scrolling stutter. GIFs only load once the
   // quest is opened (a closed <details> does not render its contents).
   const thumbnail = item.images.find((image) => !isAnimated(image));
-  const icons = item.rewardImages.filter((icon) => icon !== null);
+  // The closed card names a couple of rewards, ones with a picture first, and
+  // keeps each picture next to its own name.
+  const loot = item.rewards
+    .map((reward, position) => ({ reward, icon: item.rewardImages[position] ?? null }))
+    .sort((a, b) => Number(b.icon !== null) - Number(a.icon !== null))
+    .slice(0, LOOT_NAMES);
   const elapsed = elapsedPercent(item, now);
   const urgent =
     now !== null && item.endsAt !== null && Date.parse(item.endsAt) - now < ENDING_SOON;
   const ratingNote = item.source.rating === "ai" ? null : RATING_NOTE[item.source.rating];
+  const estimate = item.timeEstimate;
+  const moreLoot = item.rewards.length - LOOT_NAMES;
 
   return (
     <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
-      <details className="quest group">
+      <details className="quest">
         <summary className="quest-head">
           <span className="quest-icon">
             {thumbnail ? (
@@ -107,38 +113,59 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
             )}
           </span>
 
-          <div className="grid min-w-0 gap-1">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h3 className="quest-title">{item.title}</h3>
+          <div className="quest-main">
+            <h3 className="quest-title">{item.title}</h3>
+            <div className="quest-meta">
               <Countdown endsAt={item.endsAt} now={now} />
               {ratingNote && (
-                <span className="chip chip-provisional" title={ratingNote.text}>
+                // A list that is mostly rough hides this chip and shows one
+                // notice instead (see .ratings-rough in globals.css).
+                <span
+                  className="chip chip-provisional"
+                  data-rating={item.source.rating}
+                  title={ratingNote.text}
+                >
                   {ratingNote.chip}
                 </span>
               )}
             </div>
-            <span className="line-clamp-2 text-sm text-ink-soft group-open:hidden">
-              {item.summary}
-            </span>
-            {icons.length > 0 && (
-              <span className="flex gap-1 group-open:hidden" aria-hidden="true">
-                {icons.slice(0, 6).map((icon, position) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={icon + position}
-                    src={icon}
-                    alt=""
-                    className="reward-icon"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                ))}
+            <span className="quest-summary">{item.summary}</span>
+            {item.rewards.length > 0 && (
+              <span className="quest-loot">
+                <PixelSprite name="chest" className="h-4 w-5 shrink-0" />
+                <span className="sr-only">Rewards: </span>
+                <span className="truncate">
+                  {loot.map(({ reward, icon }, position) => (
+                    <span key={reward + position}>
+                      {position > 0 && ", "}
+                      {icon && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={icon}
+                          alt=""
+                          className="reward-icon"
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
+                      {reward}
+                    </span>
+                  ))}
+                  {moreLoot > 0 && `, +${moreLoot} more`}
+                </span>
               </span>
             )}
           </div>
 
-          <span className="quest-chevron" aria-hidden="true">
-            ▾
+          <span className="quest-toggle" aria-hidden="true">
+            <span className="quest-toggle-label" data-when="closed">
+              Details
+            </span>
+            <span className="quest-toggle-label" data-when="open">
+              Close
+            </span>
+            <span className="quest-chevron">▾</span>
           </span>
 
           {elapsed !== null && (
@@ -146,27 +173,51 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
               className={`gauge quest-gauge ${urgent ? "gauge-urgent" : ""}`}
               aria-hidden="true"
             >
-              <span className="gauge-fill" style={{ width: `${elapsed}%` }} />
+              <span className="gauge-fill" style={{ "--fill": `${elapsed}%` } as CSSProperties} />
             </span>
           )}
         </summary>
 
         <div className="quest-body">
-          {preview && (
-            <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
-          )}
-
           <p className="text-sm">{item.summary}</p>
 
-          <p className="flex flex-wrap gap-1.5">
-            <span className="chip chip-quiet">{CATEGORY_LABEL[item.category]}</span>
-            {item.timeEstimate?.effort && (
-              <span className="chip chip-quiet">{EFFORT_LABEL[item.timeEstimate.effort]}</span>
+          <dl className="quest-facts">
+            <div className="fact">
+              <dt>When</dt>
+              <dd>
+                {whenText(item, now)}
+                {elapsed !== null && elapsed < 100 && (
+                  <span className="fact-note"> {Math.round(elapsed)}% of the run has passed.</span>
+                )}
+              </dd>
+            </div>
+            {estimate && (
+              <div className="fact">
+                <dt>Time</dt>
+                <dd>
+                  {estimate.basis === "uncertain" ? (
+                    <>
+                      Unknown. <span className="fact-note">{estimate.label}</span>
+                    </>
+                  ) : (
+                    <>
+                      {estimate.label}
+                      {estimate.basis === "calculated" && (
+                        <span className="fact-note"> (estimated)</span>
+                      )}
+                    </>
+                  )}
+                </dd>
+              </div>
             )}
-            {elapsed !== null && (
-              <span className="chip chip-quiet">{Math.round(elapsed)}% of the event has passed</span>
-            )}
-          </p>
+            <div className="fact">
+              <dt>Type</dt>
+              <dd>
+                {CATEGORY_LABEL[item.category]}
+                {estimate?.effort && `, ${EFFORT_LABEL[estimate.effort].toLowerCase()}`}
+              </dd>
+            </div>
+          </dl>
 
           {item.rewards.length > 0 && (
             <div>
@@ -192,33 +243,39 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
             </div>
           )}
 
-          {gallery.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {gallery.map((src, position) => (
-                <NexonImage
-                  key={src}
-                  src={src}
-                  alt={`${item.title} image ${position + 2}`}
-                  className="quest-thumb"
-                />
-              ))}
+          {preview && (
+            <div className="quest-media">
+              <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
+              {gallery.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {gallery.map((src, position) => (
+                    <NexonImage
+                      key={src}
+                      src={src}
+                      alt={`${item.title} image ${position + 2}`}
+                      className="quest-thumb"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          <TimeEstimate estimate={item.timeEstimate} />
-
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-ink-soft">
-            {ratings.map(([axis, tier]) => (
-              <li key={axis}>
-                {axis}{" "}
-                <span className="stars" aria-hidden="true">
-                  {"★".repeat(TIER_STARS[tier])}
-                  <span className="stars-off">{"★".repeat(3 - TIER_STARS[tier])}</span>
-                </span>
-                <span className="sr-only">: {TIER_WORD[tier]}</span>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <h4 className="label">Worth it for a {PROFILE_INFO[profile].name}?</h4>
+            <ul className="quest-ratings">
+              {ratings.map(([axis, tier]) => (
+                <li key={axis} className={`rating tier-${tier}`}>
+                  <span className="rating-axis">{axis}</span>
+                  <span className="stars" aria-hidden="true">
+                    {"★".repeat(TIER_STARS[tier])}
+                    <span className="stars-off">{"★".repeat(3 - TIER_STARS[tier])}</span>
+                  </span>
+                  <span className="rating-word">{TIER_WORD[tier]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {ratingNote && <p className="text-xs font-bold text-ink-soft">{ratingNote.text}</p>}
 

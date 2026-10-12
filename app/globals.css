@@ -99,7 +99,78 @@ body {
   animation: fall var(--speed) linear var(--delay) infinite;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Page shell and header ---------- */
+
+/* The centred column every page shares. */
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: 1rem 0.75rem 2.5rem;
+}
+
+/* The home page ends above the status bar pinned to the bottom of the screen. */
+.page-with-statusbar {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* On a phone the two page links become one full-width row, easy to hit. */
+.site-header nav {
+  flex: 1 1 100%;
+}
+
+.nav-link {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 2.5rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.page-intro {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .page {
+    padding: 2.5rem 1rem;
+  }
+
+  .page-with-statusbar {
+    padding-bottom: 7rem;
+  }
+
+  .site-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .site-header nav {
+    flex: none;
+  }
+
+  .nav-link {
+    min-height: 2.25rem;
+    padding-inline: 1rem;
+  }
+}
 
 .logo {
   color: #ffa51f;
@@ -180,7 +251,13 @@ body {
 }
 
 .window-body {
-  padding: 1rem;
+  padding: 0.75rem;
+}
+
+@media (min-width: 40rem) {
+  .window-body {
+    padding: 1rem;
+  }
 }
 
 .label {
@@ -192,11 +269,22 @@ body {
   letter-spacing: 0.03em;
 }
 
+/* A quiet aside next to a pixel-font label, in the body font. */
+.label-note {
+  margin-left: 0.25rem;
+  color: var(--color-ink-soft);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
 /* ---------- Buttons ---------- */
 
 /* Chunky button that presses down when clicked. */
 .btn {
-  padding: 0.35rem 0.9rem;
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
   border: 2px solid var(--color-frame-dark);
   border-radius: 8px;
   background: linear-gradient(#ffffff, #dfe7f7);
@@ -280,25 +368,59 @@ body {
   animation: pop 220ms ease-out;
 }
 
-.pick-job {
-  display: grid;
-  justify-items: center;
-  gap: 0.15rem;
-  padding: 0.75rem 0.5rem;
-  text-align: center;
-  line-height: 1.25;
-}
-
+/* Phone first: sprite above the name, so four jobs (or three priorities) fit
+   in one row. From 640px up there is room for the hint as well. */
+.pick-job,
 .pick-skill {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.7rem;
-  line-height: 1.25;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.5rem 0.2rem;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .pick-sprite {
   flex-shrink: 0;
+}
+
+.pick-name {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.pick-hint {
+  display: block;
+  color: var(--color-ink-soft);
+  font-size: 0.75rem;
+}
+
+.pick-caption {
+  margin-top: 0.5rem;
+  color: var(--color-ink-soft);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (min-width: 40rem) {
+  .pick-job {
+    padding: 0.65rem 0.5rem;
+  }
+
+  .pick-skill {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+  }
+
+  .pick-name {
+    font-size: 1rem;
+  }
 }
 
 /* ---------- NPC chat ---------- */
@@ -307,8 +429,53 @@ body {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.npc-bubble {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+/* One dot per line the NPC can say; the current one is lit. */
+.npc-dots {
+  display: none;
+  gap: 0.3rem;
+  margin-right: auto;
+}
+
+@media (min-width: 40rem) {
+  .npc-dots {
+    display: flex;
+  }
+}
+
+.quest-loot .reward-icon {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.2rem;
+  vertical-align: -0.3rem;
+}
+
+.npc-dots span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--color-line);
+}
+
+.npc-dots span[data-on="true"] {
+  background: var(--color-maple);
+}
+
+@media (min-width: 40rem) {
+  .npc {
+    gap: 1rem;
+    padding: 1rem;
+  }
 }
 
 .npc-sprite {
@@ -330,9 +497,16 @@ body {
 }
 
 .npc-text {
+  font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.4;
   cursor: default;
+}
+
+@media (min-width: 40rem) {
+  .npc-text {
+    font-size: 1rem;
+  }
 }
 
 .bob {
@@ -383,8 +557,13 @@ body {
   border-color: var(--color-frame);
 }
 
+.search {
+  min-height: 2.5rem;
+}
+
 .filter {
-  padding: 0.25rem 0.7rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.8rem;
   border: 2px solid var(--color-line);
   border-radius: 999px;
   background: #ffffff;
@@ -422,8 +601,8 @@ body {
 
 .tabs {
   display: flex;
-  gap: 0.25rem;
-  padding: 0 0.4rem;
+  gap: 0.2rem;
+  padding: 0 0.3rem;
   overflow-x: auto;
 }
 
@@ -432,16 +611,17 @@ body {
   flex: 1;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
+  min-height: 2.5rem;
   margin-top: 0.4rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.4rem 0.4rem;
   border: 3px solid var(--tier-color);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   background: #ffffff;
   color: var(--tier-color);
   font-family: var(--font-pixel), monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   letter-spacing: 0.03em;
   white-space: nowrap;
   cursor: pointer;
@@ -478,20 +658,94 @@ body {
 }
 
 .tab-panel {
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: 3px solid var(--tier-color);
   border-radius: 10px;
   background: var(--color-panel);
 }
 
+.tab-blurb {
+  margin: 0.1rem 0.15rem 0.5rem;
+  color: var(--color-ink-soft);
+  font-size: 0.8rem;
+}
+
+.tab-blurb strong {
+  color: var(--color-ink);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 40rem) {
+  .tabs {
+    gap: 0.25rem;
+    padding: 0 0.4rem;
+  }
+
+  .tab {
+    gap: 0.4rem;
+    padding-inline: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .tab-panel {
+    padding: 0.75rem;
+  }
+}
+
+/* An empty tab, an empty search, a missing page: a sprite, a headline, a line
+   of text and (often) a button that leads somewhere useful. */
 .empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
   padding: 1.5rem 1rem;
   border: 2px dashed var(--color-line);
   border-radius: 10px;
   background: #ffffff;
   color: var(--color-ink-soft);
+  font-size: 0.875rem;
   font-weight: 700;
   text-align: center;
+}
+
+.empty-sprite {
+  height: 3rem;
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+.empty-title {
+  color: var(--color-ink);
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+}
+
+/* One calm line above a list whose ratings are mostly provisional. It replaces
+   the "Rough rating" chip that would otherwise sit on nearly every quest. */
+.rough-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  border: 2px solid #ecd58a;
+  border-radius: 10px;
+  background: #fffaf0;
+  color: #5c4200;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.ratings-rough .chip-provisional[data-rating="backup"] {
+  display: none;
+}
+
+/* Placeholder rows while the quest list is being read. Only opacity moves. */
+.skeleton {
+  height: 4.75rem;
+  border: 2px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-panel);
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 /* ---------- One quest ---------- */
@@ -504,31 +758,33 @@ body {
   contain-intrinsic-size: auto 6rem;
 }
 
+/* The stripe down the left edge carries the tier colour of the tab the quest
+   sits in (blue frame colour where there is no tier, as in the archive). */
 .quest {
+  --stripe: var(--tier-color, var(--color-frame));
   overflow: hidden;
   border: 2px solid var(--color-line);
+  border-left: 6px solid var(--stripe);
   border-radius: 10px;
   background: #ffffff;
-  transition:
-    border-color 120ms,
-    box-shadow 120ms;
+  transition: border-color 120ms;
 }
 
 .quest:hover {
   border-color: var(--color-gold);
+  border-left-color: var(--stripe);
 }
 
 .quest[open] {
-  border-color: var(--tier-color);
-  box-shadow: 0 3px 0 rgb(22 34 74 / 0.18);
+  border-color: var(--stripe);
 }
 
 .quest-head {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-  padding: 0.6rem 0.75rem;
+  align-items: start;
+  gap: 0.5rem 0.6rem;
+  padding: 0.6rem;
   cursor: pointer;
   list-style: none;
 }
@@ -537,10 +793,52 @@ body {
   display: none;
 }
 
+/* The focus ring is drawn inside the card, which clips anything outside it. */
+.quest-head:focus-visible {
+  outline-offset: -3px;
+  box-shadow: none;
+}
+
+.quest-main {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
 .quest-title {
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.quest-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.quest-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-ink-soft);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* "What you get" on the closed card: up to three icons, then the first reward
+   names on a single line that is cut off rather than wrapped. */
+.quest-loot {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  color: #6b4a00;
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 /* Images come from Nexon's CDN at unknown sizes, so every frame fixes its own
@@ -548,8 +846,8 @@ body {
 .quest-icon {
   display: grid;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3rem;
+  height: 3rem;
   overflow: hidden;
   border: 2px solid var(--color-line);
   border-radius: 8px;
@@ -562,14 +860,68 @@ body {
   object-fit: cover;
 }
 
+/* Looks like a small button so it is plain that the card opens. The whole
+   header is the real control; this is decoration and hidden from readers. */
+.quest-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  justify-content: center;
+  padding: 0 0.4rem;
+  border: 2px solid var(--color-frame-dark);
+  border-radius: 8px;
+  background: linear-gradient(#ffffff, #dfe7f7);
+  box-shadow: 0 2px 0 var(--color-frame-dark);
+  font-size: 0.75rem;
+  font-weight: 800;
+  transition: transform 80ms;
+}
+
+.quest-toggle-label {
+  display: none;
+}
+
+.quest-head:hover .quest-toggle {
+  background: linear-gradient(#ffe07a, #ffb21f);
+}
+
+.quest-head:active .quest-toggle {
+  transform: translateY(2px);
+}
+
 .quest-chevron {
-  color: var(--color-ink-soft);
-  font-size: 1.2rem;
+  font-size: 1rem;
+  line-height: 1;
   transition: transform 150ms;
 }
 
 .quest[open] .quest-chevron {
   transform: rotate(180deg);
+}
+
+@media (min-width: 40rem) {
+  .quest-head {
+    gap: 0.5rem 0.75rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .quest-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .quest:not([open]) .quest-toggle-label[data-when="closed"],
+  .quest[open] .quest-toggle-label[data-when="open"] {
+    display: inline;
+  }
+}
+
+/* The opened card repeats the summary and lists every reward in full. */
+.quest[open] .quest-summary,
+.quest[open] .quest-loot {
+  display: none;
 }
 
 /* Thin bar under a quest: how much of the event's run has passed. */
@@ -582,16 +934,51 @@ body {
 
 .quest-body {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.85rem;
   padding: 0.75rem;
   border-top: 2px dashed var(--color-line);
   animation: rise 200ms ease-out;
 }
 
+/* The facts of an opened quest: when, how long, what kind. */
+.quest-facts {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  background: var(--color-panel);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.fact dt {
+  color: var(--color-ink-soft);
+  font-family: var(--font-pixel), monospace;
+  letter-spacing: 0.03em;
+}
+
+.fact-note {
+  color: var(--color-ink-soft);
+  font-weight: 600;
+}
+
+.quest-media {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .quest-preview,
 .quest-thumb {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   border: 2px solid var(--color-line);
   border-radius: 8px;
@@ -607,11 +994,42 @@ body {
   height: 4.5rem;
 }
 
+/* The whole picture is shown, never cropped (these are often screenshots with
+   text) and never stretched past its own size (small icons would blur). */
 .quest-preview img,
 .quest-thumb img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+/* One tile per axis, edged in the colour of the tier it earned. */
+.quest-ratings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.rating {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.4rem 0.25rem;
+  border: 2px solid var(--color-line);
+  border-bottom: 4px solid var(--tier-color);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rating-axis {
+  color: var(--color-ink-soft);
+}
+
+.rating-word {
+  color: var(--tier-color);
 }
 
 .reward-icon {
@@ -674,12 +1092,17 @@ body {
   box-shadow: inset 0 0 0 1px var(--color-frame-dark);
 }
 
+/* The fill is always full width and slid left by the unfilled share (--fill is
+   set inline, e.g. "30%"). Sliding is a transform, which the browser animates
+   without redoing layout; animating width would not be. */
 .gauge-fill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(#bfe4ff, var(--gauge-color, #3d9be9));
-  transition: width 400ms ease-out;
+  transform: translateX(calc(var(--fill, 0%) - 100%));
+  transition: transform 400ms ease-out;
 }
 
 .gauge-urgent {
@@ -711,9 +1134,22 @@ body {
   border: 2px solid var(--color-frame-dark);
   border-radius: 8px;
   background: var(--color-cream);
+  box-shadow: 0 2px 0 var(--color-frame-dark);
   color: var(--color-ink);
   font-size: 0.8rem;
   font-weight: 800;
+  cursor: pointer;
+  min-width: 2.75rem;
+  justify-content: center;
+  transition: transform 80ms;
+}
+
+.statusbar-job:hover {
+  background: #fff4c7;
+}
+
+.statusbar-job:active {
+  transform: translateY(2px);
 }
 
 .statusbar-gauge {
@@ -787,6 +1223,59 @@ body {
   object-fit: cover;
 }
 
+/* An archive row: a card that leads to the post's own page. */
+.notice-row {
+  height: 100%;
+  border-color: var(--color-line);
+  background: #ffffff;
+}
+
+@media (max-width: 39.99rem) {
+  .notice-row img {
+    width: 4.25rem;
+  }
+}
+
+.notice-arrow {
+  margin-left: auto;
+  padding-left: 0.25rem;
+  color: var(--color-frame);
+  font-size: 1rem;
+  transition: transform 120ms;
+}
+
+.notice-row:hover .notice-arrow {
+  transform: translateX(3px);
+}
+
+/* The banner and title at the top of one archived post. */
+.post-head {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.post-head img {
+  width: 100%;
+  aspect-ratio: 540 / 304;
+  border: 2px solid var(--color-line);
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+@media (min-width: 40rem) {
+  .post-head {
+    grid-template-columns: 13rem 1fr;
+    align-items: center;
+  }
+}
+
+.job-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+}
+
 /* ---------- Small labels ---------- */
 
 .chip {
@@ -819,6 +1308,12 @@ body {
   color: #7a5600;
 }
 
+.chip-live {
+  border-color: #7cc65a;
+  background: #e6f7dc;
+  color: #1f5a0a;
+}
+
 .chip-urgent {
   border-color: #e2674a;
   background: #ffe1d6;
@@ -831,6 +1326,12 @@ body {
 @keyframes nudge {
   50% {
     transform: translateY(-2px);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
   }
 }
 

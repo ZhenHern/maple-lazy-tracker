@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import type { TrackerItem } from "@/lib/types";
 import { useLocalStorage } from "@/lib/use-local-storage";
 import { useNow } from "@/lib/use-now";
+import { PixelSprite } from "./pixel-sprite";
 import { PROFILE_INFO } from "./profile-picker";
 import { QuestItem } from "./quest-item";
-import { sanitizeProfile } from "./quest-log";
+import { mostlyRough, RoughNotice, sanitizeProfile } from "./quest-log";
 
 // The quests of one archived post. A Client Component because the ratings
 // shown depend on the visitor's job, which lives in their browser's
@@ -19,22 +21,42 @@ function byDeadline(a: TrackerItem, b: TrackerItem): number {
 export function ArchiveLog({ items }: { items: TrackerItem[] }) {
   const [profile] = useLocalStorage("lazy-tracker:profile", sanitizeProfile);
   const now = useNow();
+  const job = PROFILE_INFO[profile];
 
   const sorted = [...items].sort(byDeadline);
   const isOver = (item: TrackerItem) =>
     now !== null && item.endsAt !== null && Date.parse(item.endsAt) <= now;
   const running = sorted.filter((item) => !isOver(item));
   const ended = sorted.filter(isOver);
+  const rough = mostlyRough(items);
+
+  if (items.length === 0) {
+    return (
+      <div className="empty">
+        <PixelSprite name="bulb" className="empty-sprite" />
+        <p className="empty-title">No quests in this post</p>
+        <p>Nothing in it could be sorted into quests. The official post has the details.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid gap-4">
-      <p className="text-sm">
-        Star ratings are shown for the <strong>{PROFILE_INFO[profile].name}</strong> job. Change it
-        on the Quest Log page.
+    <div className={`grid gap-4 ${rough ? "ratings-rough" : ""}`}>
+      <p className="job-note">
+        <PixelSprite name={job.sprite} className="h-6 w-6 shrink-0" />
+        <span>
+          Ratings are shown for the <strong>{job.name}</strong> job.{" "}
+          <Link href="/" className="underline">
+            Change it on the Quest Log
+          </Link>
+          .
+        </span>
       </p>
 
+      {rough && <RoughNotice items={items} />}
+
       {running.length > 0 && (
-        <section>
+        <section className="tab-panel tier-if_free">
           <h3 className="label">Still running ({running.length})</h3>
           <ul className="grid gap-2">
             {running.map((item, index) => (
@@ -45,7 +67,7 @@ export function ArchiveLog({ items }: { items: TrackerItem[] }) {
       )}
 
       {ended.length > 0 && (
-        <section>
+        <section className="tab-panel tier-ended">
           <h3 className="label">Ended ({ended.length})</h3>
           <ul className="grid gap-2">
             {ended.map((item, index) => (

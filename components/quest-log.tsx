@@ -8,6 +8,7 @@ import { useLocalStorage } from "@/lib/use-local-storage";
 import { useNow } from "@/lib/use-now";
 import { ENDING_SOON, formatRemaining } from "./countdown";
 import { NpcDialog } from "./npc-dialog";
+import { PixelSprite, type SpriteName } from "./pixel-sprite";
 import { PROFILE_INFO, ProfilePicker } from "./profile-picker";
 import { QuestItem } from "./quest-item";
 import { StatusBar } from "./status-bar";
@@ -15,21 +16,55 @@ import { StatusBar } from "./status-bar";
 type SectionKey = Tier | "ended";
 type CategoryFilter = TrackerItem["category"] | "all";
 
-const SECTIONS: { key: SectionKey; title: string; blurb: string; empty: string }[] = [
+interface Section {
+  key: SectionKey;
+  title: string;
+  blurb: string;
+  /** Shown when the tab has no quests at all: a headline, a line and a sprite. */
+  empty: { title: string; text: string; sprite: SpriteName };
+}
+
+const SECTIONS: Section[] = [
   {
     key: "must_do",
     title: "Must Do",
     blurb: "Don't log off without these.",
-    empty: "Nothing urgent for you right now. Enjoy the free time!",
+    empty: {
+      title: "Nothing urgent!",
+      text: "No Must Do quests for this job right now. Enjoy the free time.",
+      sprite: "shroom",
+    },
   },
   {
     key: "if_free",
     title: "If Free",
     blurb: "Worth it when you have time.",
-    empty: "Nothing optional right now.",
+    empty: {
+      title: "Nothing optional",
+      text: "Every quest is either a Must Do or a Skip for this job.",
+      sprite: "cup",
+    },
   },
-  { key: "skip", title: "Skip", blurb: "Safe to ignore.", empty: "Nothing to skip. Wow." },
-  { key: "ended", title: "Ended", blurb: "Already over.", empty: "Nothing has ended yet." },
+  {
+    key: "skip",
+    title: "Skip",
+    blurb: "Safe to ignore.",
+    empty: {
+      title: "Nothing to skip. Wow.",
+      text: "Everything running right now is worth at least a look.",
+      sprite: "chest",
+    },
+  },
+  {
+    key: "ended",
+    title: "Ended",
+    blurb: "Already over.",
+    empty: {
+      title: "Nothing has ended yet",
+      text: "Quests land here when their timer runs out.",
+      sprite: "hourglass",
+    },
+  },
 ];
 
 const CATEGORIES: { key: CategoryFilter; label: string }[] = [
@@ -64,6 +99,36 @@ function plural(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
+// Smooth scrolling is motion too, so it is skipped for visitors who ask for less.
+function scrollToTop(element: HTMLElement | null) {
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  element?.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
+}
+
+/**
+ * True when most of the list was rated by a backup model. The list then shows
+ * one notice (RoughNotice) and hides the per-quest "Rough rating" chips, which
+ * would otherwise sit on nearly every card.
+ */
+export function mostlyRough(items: TrackerItem[]): boolean {
+  const rough = items.filter((item) => item.source.rating === "backup").length;
+  return rough > 0 && rough * 2 > items.length;
+}
+
+export function RoughNotice({ items }: { items: TrackerItem[] }) {
+  const rough = items.filter((item) => item.source.rating === "backup").length;
+  return (
+    <p className="rough-notice" role="note">
+      <PixelSprite name="bulb" className="h-6 w-5 shrink-0" />
+      <span>
+        <strong>Rough ratings today.</strong>{" "}
+        A backup AI sorted {rough === items.length ? "these quests" : `${rough} of these ${items.length} quests`}{" "}
+        while the main one is out of quota. They re-rate automatically.
+      </span>
+    </p>
+  );
+}
+
 interface QuestLogProps {
   items: TrackerItem[];
   /** Human-readable date the data was last refreshed, or null. */
@@ -81,6 +146,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
   const logRef = useRef<HTMLElement>(null);
+  const pickerRef = useRef<HTMLElement>(null);
 
   const groups = useMemo(() => {
     const grouped: Record<SectionKey, TrackerItem[]> = {
@@ -97,6 +163,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
   }, [allItems, profile, priorities, now]);
 
   const job = PROFILE_INFO[profile];
+  const rough = useMemo(() => mostlyRough(allItems), [allItems]);
 
   const npcLines = useMemo(() => {
     const must = groups.must_do.length;
@@ -126,7 +193,12 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
 
   function showTab(next: SectionKey) {
     setTab(next);
-    logRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToTop(logRef.current);
+  }
+
+  function clearFilters() {
+    setSearch("");
+    setCategory("all");
   }
 
   // Arrow keys move between tabs, the standard keyboard pattern for a tab list.
@@ -142,15 +214,28 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
 
   const section = SECTIONS.find((each) => each.key === tab)!;
   const query = search.trim().toLowerCase();
-  const visible = groups[tab].filter((item) => matches(item, query, category));
   const filtering = query !== "" || category !== "all";
+  // What each tab holds after the search and type filter. While filtering, the
+  // tab counts show these, so a search points at the tab that has the matches.
+  const shown = useMemo(() => {
+    const filtered = {} as Record<SectionKey, TrackerItem[]>;
+    for (const { key } of SECTIONS) {
+      filtered[key] = groups[key].filter((item) => matches(item, query, category));
+    }
+    return filtered;
+  }, [groups, query, category]);
+  const visible = shown[tab];
+  const elsewhere = SECTIONS.filter(({ key }) => key !== tab && shown[key].length > 0);
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4 sm:gap-5">
       <NpcDialog lines={npcLines} onShowMustDo={() => showTab("must_do")} />
 
-      <section className="window" aria-label="Your settings">
-        <h2 className="window-title">Your Character</h2>
+      <section className="window scroll-mt-4" aria-label="Your settings" ref={pickerRef}>
+        <h2 className="window-title">
+          Your Character
+          <span className="window-note max-sm:hidden">Pick a job and the quests re-sort</span>
+        </h2>
         <div className="window-body">
           <ProfilePicker
             profile={profile}
@@ -167,7 +252,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
           {updated && <span className="window-note">Last checked {updated}</span>}
         </h2>
         <div className="window-body grid gap-3">
-          <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="grid min-w-0 gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
             <input
               type="search"
               className="search"
@@ -191,7 +276,9 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
             </div>
           </div>
 
-          <div>
+          {rough && <RoughNotice items={allItems} />}
+
+          <div className="min-w-0">
             <div className="tabs" role="tablist" aria-label="Tiers" onKeyDown={onTabKeyDown}>
               {SECTIONS.map(({ key, title }) => {
                 if (key === "ended" && groups.ended.length === 0) return null;
@@ -208,7 +295,10 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
                     onClick={() => setTab(key)}
                   >
                     {title}
-                    <span className="tab-count">{groups[key].length}</span>
+                    <span className="tab-count">
+                      {shown[key].length}
+                      {filtering && <span className="sr-only"> matching</span>}
+                    </span>
                   </button>
                 );
               })}
@@ -218,30 +308,57 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
               id="quest-panel"
               role="tabpanel"
               aria-labelledby={`tab-${tab}`}
-              className={`tab-panel tier-${tab}`}
+              className={`tab-panel tier-${tab} ${rough ? "ratings-rough" : ""}`}
             >
-              <p className="mb-2 text-sm font-bold">
-                {section.blurb}{" "}
-                <span className="font-normal text-ink-soft">
+              <p className="tab-blurb">
+                <strong>{section.blurb}</strong>{" "}
+                <span aria-live="polite">
                   {filtering
                     ? `Showing ${visible.length} of ${groups[tab].length}.`
-                    : "Click a quest to open it."}
+                    : visible.length > 0 && "Soonest deadline first."}
                 </span>
               </p>
 
-              {visible.length === 0 ? (
-                <p className="empty">
-                  {filtering && groups[tab].length > 0
-                    ? "No quests match your search in this tab."
-                    : section.empty}
-                </p>
-              ) : (
+              {visible.length > 0 ? (
                 // The key remounts the list on a tab change so quests animate in.
                 <ul key={tab} className="grid gap-2">
                   {visible.map((item, index) => (
                     <QuestItem key={item.id} item={item} profile={profile} now={now} index={index} />
                   ))}
                 </ul>
+              ) : filtering && groups[tab].length > 0 ? (
+                <div className="empty">
+                  <PixelSprite name="bulb" className="empty-sprite" />
+                  <p className="empty-title">No quests match here</p>
+                  <p>
+                    {elsewhere.length > 0
+                      ? "Nothing in this tab fits your search, but other tabs have matches."
+                      : "Nothing fits your search in any tab. Try a shorter word."}
+                  </p>
+                  <p className="flex flex-wrap justify-center gap-2">
+                    {elsewhere.map(({ key, title }) => (
+                      <button key={key} type="button" className="btn" onClick={() => setTab(key)}>
+                        {title} ({shown[key].length})
+                      </button>
+                    ))}
+                    <button type="button" className="btn btn-go" onClick={clearFilters}>
+                      Clear search
+                    </button>
+                  </p>
+                </div>
+              ) : (
+                <div className="empty">
+                  <PixelSprite name={section.empty.sprite} className="empty-sprite" />
+                  <p className="empty-title">{section.empty.title}</p>
+                  <p>{section.empty.text}</p>
+                  {tab === "must_do" && groups.if_free.length > 0 && (
+                    <p>
+                      <button type="button" className="btn btn-go" onClick={() => setTab("if_free")}>
+                        See If Free ({groups.if_free.length})
+                      </button>
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -257,6 +374,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
         }}
         active={tab}
         onSelect={showTab}
+        onChangeJob={() => scrollToTop(pickerRef.current)}
       />
     </div>
   );

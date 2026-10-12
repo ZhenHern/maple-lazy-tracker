@@ -144,6 +144,19 @@ const sprites = {
     ],
     palette: { k: "#3a2a5c", r: "#d12c43" },
   },
+  chest: {
+    rows: [
+      ".kkkkkkkk.",
+      "kbbbbbbbbk",
+      "kbwbbbbbbk",
+      "kkkkyykkkk",
+      "kbbbyybbbk",
+      "kbbbbbbbbk",
+      "kbbbbbbbbk",
+      "kkkkkkkkkk",
+    ],
+    palette: { k: "#5a2d0c", b: "#c9853c", w: "#f0c58a", y: "#ffc531" },
+  },
 } satisfies Record<string, Sprite>;
 
 export type SpriteName = keyof typeof sprites;
