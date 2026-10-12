@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { PostgrestClient } from "@supabase/postgrest-js";
 import { z } from "zod";
 import { storedPostSchema } from "@/lib/classifier/schema";
 import type { StoredPost } from "@/lib/types";
@@ -12,17 +12,20 @@ import type { PostStore } from "./store";
 // run on the server. `import "server-only"` makes the build fail if a Client
 // Component tries to import it.
 
-let client: SupabaseClient | undefined;
-function db(): SupabaseClient {
+// Supabase exposes every table as a REST endpoint under /rest/v1. This client
+// only builds those HTTP requests. The full "supabase-js" package also bundles
+// sign-in, file storage and realtime sockets, none of which this app uses.
+let client: PostgrestClient | undefined;
+function db(): PostgrestClient {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must both be set.");
   }
-  // No session handling: this is a server talking to its own database, not a
-  // user signing in.
-  client ??= createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
+  // A trailing slash on the URL would produce "//rest/v1".
+  const base = url.endsWith("/") ? url.slice(0, -1) : url;
+  client ??= new PostgrestClient(`${base}/rest/v1`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
   });
   return client;
 }
