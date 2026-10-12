@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { Suspense } from "react";
+import { PixelSprite } from "@/components/pixel-sprite";
 import { QuestLog } from "@/components/quest-log";
 import { Scenery } from "@/components/scenery";
 import { SiteFooter, SiteHeader } from "@/components/site-header";
@@ -6,15 +8,15 @@ import { getOngoing } from "@/lib/tracker";
 
 export default function Home() {
   return (
-    // The bottom padding leaves room for the status bar pinned to the screen.
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:pt-10">
+    // "page-with-statusbar" leaves room for the status bar pinned to the screen.
+    <div className="page page-with-statusbar">
       <Scenery />
 
       <SiteHeader current="/" />
 
       <main>
         <h1 className="sr-only">Lazy Tracker: what is worth doing in MapleStory right now</h1>
-        <Suspense fallback={<Notice title="Loading">Checking what is running...</Notice>}>
+        <Suspense fallback={<Loading />}>
           <Tracker />
         </Suspense>
       </main>
@@ -24,12 +26,32 @@ export default function Home() {
   );
 }
 
-function Notice({ title, children }: { title: string; children: React.ReactNode }) {
+// Shown while the cached list is being read: the same windows as the real page,
+// with grey bars where the quests will be, so nothing jumps when they arrive.
+function Loading() {
   return (
-    <section className="window">
-      <h2 className="window-title">{title}</h2>
-      <p className="window-body">{children}</p>
-    </section>
+    <div className="grid gap-4 sm:gap-5" role="status">
+      <section className="window">
+        <div className="npc">
+          <span className="npc-sprite">
+            <span className="bob">
+              <PixelSprite name="shroom" className="w-16 sm:w-24" />
+            </span>
+            <span className="npc-name">Lazy Shroom</span>
+          </span>
+          <p className="npc-text">Hold on, I am reading the notice board for you...</p>
+        </div>
+      </section>
+
+      <section className="window" aria-hidden="true">
+        <h2 className="window-title">Quest Log</h2>
+        <div className="window-body grid gap-2">
+          {[0, 1, 2, 3].map((row) => (
+            <div key={row} className="skeleton" />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
@@ -49,19 +71,38 @@ async function Tracker() {
 
   if (items.length === 0) {
     return (
-      <Notice title="Nothing to show">
-        No ongoing events are stored yet. Run the ingest step to fetch and classify the latest
-        posts.
-      </Notice>
+      <section className="window">
+        <h2 className="window-title">Quest Log</h2>
+        <div className="window-body">
+          <div className="empty">
+            <PixelSprite name="shroom" className="empty-sprite" />
+            <p className="empty-title">The notice board is empty</p>
+            <p>
+              No ongoing events are stored yet. The list fills itself once a day, so check back
+              soon, or browse what was sorted before.
+            </p>
+            <p>
+              <Link href="/archive" className="btn btn-go">
+                Open the archive
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4 sm:gap-5">
       <QuestLog items={items} updated={updatedAt ? formatDay(updatedAt) : null} />
 
       <section className="window">
-        <h2 className="window-title">Notice Board</h2>
+        <h2 className="window-title">
+          Notice Board
+          <Link href="/archive" className="window-note underline">
+            All sorted posts
+          </Link>
+        </h2>
         <div className="window-body">
           <p className="mb-3 text-sm">The official posts this list was built from:</p>
           <ul className="grid gap-2 text-sm sm:grid-cols-2">

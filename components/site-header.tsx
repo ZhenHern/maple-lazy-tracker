@@ -9,12 +9,12 @@ const LINKS = [
 /** The logo and the two-page navigation, shared by every page. */
 export function SiteHeader({ current }: { current?: (typeof LINKS)[number]["href"] }) {
   return (
-    <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <header className="site-header">
       {/* Link navigates without a full page reload, and prefetches the target. */}
-      <Link href="/" className="flex items-center gap-3">
-        <PixelSprite name="leaf" className="logo-leaf h-14 w-14 shrink-0" />
+      <Link href="/" className="flex items-center gap-2.5 sm:gap-3">
+        <PixelSprite name="leaf" className="logo-leaf h-11 w-11 shrink-0 sm:h-14 sm:w-14" />
         <div>
-          <p className="logo text-4xl leading-none sm:text-5xl">Lazy Tracker</p>
+          <p className="logo text-[2rem] leading-none sm:text-5xl">Lazy Tracker</p>
           <p className="tagline">Play less. Miss nothing.</p>
         </div>
       </Link>
@@ -24,7 +24,7 @@ export function SiteHeader({ current }: { current?: (typeof LINKS)[number]["href
           <Link
             key={href}
             href={href}
-            className="filter"
+            className="filter nav-link"
             aria-current={current === href ? "page" : undefined}
           >
             {label}

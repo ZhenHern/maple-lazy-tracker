@@ -10,7 +10,7 @@ export function formatRemaining(ms: number): string {
   return "under 1h left";
 }
 
-function formatDate(iso: string): string {
+export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",

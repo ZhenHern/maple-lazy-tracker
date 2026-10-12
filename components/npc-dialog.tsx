@@ -81,7 +81,7 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
         >
           {/* Changing the key remounts the sprite, which restarts the hop. */}
           <span key={pokes} className={pokes > 0 ? "hop" : "bob"}>
-            <PixelSprite name="shroom" className="w-20 sm:w-24" />
+            <PixelSprite name="shroom" className="w-16 sm:w-24" />
           </span>
           {hits.map((hit) => (
             <span
@@ -99,12 +99,21 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
           <span className="npc-name">Lazy Shroom</span>
         </button>
 
-        <div className="grid min-w-0 gap-3">
+        <div className="npc-bubble">
           <Typewriter key={line} text={line} />
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <span className="npc-dots" aria-hidden="true">
+              {lines.map((each, position) => (
+                <span key={each} data-on={position === index % lines.length} />
+              ))}
+            </span>
             {lines.length > 1 && (
               <button type="button" className="btn" onClick={() => setIndex((i) => i + 1)}>
                 Next ▸
+                <span className="sr-only">
+                  {" "}
+                  (line {(index % lines.length) + 1} of {lines.length})
+                </span>
               </button>
             )}
             <button type="button" className="btn btn-go" onClick={onShowMustDo}>

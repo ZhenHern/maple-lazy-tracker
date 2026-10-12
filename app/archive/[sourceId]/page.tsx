@@ -41,29 +41,50 @@ export default async function ArchivedPostPage({ params }: PageProps<"/archive/[
   const { post, items, classifiedAt } = archived;
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-10 sm:pt-10">
+    <div className="page">
       <Scenery />
       <SiteHeader current="/archive" />
 
-      <main>
+      <main className="grid gap-3">
+        <p>
+          <Link href="/archive" className="btn">
+            ◂ Back to the archive
+          </Link>
+        </p>
+
         <section className="window">
-          <h1 className="window-title">
+          <p className="window-title">
             {post.kind === "patch" ? "Patch Notes" : "Event Notice"}
             <span className="window-note">Sorted {formatDay(classifiedAt)}</span>
-          </h1>
+          </p>
           <div className="window-body grid gap-4">
-            <div className="grid gap-1">
-              <p className="text-lg font-extrabold">{post.title}</p>
-              <p className="text-sm text-ink-soft">
-                Published {formatDay(post.publishedAt)} ·{" "}
-                <a href={post.url} target="_blank" rel="noreferrer" className="underline">
-                  Read the official post
-                </a>{" "}
-                ·{" "}
-                <Link href="/archive" className="underline">
-                  Back to the archive
-                </Link>
-              </p>
+            <div className="post-head">
+              {post.thumbnailUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={post.thumbnailUrl} alt="" referrerPolicy="no-referrer" />
+              )}
+              <div className="grid min-w-0 gap-1.5">
+                <h1 className="text-lg leading-tight font-extrabold">{post.title}</h1>
+                <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-ink-soft">
+                  <span>Published {formatDay(post.publishedAt)}</span>
+                  <span className="chip chip-quiet">
+                    {post.itemCount} {post.itemCount === 1 ? "quest" : "quests"}
+                  </span>
+                  {post.ongoingCount > 0 && (
+                    <span className="chip chip-live">{post.ongoingCount} still running</span>
+                  )}
+                </p>
+                <p>
+                  <a
+                    href={post.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-bold underline"
+                  >
+                    Read the official post ↗
+                  </a>
+                </p>
+              </div>
             </div>
 
             <ArchiveLog items={items} />
