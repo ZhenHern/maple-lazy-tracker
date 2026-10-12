@@ -1,12 +1,23 @@
 import "server-only";
-import { GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import type { ScrapedPost, TrackerItem } from "@/lib/types";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
-import { classificationSchema, geminiResponseSchema } from "./schema";
+import {
+  classificationSchema,
+  geminiResponseSchema,
+  MAX_ITEMS,
+  MAX_REWARDS,
+} from "./schema";
 
-export function geminiModel(): string {
-  return process.env.GEMINI_MODEL || "gemini-flash-latest";
+const DEFAULT_MODELS = "gemini-3.6-flash,gemini-3.5-flash-lite";
+
+/** Models to try, in order. GEMINI_MODEL is a comma-separated list. */
+function geminiModels(): string[] {
+  return (process.env.GEMINI_MODEL || DEFAULT_MODELS)
+    .split(",")
+    .map((model) => model.trim())
+    .filter(Boolean);
 }
 
 // Created on first use, so importing this file never fails when the key is missing.
@@ -16,8 +27,19 @@ function getClient(): GoogleGenAI {
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not set. Add it to .env.local (see .env.example).");
   }
-  client ??= new GoogleGenAI({ apiKey });
+  // The SDK defaults to 5 retries with no timeout, which can hang for minutes
+  // when a model is overloaded. Fail fast and move on to the next model instead.
+  client ??= new GoogleGenAI({
+    apiKey,
+    httpOptions: { timeout: 120_000, retryOptions: { attempts: 1 } },
+  });
   return client;
+}
+
+// A bad request or a rejected key fails the same way on every model, so only
+// other failures (overloaded, rate limited, retired model, timeout) fall through.
+function shouldTryNextModel(error: unknown): boolean {
+  return !(error instanceof ApiError && [400, 401, 403].includes(error.status));
 }
 
 function slugify(value: string): string {
@@ -31,19 +53,24 @@ function slugify(value: string): string {
 }
 
 // IDs key the player's checklist, so they must be clean and unique per post.
-function normalizeIds(items: TrackerItem[]): TrackerItem[] {
+// Array caps are applied here because Gemini cannot be given them in the schema.
+function normalizeItems(items: TrackerItem[]): TrackerItem[] {
   const seen = new Map<string, number>();
-  return items.map((item) => {
+  return items.slice(0, MAX_ITEMS).map((item) => {
     const base = slugify(item.id);
     const count = (seen.get(base) ?? 0) + 1;
     seen.set(base, count);
-    return { ...item, id: count === 1 ? base : `${base}-${count}` };
+    return {
+      ...item,
+      id: count === 1 ? base : `${base}-${count}`,
+      rewards: item.rewards.slice(0, MAX_REWARDS),
+    };
   });
 }
 
-export async function classifyPost(post: ScrapedPost): Promise<TrackerItem[]> {
+async function generate(model: string, post: ScrapedPost): Promise<string> {
   const response = await getClient().models.generateContent({
-    model: geminiModel(),
+    model,
     contents: buildUserPrompt(post),
     config: {
       systemInstruction: SYSTEM_PROMPT,
@@ -51,12 +78,13 @@ export async function classifyPost(post: ScrapedPost): Promise<TrackerItem[]> {
       responseJsonSchema: geminiResponseSchema,
     },
   });
-
-  const raw = response.text;
-  if (!raw) {
-    throw new Error(`Gemini returned no text for post ${post.sourceId}`);
+  if (!response.text) {
+    throw new Error(`Gemini (${model}) returned no text for post ${post.sourceId}`);
   }
+  return response.text;
+}
 
+function parseItems(raw: string, post: ScrapedPost): TrackerItem[] {
   let json: unknown;
   try {
     json = JSON.parse(raw);
@@ -70,5 +98,24 @@ export async function classifyPost(post: ScrapedPost): Promise<TrackerItem[]> {
       `Gemini output failed validation for post ${post.sourceId}: ${z.prettifyError(parsed.error)}`,
     );
   }
-  return normalizeIds(parsed.data.items);
+  return normalizeItems(parsed.data.items);
+}
+
+export async function classifyPost(
+  post: ScrapedPost,
+): Promise<{ items: TrackerItem[]; model: string }> {
+  const failures: string[] = [];
+  for (const model of geminiModels()) {
+    let raw: string;
+    try {
+      raw = await generate(model, post);
+    } catch (error) {
+      if (!shouldTryNextModel(error)) throw error;
+      const reason = error instanceof ApiError ? `HTTP ${error.status}` : String(error);
+      failures.push(`${model}: ${reason}`);
+      continue;
+    }
+    return { items: parseItems(raw, post), model };
+  }
+  throw new Error(`Every Gemini model failed for post ${post.sourceId} (${failures.join("; ")})`);
 }

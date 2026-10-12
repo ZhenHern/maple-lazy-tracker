@@ -1,6 +1,6 @@
 import "server-only";
 import { cacheLife } from "next/cache";
-import { classifyPost, geminiModel } from "@/lib/classifier/classify";
+import { classifyPost } from "@/lib/classifier/classify";
 import { PROMPT_VERSION } from "@/lib/classifier/prompt";
 import { fetchPost, listTrackedPosts } from "@/lib/scraper/nexon";
 import type { ClassifiedPost, ScrapedPost } from "@/lib/types";
@@ -22,11 +22,11 @@ export async function getClassifiedPost(sourceId?: string): Promise<ClassifiedPo
   cacheLife("hours");
 
   const { text, ...post } = await scrapePost(sourceId);
-  const items = await classifyPost({ ...post, text });
+  const { items, model } = await classifyPost({ ...post, text });
   return {
     ...post,
     items,
-    model: geminiModel(),
+    model,
     promptVersion: PROMPT_VERSION,
     classifiedAt: new Date().toISOString(),
   };

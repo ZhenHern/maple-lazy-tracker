@@ -3,6 +3,7 @@ import { z } from "zod";
 export const TIERS = ["must_do", "if_free", "skip"] as const;
 export const PROFILES = ["new", "casual", "endgame", "returning"] as const;
 export const MAX_ITEMS = 40;
+export const MAX_REWARDS = 5;
 
 const tier = z.enum(TIERS);
 
@@ -22,7 +23,7 @@ export const trackerItemSchema = z.object({
     endgame: tier,
     returning: tier,
   }),
-  rewards: z.array(z.string()).max(5),
+  rewards: z.array(z.string()),
   startsAt: isoDate.nullable(),
   endsAt: isoDate.nullable(),
   timeEstimate: z
@@ -34,16 +35,19 @@ export const trackerItemSchema = z.object({
 });
 
 export const classificationSchema = z.object({
-  items: z.array(trackerItemSchema).min(1).max(MAX_ITEMS),
+  items: z.array(trackerItemSchema).min(1),
 });
 
-// Gemini supports only a subset of JSON Schema, so keywords outside it are
-// removed here. The Zod schema above still enforces them on the reply.
+// Gemini rejects this schema with a bare 400 when it carries string-length or
+// array-size keywords, so they are removed from the copy it receives. Zod still
+// checks minimums on the reply, and classify.ts trims arrays to their caps.
 export const geminiResponseSchema: Record<string, unknown> = z.toJSONSchema(
   classificationSchema,
   {
     override: ({ jsonSchema }) => {
       delete jsonSchema.minLength;
+      delete jsonSchema.minItems;
+      delete jsonSchema.maxItems;
     },
   },
 );
