@@ -34,15 +34,16 @@ Profiles:
 Stack: Next.js App Router + TypeScript on Vercel, Supabase (Postgres) for cache, Gemini via `@google/genai`, Tailwind for styling.
 
 ```
-Vercel Cron (daily)
+Vercel Cron (daily, 08:30 UTC, just after Gemini's quota resets)
    └─> GET /api/cron/ingest        (checks Authorization: Bearer CRON_SECRET)
          1. scraper   list recent posts, fetch body, HTML -> clean text, hash
-         2. diff      skip posts whose hash matches the DB
-         3. classify  Gemini (structured output) -> Zod validate
-         4. store     upsert into Supabase `posts`
-         5. revalidatePath('/')    tell Next.js to rebuild cached pages
+         2. plan      queue posts that are new, changed, or only provisionally rated
+         3. batch     pack several posts into one Gemini request
+         4. classify  Gemini (structured output) -> Zod validate -> grounding checks
+         5. store     upsert into Supabase `posts`
+         6. revalidateTag('posts') tell Next.js the cached pages are stale
 
-Visitor ─> Server Component ─> Supabase (read) ─> HTML
+Visitor ─> Server Component ─> cached read of Supabase ─> HTML
               └─ Client Components: profile picker, priorities, countdown (localStorage)
 ```
 
@@ -50,29 +51,39 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 
 | Path | Purpose |
 |---|---|
-| `app/page.tsx` | Home: one list of everything ongoing, across all recent posts. There are no per-post pages |
-| `app/api/dev/ingest/route.ts` | Dev-only trigger for an ingest run. Phase 2 adds `app/api/cron/ingest/route.ts`, the secured scheduled version |
-| `lib/ingest.ts` | Scrape recent posts, classify new or changed ones (capped per run), attach images, save |
-| `lib/tracker.ts` | `getOngoing()`: merge stored posts, drop ended and duplicate items, rank into tiers |
+| `app/page.tsx` | Home: one list of everything ongoing, across all recent posts |
+| `app/archive/` | `page.tsx` lists every stored post; `[sourceId]/page.tsx` shows one post's quests, ended ones included |
+| `app/api/cron/ingest/route.ts` | The scheduled refresh, protected by `CRON_SECRET` |
+| `app/api/dev/ingest/route.ts` | The same run, triggered by hand. Development only (404 in production) |
+| `lib/ingest.ts` | Scrape recent posts, queue the ones that need work, classify in batches, attach images, save |
+| `lib/tracker.ts` | Cached reads: `getOngoing()` for the home page, `getArchive()` and `getArchivedPost()` for the archive |
 | `lib/images.ts` | Image switch, title-to-section matching, reward-to-icon matching |
 | `lib/scraper/` | Nexon news (cheerio for HTML to text and section images) and maplestory.io item icons |
-| `lib/classifier/` | Prompt, Gemini call, Zod schemas, score-to-tier calibration (`import 'server-only'`) |
-| `lib/db/store.ts` | Post store. A local JSON-file stand-in today (`.data/posts`, with `data/seed` as fallback); Phase 2 swaps its internals for Supabase |
+| `lib/classifier/classify.ts` | The Gemini call: picks a model, respects the quota ledger, waits out per-minute limits |
+| `lib/classifier/quota.ts` | The quota ledger: requests spent per model per day, and which models are blocked |
+| `lib/classifier/batch.ts` | Packs several posts into one request |
+| `lib/classifier/reply.ts`, `grounding.ts`, `dates.ts` | Validate the reply post by post, then check dates and rewards against the post text |
+| `lib/classifier/rules.ts` | No-AI fallback: lists a new event unrated when every model is out of quota |
+| `lib/classifier/models.ts` | Which models are trusted and which are backups |
+| `lib/classifier/prompt.ts`, `schema.ts`, `calibrate.ts` | Prompt, Zod schemas, score-to-tier calibration |
+| `lib/db/store.ts` | The `PostStore` interface. Picks `supabase-store.ts` when Supabase is configured, else `file-store.ts` (`.data/`), with `data/seed` as fallback |
+| `supabase/schema.sql` | The two tables to create in Supabase |
 | `lib/types.ts` | Shared types |
-| `components/` | `QuestLog` (the only stateful client component), `QuestItem`, `ProfilePicker`, `Countdown` |
+| `tests/` | Vitest tests for the ledger, the checks, the ingest flow and the Supabase store |
+| `components/` | `QuestLog` (the stateful client component), `QuestItem`, `ProfilePicker`, `Countdown`, `ArchiveLog`, `SiteHeader` |
 | `lib/tiering.ts` | `resolveTier()`: profile + priorities to one tier |
 | `lib/use-local-storage.ts`, `lib/use-now.ts` | Hydration-safe hooks for browser storage and the clock |
 | `app/globals.css` | Theme tokens and the quest-log component styles |
 
 ### Key design decisions
 
-1. **One Gemini call per post, not one per profile.** Gemini extracts the items once and returns a tier for every profile on each item. A quarter of the cost, and all profiles share the same items, so switching profile only re-groups the list.
+1. **One Gemini call for several posts, never one per profile.** Gemini extracts the items once and returns a score for every profile on each item, so switching profile only re-groups the list. Short posts also share a request: the free tier limits requests, not text, so thirteen posts cost four requests instead of thirteen.
 2. **Structured output plus Zod.** Gemini is given a JSON response schema, which forces the shape of its answer. Zod (a TypeScript runtime validation library) then re-checks the result before anything is saved, because valid JSON can still hold nonsense values.
 3. **Content hash to skip work.** Nexon edits patch notes after publishing. We store a SHA-256 of the cleaned text and only call Gemini when it changes.
 4. **Item IDs are clean slugs, unique per post.** They are used as React keys. Keeping them stable across re-classification is no longer required now that nothing is stored per item.
 5. **Supabase is server-only.** Row Level Security (Postgres rules for who can read which rows) is enabled with no public policies. Only server code using the service-role key touches the DB; the browser never gets a Supabase key.
 6. **Supabase over a key-value store.** A KV cache (Upstash, Vercel Blob) would be less setup, but the archive needs listing and sorting by date, which SQL does naturally. One table with a `jsonb` column keeps it close to "cached JSON".
-7. **Model list in an env var.** `GEMINI_MODEL` is an ordered, comma-separated list. If a model is overloaded, rate limited or retired, the next is tried, and the row records which one answered.
+7. **Two model lists in env vars.** `GEMINI_MODEL` is the ordered list of trusted models; `GEMINI_FALLBACK_MODEL` lists weaker backups. If a trusted model is overloaded, out of quota or retired, the next is tried, and the row records which one answered. See "Running out of quota" below for when backups are used.
 8. **Priorities are resolved in code, not by prompting per user.** Players pick what they care about: `progression`, `limited` items, `cosmetic` (any combination). Gemini rates every item once on all three axes (progression once per profile), and `resolveTier()` in `lib/tiering.ts` returns the best rating among the chosen priorities. Switching priorities is instant and costs no AI calls.
 9. **Gemini scores, code decides tiers.** Gemini returns a 0-100 score per axis. `lib/classifier/calibrate.ts` maps scores to tiers: `must_do` needs a score of 70+ and a place in the top quarter of the post for that axis; 35+ is `if_free`; the rest is `skip`. Models rank far more reliably than they follow "be strict", so this keeps `must_do` rare whichever model answers.
 10. **No guessed time estimates.** Posts describe mechanics, not duration, and a wrong number is worse than none. Each estimate records its basis: `stated` (the post gives the duration), `calculated` (the post gives every quantity needed), or `uncertain`. An uncertain estimate says what is known and never carries a number; the code strips one if the model sends it anyway.
@@ -81,9 +92,23 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 ### Rules
 
 - `GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `CRON_SECRET` are server-only. None use the `NEXT_PUBLIC_` prefix.
-- Caching uses Next 16 Cache Components (on by default in new projects): data functions are marked `'use cache'` with `cacheLife('hours')` as a fallback to the explicit revalidation in step 5. This replaces the older `export const revalidate` page setting.
-- At most 3 posts are classified per cron run, to stay inside the function time limit. Any backlog drains on later runs.
+- Caching uses Next 16 Cache Components: the read functions in `lib/tracker.ts` are marked `'use cache'` with `cacheTag('posts')` and `cacheLife('hours')`. Ingest calls `revalidateTag('posts', 'max')` after saving; the one-hour lifetime is the fallback. This replaces the older `export const revalidate` page setting.
+- At most 3 Gemini requests are spent per cron run, and none is started after 170 seconds, to stay inside the 300-second function limit. Any backlog drains on later runs.
 - If scraping, Gemini or validation fails, the row keeps its previous `items` and records `error`. Nothing live is ever replaced by a bad result.
+
+### Running out of quota
+
+Phase 1 ended with every post rated by `flash-lite`: the trusted models had used their 20 requests for the day and ingest fell straight through to the weakest one. These rules keep ratings accurate when that happens.
+
+1. **Spend fewer requests.** Posts are batched (decision 1), and a quota ledger (`meta` row `gemini-quota`) remembers which models have refused. A model that is out for the day is skipped without a request, because failed requests count against the quota too.
+2. **Tell the two kinds of refusal apart.** A 429 names the quota it hit. A per-minute refusal clears in seconds, so ingest waits (up to 70 seconds) and retries the same model. Only a per-day refusal moves on to the next model.
+3. **Backup results are provisional.** A result from a fallback model is saved, shown with a "Rough rating" badge, and queued to be redone by a trusted model. A backup model may fill a gap (a new post), but it never overwrites a trusted result, even when the post's text has changed.
+4. **Check every answer in code.** `grounding.ts` compares the reply with the post: a date or reward that does not appear in the text is removed, a coin shop listed as its own item is dropped, an estimate with no unit of time becomes `uncertain`, and a single event's end time is aligned with the period the post states. These checks cost no requests and apply to every model.
+5. **Last resort, no AI.** When no model can answer, a new event notice is still listed, unrated ("Not rated yet"), with its dates read by code. Patch notes wait: they cannot be split into items without a model.
+
+The queue order is: new posts, unrated posts, changed posts, provisional posts, then posts rated under an older prompt.
+
+The simplest fix of all is outside the code: enabling billing on the Gemini key lifts the 20-per-day cap, and this workload is only a few requests a day (check current pricing first). Set `GEMINI_DAILY_LIMIT` and `GEMINI_RPM` to match if you do.
 
 ### Nexon images
 
@@ -96,7 +121,8 @@ The patch notes carry a preview and reward pictures under each event's heading. 
 
 ### Gemini free-tier limits (measured in Phase 1)
 
-- 5 requests per minute and 20 requests per day, per model. Failed requests count. The cron must stay well inside the daily figure, which the hash check and the 3-posts-per-run cap already ensure.
+- 5 requests per minute and 20 requests per day, per model. Failed requests count. The daily quota resets at midnight Pacific time (07:00 or 08:00 UTC), which is why the cron runs at 08:30 UTC. The hash check, batching and the 3-requests-per-run cap keep the cron far inside the daily figure; development re-runs are what exhaust it.
+- Three short event notices in one request came back in about 5 seconds with every post answered (measured against `flash-lite`).
 - Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key.
 - Gemini rejects the response schema with a bare 400 if it contains `minItems`/`maxItems`, so size and range limits are enforced in our code instead.
 - Full patch notes (about 45k tokens) can take over a minute, and the SDK retries five times with no timeout by default. We set a 120-second timeout and no SDK retries.
@@ -142,9 +168,11 @@ interface TrackerItem {
 }
 ```
 
-Gemini returns the same shape with 0-100 scores in place of tiers; calibration converts them before anything is stored.
+Gemini returns the same shape with 0-100 scores in place of tiers. The scores are stored as they are and converted to tiers when the page is built. Each item shown also carries `source.rating`: `ai` (trusted model), `backup` (fallback model, to be redone) or `unrated` (no AI rating yet).
 
-### Supabase table
+### Supabase tables
+
+The full script is `supabase/schema.sql`.
 
 ```sql
 create table posts (
@@ -154,16 +182,26 @@ create table posts (
   title          text not null,
   url            text not null,
   published_at   timestamptz not null,
+  thumbnail_url  text,
   content_hash   text not null,                 -- sha256 of cleaned text
-  items          jsonb,                         -- TrackerItem[]; null until first success
-  model          text,
+  items          jsonb,                         -- StoredItem[]
+  model          text,                          -- which model rated it, or 'rules'
   prompt_version int,
+  warnings       jsonb not null default '[]',   -- corrections made by the grounding checks
   error          text,                          -- last failure, null when healthy
   classified_at  timestamptz,
   created_at     timestamptz not null default now()
 );
 create index posts_published_at_idx on posts (published_at desc);
+
+create table meta (                             -- holds the quota ledger
+  key         text primary key,
+  value       jsonb not null,
+  updated_at  timestamptz not null default now()
+);
+
 alter table posts enable row level security;    -- no policies: service role only
+alter table meta  enable row level security;
 ```
 
 ### Browser storage (`localStorage`)
@@ -176,11 +214,19 @@ alter table posts enable row level security;    -- no policies: service role onl
 ### Environment variables
 
 All server-only, documented in `.env.example`:
-`GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, plus one switch: `NEXON_IMAGES` (show images from Nexon's CDN and maplestory.io).
+`GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`, `GEMINI_DAILY_LIMIT`, `GEMINI_RPM`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, plus one switch: `NEXON_IMAGES` (show images from Nexon's CDN and maplestory.io).
 
 ## 5. Build phases
 
-Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2. Parts of Phase 2 now exist in local form: the ingest step with hash-based skipping (`lib/ingest.ts`) and a post store (`lib/db/store.ts`) backed by JSON files. What Phase 2 still has to do is swap the store's internals for Supabase, add the secured cron route, and deploy. The file store cannot work on Vercel, whose file system is read-only.
+Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2.
+
+**Status.** All the code for the three phases is written and tested locally. What is left needs accounts, so it is yours to do:
+
+1. Create a Supabase project and run `supabase/schema.sql` in its SQL editor.
+2. Import the repository in Vercel and set the environment variables from `.env.example` (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `GEMINI_API_KEY`, the model lists, and `NEXON_IMAGES` if you decide to show images).
+3. Deploy. The cron in `vercel.json` starts on its own; trigger it once by hand from the Vercel dashboard to fill the database.
+
+Not yet verified: the Supabase store has only run against a local stand-in for Supabase's REST API (`tests/supabase-store.test.ts`), never a real project, and the cron has only been called by hand on a local production build. The file store cannot work on Vercel, whose file system is read-only, so step 1 is required.
 
 ### The ongoing view
 
@@ -213,7 +259,7 @@ Scaffold Next.js + TypeScript + Tailwind. Find the news data source, build the s
 
 Create the Supabase project and `posts` table. Add the DB layer, hash-based diffing, ID reuse on re-classification, the secured cron route and the `vercel.json` schedule. Pages read from Supabase. Add the archive list and detail routes.
 
-- **Done when:** running ingest twice in a row makes zero Gemini calls the second time, and a deliberately broken Gemini response leaves the old data live.
+- **Done when:** running ingest twice in a row makes zero Gemini calls the second time, and a deliberately broken Gemini response leaves the old data live. Both are covered by `tests/ingest.test.ts`.
 - **Concepts:** Postgres + jsonb, RLS, service-role key, Vercel Cron, ISR and revalidation.
 
 ### Phase 3: Quest-log UI and launch
