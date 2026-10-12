@@ -40,7 +40,7 @@ const CATEGORIES: { key: CategoryFilter; label: string }[] = [
 ];
 
 // Stable sanitizers for useLocalStorage: stored data is untrusted input too.
-function sanitizeProfile(stored: unknown): Profile {
+export function sanitizeProfile(stored: unknown): Profile {
   return PROFILES.find((profile) => profile === stored) ?? "casual";
 }
 

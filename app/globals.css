@@ -397,7 +397,8 @@ body {
   border-color: var(--color-frame);
 }
 
-.filter[aria-pressed="true"] {
+.filter[aria-pressed="true"],
+.filter[aria-current="page"] {
   border-color: var(--color-frame-dark);
   background: var(--color-frame);
   color: #ffffff;

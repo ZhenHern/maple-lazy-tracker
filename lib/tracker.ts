@@ -1,7 +1,7 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { calibrate } from "@/lib/classifier/calibrate";
-import { ratingOf } from "@/lib/classifier/models";
+import { ratingOf, type Rating } from "@/lib/classifier/models";
 import { readAllPosts } from "@/lib/db/store";
 import { nexonImagesEnabled, sameTitle } from "@/lib/images";
 import type { PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
@@ -89,5 +89,80 @@ export async function getOngoing(): Promise<OngoingTracker> {
       .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
     updatedAt:
       contributing.map((post) => post.classifiedAt).sort().at(-1) ?? null,
+  };
+}
+
+/** One stored post as the archive lists it. */
+export interface ArchiveEntry extends PostSummary {
+  itemCount: number;
+  /** Items that have not ended yet. */
+  ongoingCount: number;
+  rating: Rating;
+}
+
+function toSummary(post: StoredPost, showImages: boolean): PostSummary {
+  const { sourceId, kind, title, url, publishedAt, thumbnailUrl } = post;
+  return { sourceId, kind, title, url, publishedAt, thumbnailUrl: showImages ? thumbnailUrl : null };
+}
+
+/** Every stored post, newest first, including ones too old for the home page. */
+export async function getArchive(): Promise<ArchiveEntry[]> {
+  "use cache";
+  cacheTag(POSTS_TAG);
+  cacheLife("hours");
+
+  const now = Date.now();
+  const showImages = nexonImagesEnabled();
+  return (await readAllPosts())
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .map((post) => ({
+      ...toSummary(post, showImages),
+      itemCount: post.items.length,
+      ongoingCount: post.items.filter(
+        (item) => item.endsAt === null || Date.parse(item.endsAt) > now,
+      ).length,
+      rating: ratingOf(post.model),
+    }));
+}
+
+export interface ArchivedPost {
+  post: ArchiveEntry;
+  /** Every item of the post, ended ones included, ranked against each other. */
+  items: TrackerItem[];
+  classifiedAt: string;
+}
+
+/** One post in full, or null when it is not in the store. */
+export async function getArchivedPost(sourceId: string): Promise<ArchivedPost | null> {
+  "use cache";
+  cacheTag(POSTS_TAG);
+  cacheLife("hours");
+
+  const stored = (await readAllPosts()).find((post) => post.sourceId === sourceId);
+  if (!stored) return null;
+
+  const now = Date.now();
+  const showImages = nexonImagesEnabled();
+  const rating = ratingOf(stored.model);
+  const source = { sourceId: stored.sourceId, title: stored.title, url: stored.url, rating };
+  return {
+    post: {
+      ...toSummary(stored, showImages),
+      itemCount: stored.items.length,
+      ongoingCount: stored.items.filter(
+        (item) => item.endsAt === null || Date.parse(item.endsAt) > now,
+      ).length,
+      rating,
+    },
+    // Here tiers are ranked inside the one post: the archive answers "what
+    // mattered in this patch", not "what matters today".
+    items: calibrate(
+      stored.items.map((item) => ({
+        ...(showImages ? item : stripImages(item)),
+        id: `${stored.sourceId}-${item.id}`,
+        source,
+      })),
+    ),
+    classifiedAt: stored.classifiedAt,
   };
 }

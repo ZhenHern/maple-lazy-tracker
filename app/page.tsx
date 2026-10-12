@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { PixelSprite } from "@/components/pixel-sprite";
 import { QuestLog } from "@/components/quest-log";
 import { Scenery } from "@/components/scenery";
+import { SiteFooter, SiteHeader } from "@/components/site-header";
 import { getOngoing } from "@/lib/tracker";
 
 export default function Home() {
@@ -10,24 +10,16 @@ export default function Home() {
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:pt-10">
       <Scenery />
 
-      <header className="mb-6 flex items-center gap-3">
-        <PixelSprite name="leaf" className="logo-leaf h-14 w-14 shrink-0" />
-        <div>
-          <h1 className="logo text-4xl leading-none sm:text-5xl">Lazy Tracker</h1>
-          <p className="tagline">Play less. Miss nothing.</p>
-        </div>
-      </header>
+      <SiteHeader current="/" />
 
       <main>
+        <h1 className="sr-only">Lazy Tracker: what is worth doing in MapleStory right now</h1>
         <Suspense fallback={<Notice title="Loading">Checking what is running...</Notice>}>
           <Tracker />
         </Suspense>
       </main>
 
-      <footer className="footnote">
-        Fan project, not affiliated with Nexon. Tiers and time estimates are AI-generated from the
-        official patch notes and can be wrong. MapleStory and all related images belong to Nexon.
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
@@ -50,8 +42,8 @@ function formatDay(iso: string): string {
   });
 }
 
-// Reads the store on every request, inside <Suspense>, so the page shell is
-// sent at once and the list streams in. No AI call ever happens here.
+// Reads the cached list (see getOngoing). No AI call ever happens here: the
+// daily cron does the classifying, visitors only ever read its results.
 async function Tracker() {
   const { items, sources, updatedAt } = await getOngoing();
 
