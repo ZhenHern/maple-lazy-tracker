@@ -57,7 +57,10 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 | `lib/classifier/` | Prompt, Gemini call, Zod schema (`import 'server-only'`) |
 | `lib/db/` | Supabase server client and queries (`import 'server-only'`) |
 | `lib/types.ts` | Shared types |
-| `components/` | `QuestLog`, `QuestItem`, `ProfilePicker`, `Countdown` |
+| `components/` | `QuestLog` (the only stateful client component), `QuestItem`, `ProfilePicker`, `Countdown` |
+| `lib/tiering.ts` | `resolveTier()`: profile + priorities to one tier |
+| `lib/use-local-storage.ts`, `lib/use-now.ts` | Hydration-safe hooks for browser storage and the clock |
+| `app/globals.css` | Theme tokens and the quest-log component styles |
 
 ### Key design decisions
 
@@ -166,6 +169,8 @@ All server-only, documented in `.env.example`:
 `GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`.
 
 ## 5. Build phases
+
+Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2. Until Supabase exists, the UI reads through `getClassifiedPost()` in `lib/pipeline.ts`, which serves a saved real classification (`lib/fixtures/sample-post.json`) when `TRACKER_FIXTURE=1`. Phase 2 replaces that function's body with a Supabase read; the components do not change.
 
 ### Phase 1: Pipeline to JSON
 
