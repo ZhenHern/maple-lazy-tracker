@@ -236,7 +236,10 @@ Not yet verified: the Supabase store has only run against a local stand-in for S
 
 The home page shows everything running now in one list, so players do not open posts one by one.
 
-- **Sources.** Patch notes and event notices published in the last 100 days.
+- **Sources.** Every stored post. A quest with an end date stays until it ends, however old its post is. Permanent items count only from posts published in the last 100 days (and only from the latest patch, see below).
+- **Not started yet.** A quest whose start date is in the future shows "Starts <date>" instead of a countdown.
+- **Rough ratings.** When most of the list was rated by a backup model, one notice above the tabs replaces the per-quest "Rough rating" chips.
+- **New since last visit.** The browser remembers the previous visit (`lazy-tracker:visits` in localStorage) and marks quests from posts published after it.
 - **Scores are stored, tiers are computed on read.** Gemini's 0-100 scores are saved as they are. `getOngoing()` ranks the combined ongoing list, so items from different posts compete for the same must-do slots. Ranking inside each post would crown the only item of every single-event notice.
 - **Duplicates.** The same event often appears in the patch notes and in its own notice. Items with matching titles are merged; the dedicated notice wins, then the newer post.
 - **Ended items** are dropped on the server at read time, and the client moves anything that expires while the page is open into an "Ended" section.
@@ -244,7 +247,7 @@ The home page shows everything running now in one list, so players do not open p
 
 ### What the prompt knows about progression
 
-The same reward is worth different amounts to different players, so the prompt (version 7) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
+The same reward is worth different amounts to different players, so the prompt (version 8) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
 
 ### Picking pictures
 

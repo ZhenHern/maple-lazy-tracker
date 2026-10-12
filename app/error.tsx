@@ -19,19 +19,19 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-10 pb-10">
+    <div className="page">
       <section className="window">
         <h1 className="window-title">Connection lost</h1>
-        <div className="window-body grid gap-3">
-          <p>
-            The quest log could not be loaded. This is on our side, not yours, and it is usually
-            temporary.
-          </p>
-          <p>
-            <button type="button" className="btn btn-go" onClick={() => retry()}>
-              Try again
-            </button>
-          </p>
+        <div className="window-body">
+          <div className="empty">
+            <p className="empty-title">The quest log could not be loaded</p>
+            <p>This is on our side, not yours, and it is usually temporary.</p>
+            <p>
+              <button type="button" className="btn btn-go" onClick={() => retry()}>
+                Try again
+              </button>
+            </p>
+          </div>
         </div>
       </section>
     </div>

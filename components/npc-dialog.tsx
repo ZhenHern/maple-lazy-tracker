@@ -54,7 +54,9 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
   const [hits, setHits] = useState<Hit[]>([]);
   const nextHitId = useRef(0);
 
-  const line = pokes > 0 && pokes % 5 === 0 ? OUCH : lines[index % lines.length];
+  // Every fifth poke the Shroom complains, until the visitor moves on.
+  const [ouch, setOuch] = useState(false);
+  const line = ouch ? OUCH : lines[index % lines.length];
 
   function poke() {
     const critical = Math.random() < 0.2;
@@ -67,6 +69,13 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
     };
     setHits((current) => [...current, hit]);
     setPokes((count) => count + 1);
+    setOuch((pokes + 1) % 5 === 0);
+    // The number normally removes itself when its animation ends. With reduced
+    // motion there is no animation, so a timer clears it as well.
+    window.setTimeout(
+      () => setHits((current) => current.filter((each) => each.id !== hit.id)),
+      1000,
+    );
   }
 
   return (
@@ -108,7 +117,10 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
               ))}
             </span>
             {lines.length > 1 && (
-              <button type="button" className="btn" onClick={() => setIndex((i) => i + 1)}>
+              <button type="button" className="btn" onClick={() => {
+                  setOuch(false);
+                  setIndex((i) => i + 1);
+                }}>
                 Next ▸
                 <span className="sr-only">
                   {" "}

@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
   const profile: Profile = PROFILES.find((each) => each === params.get("profile")) ?? "casual";
   const wanted = (params.get("priorities") ?? "").split(",");
   const priorities: Priority[] = PRIORITIES.filter((each) => wanted.includes(each));
-  const tiers = TIERS_BY_DEPTH[params.get("tier") ?? "worth"] ?? TIERS_BY_DEPTH.worth;
+  // Object.hasOwn, not a bare lookup: "?tier=constructor" would otherwise find
+  // a property every object inherits and crash the route.
+  const depth = params.get("tier") ?? "worth";
+  const tiers = Object.hasOwn(TIERS_BY_DEPTH, depth) ? TIERS_BY_DEPTH[depth] : TIERS_BY_DEPTH.worth;
 
   const { items } = await getOngoing();
   const chosen = items.filter((item) => tiers.includes(resolveTier(item, profile, priorities)));

@@ -241,7 +241,7 @@ describe("pickImages", () => {
   const MB = 1_000_000;
   const sizes = new Map([
     ["icon.png", 2_000],
-    ["screenshot.png", 0.5 * MB],
+    ["screenshot.png", 0.3 * MB],
     ["poster.png", 5 * MB],
     ["small.gif", 0.2 * MB],
     ["huge.gif", 80 * MB],

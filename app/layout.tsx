@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito, Pixelify_Sans } from "next/font/google";
+import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 // next/font downloads these at build time and self-hosts them, so the browser
@@ -14,9 +15,20 @@ const pixelFont = Pixelify_Sans({
   subsets: ["latin"],
 });
 
+// Metadata becomes the <title> and the tags that link previews read. The
+// share picture is app/opengraph-image.tsx; metadataBase turns its path into
+// the full URL that Discord and others need.
 export const metadata: Metadata = {
-  title: "Lazy Tracker",
-  description: "What is actually worth doing in the latest Global MapleStory patch.",
+  metadataBase: new URL(siteUrl()),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

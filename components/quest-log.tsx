@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
 import { resolveTier } from "@/lib/tiering";
 import type { Priority, Profile, Tier, TrackerItem } from "@/lib/types";
+import { usePreviousVisit } from "@/lib/use-last-visit";
 import { useLocalStorage } from "@/lib/use-local-storage";
 import { useNow } from "@/lib/use-now";
 import { ENDING_SOON, formatRemaining } from "./countdown";
@@ -142,6 +143,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
     sanitizePriorities,
   );
   const now = useNow();
+  const previousVisit = usePreviousVisit();
   const [tab, setTab] = useState<SectionKey>("must_do");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("all");
@@ -278,6 +280,17 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
 
           {rough && <RoughNotice items={allItems} />}
 
+          <p className="text-xs text-ink-soft">
+            {/* A plain link: the server builds the file for the chosen job and priorities. */}
+            <a
+              className="font-bold underline"
+              href={`/api/calendar?profile=${profile}&priorities=${priorities.join(",")}`}
+            >
+              Add the deadlines to your calendar
+            </a>{" "}
+            (Must Do and If Free quests for your job, as an .ics file).
+          </p>
+
           <div className="min-w-0">
             <div className="tabs" role="tablist" aria-label="Tiers" onKeyDown={onTabKeyDown}>
               {SECTIONS.map(({ key, title }) => {
@@ -323,7 +336,16 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
                 // The key remounts the list on a tab change so quests animate in.
                 <ul key={tab} className="grid gap-2">
                   {visible.map((item, index) => (
-                    <QuestItem key={item.id} item={item} profile={profile} now={now} index={index} />
+                    <QuestItem
+                      key={item.id}
+                      item={item}
+                      profile={profile}
+                      now={now}
+                      index={index}
+                      isNew={
+                        previousVisit !== null && Date.parse(item.source.publishedAt) > previousVisit
+                      }
+                    />
                   ))}
                 </ul>
               ) : filtering && groups[tab].length > 0 ? (

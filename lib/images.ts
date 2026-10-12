@@ -51,7 +51,7 @@ export function isAnimated(url: string): boolean {
 
 // A still picture up to this size makes a good preview. Bigger ones are kept
 // but rank lower, because the preview is also the small thumbnail in the list.
-const PREVIEW_MAX_BYTES = 1_500_000;
+const PREVIEW_MAX_BYTES = 400_000;
 // A GIF above this is left out altogether: it costs too much data and CPU.
 const GIF_MAX_BYTES = 6_000_000;
 

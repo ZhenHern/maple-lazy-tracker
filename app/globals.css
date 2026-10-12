@@ -1308,6 +1308,31 @@ body {
   color: #7a5600;
 }
 
+/* Announced but not open yet. */
+.chip-soon {
+  border-color: #b9a4e6;
+  background: #efe8ff;
+  color: #45308a;
+}
+
+/* Appeared since the visitor's previous visit. */
+.chip-new {
+  border-color: #c2410c;
+  background: var(--color-maple);
+  color: #ffffff;
+}
+
+/* The model's one-sentence reason for a quest's ratings. */
+.quest-why {
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.65rem;
+  border-left: 4px solid var(--color-gold);
+  border-radius: 6px;
+  background: #fffaf0;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
 .chip-live {
   border-color: #7cc65a;
   background: #e6f7dc;

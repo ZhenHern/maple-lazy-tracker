@@ -47,10 +47,12 @@ export async function getOngoing(): Promise<OngoingTracker> {
   cacheLife("hours");
 
   const now = Date.now();
-  const posts = (await readAllPosts())
-    .filter((post) => Date.parse(post.publishedAt) >= now - WINDOW_DAYS * DAY)
-    .sort(byPreference);
+  const posts = (await readAllPosts()).sort(byPreference);
   const showImages = nexonImagesEnabled();
+  // Posts older than this no longer contribute permanent items. A dated item
+  // stays until it ends, however old its post is: a long event must not drop
+  // off the list while it is still running.
+  const cutoff = now - WINDOW_DAYS * DAY;
 
   // Permanent content and system changes have no end date, so without a rule
   // they would sit in the list for months. They are news of the current patch:
@@ -63,7 +65,9 @@ export async function getOngoing(): Promise<OngoingTracker> {
 
   const kept: (StoredItem & { source: TrackerItem["source"] })[] = [];
   for (const post of posts) {
-    const superseded = post.kind === "patch" && post.publishedAt !== latestPatch;
+    const stale =
+      (post.kind === "patch" && post.publishedAt !== latestPatch) ||
+      Date.parse(post.publishedAt) < cutoff;
     const source = {
       sourceId: post.sourceId,
       title: post.title,
@@ -73,7 +77,7 @@ export async function getOngoing(): Promise<OngoingTracker> {
     };
     for (const item of post.items) {
       if (item.endsAt !== null && Date.parse(item.endsAt) <= now) continue;
-      if (item.endsAt === null && superseded) continue;
+      if (item.endsAt === null && stale) continue;
       // A repeat is the same title in ANOTHER post (the patch notes and the
       // event's own notice). Inside one post, "Operation: Dive" and
       // "Operation: Dive Dungeon" are two activities and both stay.
@@ -119,6 +123,24 @@ export interface ArchiveEntry extends PostSummary {
   rating: Rating;
 }
 
+/** The newest patch notes' publish date: only that patch's permanent items count as current. */
+function latestPatchDate(posts: StoredPost[]): string | undefined {
+  return posts
+    .filter((post) => post.kind === "patch")
+    .map((post) => post.publishedAt)
+    .sort()
+    .at(-1);
+}
+
+// The same rule the home page uses, so the archive's "still running" count
+// matches what a visitor sees there.
+function countRunning(post: StoredPost, now: number, latestPatch: string | undefined): number {
+  const current = post.kind !== "patch" || post.publishedAt === latestPatch;
+  return post.items.filter((item) =>
+    item.endsAt === null ? current : Date.parse(item.endsAt) > now,
+  ).length;
+}
+
 function toSummary(post: StoredPost, showImages: boolean): PostSummary {
   const { sourceId, kind, title, url, publishedAt, thumbnailUrl } = post;
   return { sourceId, kind, title, url, publishedAt, thumbnailUrl: showImages ? thumbnailUrl : null };
@@ -132,14 +154,14 @@ export async function getArchive(): Promise<ArchiveEntry[]> {
 
   const now = Date.now();
   const showImages = nexonImagesEnabled();
-  return (await readAllPosts())
+  const posts = await readAllPosts();
+  const latestPatch = latestPatchDate(posts);
+  return posts
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .map((post) => ({
       ...toSummary(post, showImages),
       itemCount: post.items.length,
-      ongoingCount: post.items.filter(
-        (item) => item.endsAt === null || Date.parse(item.endsAt) > now,
-      ).length,
+      ongoingCount: countRunning(post, now, latestPatch),
       rating: ratingOf(post.model),
     }));
 }
@@ -157,7 +179,8 @@ export async function getArchivedPost(sourceId: string): Promise<ArchivedPost | 
   cacheTag(POSTS_TAG);
   cacheLife("hours");
 
-  const stored = (await readAllPosts()).find((post) => post.sourceId === sourceId);
+  const posts = await readAllPosts();
+  const stored = posts.find((post) => post.sourceId === sourceId);
   if (!stored) return null;
 
   const now = Date.now();
@@ -174,9 +197,7 @@ export async function getArchivedPost(sourceId: string): Promise<ArchivedPost | 
     post: {
       ...toSummary(stored, showImages),
       itemCount: stored.items.length,
-      ongoingCount: stored.items.filter(
-        (item) => item.endsAt === null || Date.parse(item.endsAt) > now,
-      ).length,
+      ongoingCount: countRunning(stored, now, latestPatchDate(posts)),
       rating,
     },
     // Here tiers are ranked inside the one post: the archive answers "what

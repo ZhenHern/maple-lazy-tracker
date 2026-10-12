@@ -42,6 +42,8 @@ interface QuestItemProps {
   now: number | null;
   /** Position in the list, used to stagger the entrance animation. */
   index: number;
+  /** True when the quest appeared since the visitor's previous visit. */
+  isNew?: boolean;
 }
 
 // Images load straight from Nexon's CDN in the visitor's browser. next/image is
@@ -76,7 +78,7 @@ function whenText(item: TrackerItem, now: number | null): string {
     : `${dates} (UTC). ${formatRemaining(remaining)}.`;
 }
 
-export function QuestItem({ item, profile, now, index }: QuestItemProps) {
+export function QuestItem({ item, profile, now, index, isNew = false }: QuestItemProps) {
   const ratings: [string, Tier][] = [
     ["Progression", item.value.progression[profile]],
     ["Limited", item.value.limited],
@@ -90,7 +92,11 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
   // The closed card names a couple of rewards, ones with a picture first, and
   // keeps each picture next to its own name.
   const loot = item.rewards
-    .map((reward, position) => ({ reward, icon: item.rewardImages[position] ?? null }))
+    .map((reward, position) => {
+      const icon = item.rewardImages[position] ?? null;
+      // No animated icons in the closed list, for the same reason as the thumbnail.
+      return { reward, icon: icon && !isAnimated(icon) ? icon : null };
+    })
     .sort((a, b) => Number(b.icon !== null) - Number(a.icon !== null))
     .slice(0, LOOT_NAMES);
   const elapsed = elapsedPercent(item, now);
@@ -116,7 +122,8 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
           <div className="quest-main">
             <h3 className="quest-title">{item.title}</h3>
             <div className="quest-meta">
-              <Countdown endsAt={item.endsAt} now={now} />
+              {isNew && <span className="chip chip-new">New</span>}
+              <Countdown startsAt={item.startsAt} endsAt={item.endsAt} now={now} />
               {ratingNote && (
                 // A list that is mostly rough hides this chip and shows one
                 // notice instead (see .ratings-rough in globals.css).
@@ -263,6 +270,8 @@ export function QuestItem({ item, profile, now, index }: QuestItemProps) {
 
           <div>
             <h4 className="label">Worth it for a {PROFILE_INFO[profile].name}?</h4>
+            {/* The model's one-sentence reason. Older data has none. */}
+            {item.why && <p className="quest-why">{item.why}</p>}
             <ul className="quest-ratings">
               {ratings.map(([axis, tier]) => (
                 <li key={axis} className={`rating tier-${tier}`}>

@@ -19,12 +19,23 @@ export function formatDate(iso: string): string {
 }
 
 interface CountdownProps {
+  /** When set and still in the future, the chip says when the quest opens. */
+  startsAt?: string | null;
   endsAt: string | null;
   /** Current time in ms, or null before hydration. */
   now: number | null;
 }
 
-export function Countdown({ endsAt, now }: CountdownProps) {
+export function Countdown({ startsAt = null, endsAt, now }: CountdownProps) {
+  // Not open yet: saying "29 days left" would send players to an event that
+  // does not exist in the game today.
+  if (now !== null && startsAt !== null && Date.parse(startsAt) > now) {
+    return (
+      <span className="chip chip-soon" title={`Starts ${formatDate(startsAt)} (UTC)`}>
+        Starts {formatDate(startsAt)}
+      </span>
+    );
+  }
   if (!endsAt) {
     return <span className="chip chip-quiet">Permanent</span>;
   }
