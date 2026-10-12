@@ -27,6 +27,14 @@ Each post gets a status:
 
 The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day, resetting at midnight Pacific time. The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
 
+## Useful URLs
+
+| URL | What it gives you |
+|---|---|
+| `/api/status` | Health check: which store is in use, how many posts have a final rating, when the last run was, today's quota use |
+| `/api/calendar` | The end dates of worthwhile quests as an `.ics` calendar file. Optional: `?profile=new|casual|endgame|returning`, `&priorities=progression,limited,cosmetic`, `&tier=must_do|worth|all` |
+| `/sitemap.xml`, `/robots.txt` | For search engines |
+
 ## Deploying
 
 1. Create a Supabase project and run `supabase/schema.sql` in its SQL editor.
