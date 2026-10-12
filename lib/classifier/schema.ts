@@ -50,12 +50,35 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
   });
 }
 
-// Stored items also carry image URLs. These come from the post's HTML, never
-// from Gemini, so they are not part of the schema Gemini is given.
-export const trackerItemSchema = itemSchema(tier).extend({
-  images: z.array(z.string()).default([]),
-});
+// What Gemini returns: the item with a 0-100 score on each axis.
 export const scoredItemSchema = itemSchema(z.number());
+
+// What we store: Gemini's item plus image URLs. Images come from the post's
+// HTML and an item database, never from Gemini. Scores are stored raw and
+// turned into tiers at read time, so items from different posts are ranked
+// against each other.
+export const storedItemSchema = scoredItemSchema.extend({
+  images: z.array(z.string()).default([]),
+  // Parallel to "rewards": the icon for each reward, or null.
+  rewardImages: z.array(z.string().nullable()).default([]),
+});
+
+export const storedPostSchema = z.object({
+  sourceId: z.string(),
+  kind: z.enum(["patch", "event"]),
+  title: z.string(),
+  url: z.string(),
+  publishedAt: z.string(),
+  thumbnailUrl: z.string().nullable(),
+  contentHash: z.string(),
+  items: z.array(storedItemSchema),
+  model: z.string(),
+  promptVersion: z.number(),
+  classifiedAt: z.string(),
+});
+
+// Kept only so the tier-valued item type can be derived from it.
+export const tieredItemSchema = itemSchema(tier);
 
 export const classificationSchema = z.object({
   items: z.array(scoredItemSchema).min(1),

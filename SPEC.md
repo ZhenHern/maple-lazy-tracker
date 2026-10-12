@@ -50,13 +50,14 @@ Visitor ─> Server Component ─> Supabase (read) ─> HTML
 
 | Path | Purpose |
 |---|---|
-| `app/page.tsx` | Home: current quest log (latest patch + unexpired event items) |
-| `app/archive/page.tsx` | List of past patches |
-| `app/patch/[id]/page.tsx` | One archived patch |
-| `app/api/cron/ingest/route.ts` | Pipeline entry point, `maxDuration = 60` |
-| `lib/scraper/` | Fetch and parse Nexon news (cheerio for HTML to text) |
-| `lib/classifier/` | Prompt, Gemini call, Zod schema (`import 'server-only'`) |
-| `lib/db/` | Supabase server client and queries (`import 'server-only'`) |
+| `app/page.tsx` | Home: one list of everything ongoing, across all recent posts. There are no per-post pages |
+| `app/api/dev/ingest/route.ts` | Dev-only trigger for an ingest run. Phase 2 adds `app/api/cron/ingest/route.ts`, the secured scheduled version |
+| `lib/ingest.ts` | Scrape recent posts, classify new or changed ones (capped per run), attach images, save |
+| `lib/tracker.ts` | `getOngoing()`: merge stored posts, drop ended and duplicate items, rank into tiers |
+| `lib/images.ts` | Image switch, title-to-section matching, reward-to-icon matching |
+| `lib/scraper/` | Nexon news (cheerio for HTML to text and section images) and maplestory.io item icons |
+| `lib/classifier/` | Prompt, Gemini call, Zod schemas, score-to-tier calibration (`import 'server-only'`) |
+| `lib/db/store.ts` | Post store. A local JSON-file stand-in today (`.data/posts`, with `data/seed` as fallback); Phase 2 swaps its internals for Supabase |
 | `lib/types.ts` | Shared types |
 | `components/` | `QuestLog` (the only stateful client component), `QuestItem`, `ProfilePicker`, `Countdown` |
 | `lib/tiering.ts` | `resolveTier()`: profile + priorities to one tier |
@@ -175,11 +176,31 @@ alter table posts enable row level security;    -- no policies: service role onl
 ### Environment variables
 
 All server-only, documented in `.env.example`:
-`GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, plus two switches: `TRACKER_FIXTURE` (serve the saved sample instead of calling Gemini) and `NEXON_IMAGES` (show images from Nexon's CDN).
+`GEMINI_API_KEY`, `GEMINI_MODEL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, plus one switch: `NEXON_IMAGES` (show images from Nexon's CDN and maplestory.io).
 
 ## 5. Build phases
 
-Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2. Until Supabase exists, the UI reads through `getClassifiedPost()` in `lib/pipeline.ts`, which serves a saved real classification (`lib/fixtures/sample-post.json`) when `TRACKER_FIXTURE=1`. Phase 2 replaces that function's body with a Supabase read; the components do not change.
+Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2. Parts of Phase 2 now exist in local form: the ingest step with hash-based skipping (`lib/ingest.ts`) and a post store (`lib/db/store.ts`) backed by JSON files. What Phase 2 still has to do is swap the store's internals for Supabase, add the secured cron route, and deploy. The file store cannot work on Vercel, whose file system is read-only.
+
+### The ongoing view
+
+The home page shows everything running now in one list, so players do not open posts one by one.
+
+- **Sources.** Patch notes and event notices published in the last 100 days.
+- **Scores are stored, tiers are computed on read.** Gemini's 0-100 scores are saved as they are. `getOngoing()` ranks the combined ongoing list, so items from different posts compete for the same must-do slots. Ranking inside each post would crown the only item of every single-event notice.
+- **Duplicates.** The same event often appears in the patch notes and in its own notice. Items with matching titles are merged; the dedicated notice wins, then the newer post.
+- **Ended items** are dropped on the server at read time, and the client moves anything that expires while the page is open into an "Ended" section.
+
+### Reward icons
+
+Each reward can carry an icon, looked up in this order:
+
+1. Images under the item's own heading in the post. Nexon names its icon files after the item (`icon_advanced_exp_voucher.png`), so rewards are matched by filename words.
+2. Images anywhere in the same post.
+3. Images in any other recent post (common rewards are often illustrated only once).
+4. maplestory.io, a community-run database built from the game's data files, by exact item name. It is unofficial, has no uptime guarantee and runs about one patch behind, so every call fails soft.
+
+Matching is strict on purpose: a wrong icon is worse than none. Rewards that are not items (buffs, skills, "Passive EXP") get no icon. All icons are subject to the `NEXON_IMAGES` switch.
 
 ### Phase 1: Pipeline to JSON
 

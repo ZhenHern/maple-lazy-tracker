@@ -1,0 +1,1129 @@
+{
+  "sourceId": "42415",
+  "kind": "patch",
+  "title": "[Updated 9/9] v.270 - Ride the Lightning Patch Notes",
+  "url": "https://www.nexon.com/maplestory/news/update/42415",
+  "publishedAt": "2026-07-21T16:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/yinjsgsf/260717_rl2_patchnotes-wgc-3285-540x304.png",
+  "contentHash": "1ecbef8c58a90c89f2d17901a3e8c96c1ff4ac9846024b515763b93da7292315",
+  "items": [
+    {
+      "id": "new-boss-jupiter",
+      "title": "New Boss: Jupiter",
+      "category": "content",
+      "summary": "Challenge the new weekly boss Jupiter at level 295+ to obtain Grand Sacred Symbol: Geardock and new gear pieces like the Original Sin of Pride and Eternal armor boxes.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 60,
+          "endgame": 100,
+          "returning": 0
+        },
+        "limited": 0,
+        "cosmetic": 60
+      },
+      "rewards": [
+        "Original Sin of Pride",
+        "Lingering Twisted Desire",
+        "Eternal Twisted Armor Box",
+        "Jupiter's Soul Shard"
+      ],
+      "startsAt": "2026-07-23T00:00:00Z",
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/crahn5t0/jupiter-main-pic.png",
+        "https://g.nexonstatic.com/media/33kfrr1s/jupiteroid.png",
+        "https://g.nexonstatic.com/media/pqooq1my/rejection.png",
+        "https://g.nexonstatic.com/media/y0lljies/control-and-madness.png",
+        "https://g.nexonstatic.com/media/ppon2gej/original-sin-of-pride.png?rmode=max&width=50&height=46"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/1012911/icon",
+        "https://g.nexonstatic.com/media/uo5njh0l/lingering-twisted-desire.png",
+        "https://g.nexonstatic.com/media/cnkp1r1k/eternal-twisted-armor-box.png",
+        "https://maplestory.io/api/GMS/270/item/2831524/icon"
+      ]
+    },
+    {
+      "id": "new-area-geardock",
+      "title": "New Area: Geardock",
+      "category": "content",
+      "summary": "Explore the Geardock region, complete area quests at level 295+, and unlock the Grand Sacred Symbol: Geardock for bonus EXP and stats.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 70,
+          "endgame": 95,
+          "returning": 0
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Grandis Daily Quest Symbol Rewards",
+        "Grand Sacred Symbol: Geardock",
+        "Requiem of the Gods Medal"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/a51nonlw/image.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/cyybwpud/sacred-symbol-geardock.png",
+        null
+      ]
+    },
+    {
+      "id": "astra-secondary-weapon",
+      "title": "Astra Secondary Weapon",
+      "category": "content",
+      "summary": "Complete secondary weapon quests using Vestiges of Erion and Traces of Battle gathered from Grandis dailies and bosses to unlock and upgrade your Lv. 200 Astra Secondary Weapon up to 30 stars.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 80,
+          "endgame": 100,
+          "returning": 70
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Astra Secondary Weapon I, II, III",
+        "Stat upgrades"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": "destiny-2nd-transcendence-weapon",
+      "title": "Destiny 2nd Transcendence Weapon",
+      "category": "content",
+      "summary": "Complete Decisive Battle quests against First Adversary, Limbo, and Baldrix in Destiny Mode to further transcend your Destiny Weapon up to 25 stars and gain powerful passive and active skills.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 75,
+          "endgame": 100,
+          "returning": 0
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Legacy of First Transcendence skill",
+        "Decisive Willpower skill",
+        "Undying Determination skill"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/uysnzgmo/destiny-2nd-transcendence-weapon-box.png",
+        "https://g.nexonstatic.com/media/i0wiozp2/loft1.png"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "kinesis-redux",
+      "title": "Kinesis Redux",
+      "category": "system",
+      "summary": "Kinesis has been revamped to use MP instead of Psychic Points, with skill changes and resets available for existing characters via Maple Administrator.",
+      "value": {
+        "progression": {
+          "new": 70,
+          "casual": 60,
+          "endgame": 70,
+          "returning": 90
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "HEXA Matrix Reset Scroll",
+        "Change Circulator"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2831068/icon",
+        "https://maplestory.io/api/GMS/270/item/2831312/icon"
+      ]
+    },
+    {
+      "id": "kinetic",
+      "title": "Kinetic",
+      "category": "event",
+      "summary": "Kinesis characters can complete check-ins by defeating 1,000 enemies near their level up to 12 times to claim a Hyper Burninator and exclusive Kinesis rewards.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 80,
+          "endgame": 50,
+          "returning": 90
+        },
+        "limited": 90,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Hyper Burninator",
+        "Lil Jay Pet Package",
+        "Kinetic Chair",
+        "Sol Erda Fragment Selector Coupon",
+        "Yunaroid"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-15T23:59:00Z",
+      "timeEstimate": {
+        "label": "1000 monsters/day",
+        "minutesPerWeek": 140,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/kmzelae1/kineticchair.gif",
+        "https://g.nexonstatic.com/media/r3xpvrmv/kinetic-mount.gif",
+        "https://g.nexonstatic.com/media/4h4l1kvy/knight-statue.gif",
+        "https://g.nexonstatic.com/media/5y4fshpp/kinetic-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/rs0b2epq/kineticlabelchat-ring.png"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2534007/icon",
+        "https://maplestory.io/api/GMS/270/item/2831194/icon",
+        "https://maplestory.io/api/GMS/270/item/3019667/icon",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://g.nexonstatic.com/media/fcuoybnx/yunaroid.png"
+      ]
+    },
+    {
+      "id": "ride-or-die",
+      "title": "Ride or Die",
+      "category": "event",
+      "summary": "Challenge designated weekly bosses under unique constraints in Ride or Die, using Mapae and Amulets to secure high ranks and valuable Inspector Box rewards.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 85,
+          "endgame": 100,
+          "returning": 0
+        },
+        "limited": 85,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Inspector Boxes",
+        "Sol Erda",
+        "Advanced EXP Vouchers",
+        "Inspector Outfit Set",
+        "Legion Block Lv. 250"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-01T23:59:59Z",
+      "timeEstimate": {
+        "label": "Weekly attempts; run length not stated",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/kdbejb4j/rideordieui.png",
+        "https://g.nexonstatic.com/media/oshggi1t/reliquiary.png",
+        "https://g.nexonstatic.com/media/daxdiy3e/weeklyinfo.png",
+        "https://g.nexonstatic.com/media/niecazmx/lv-4-inspector-box.png",
+        "https://g.nexonstatic.com/media/yvvo5zox/lv-5-inspector-box.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/py0b0pjb/sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://g.nexonstatic.com/media/2cfhiwyt/inspector-outfit-set.png",
+        null
+      ]
+    },
+    {
+      "id": "mystic-frontier-champions",
+      "title": "Mystic Frontier Champions",
+      "category": "event",
+      "summary": "Build your Familiar deck during the leveling period and participate in automated best-of-3 weekend matches against other players to earn Sol Erda Fragments and boxes.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 70,
+          "endgame": 90,
+          "returning": 0
+        },
+        "limited": 80,
+        "cosmetic": 70
+      },
+      "rewards": [
+        "Sol Erda Fragment Coupon",
+        "Frontier Boxes",
+        "Pitched Whispers Coupon",
+        "Frontier Champion Medals"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Matches on weekends; run length not stated",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/rebjcnq1/mysticfrontierlobby.png",
+        "https://g.nexonstatic.com/media/zyblqhiu/image.png",
+        "https://g.nexonstatic.com/media/a41i2gqa/image.png",
+        "https://g.nexonstatic.com/media/dhbdatw1/image.png",
+        "https://g.nexonstatic.com/media/mroj2hiz/image.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "familiar-adventure",
+      "title": "Familiar Adventure",
+      "category": "event",
+      "summary": "Use Frontier Tickets to enter Familiar Adventures, attack Treasure Chests to upgrade their rank, and collect familiar cards, essences, and Sol Erda energy.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 75,
+          "endgame": 85,
+          "returning": 0
+        },
+        "limited": 70,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Glowing Familiar Card Pack",
+        "Mystical Familiar Card",
+        "Sol Erda Fragment Coupon",
+        "Dense Sol Erda Energy"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "3 tickets daily, up to 5 times/week",
+        "minutesPerWeek": 35,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/vr2exbxz/treasuerchest.gif",
+        "https://g.nexonstatic.com/media/r3ep4cdg/familiaradventure.png",
+        "https://g.nexonstatic.com/media/py0b0pjb/sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/nqqanfhn/fauxmiliar-card.png",
+        "https://g.nexonstatic.com/media/bsmjwl52/frontier-ticket-coupon.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/5tgiscg3/glowing-familiar-card-pack.png",
+        "https://g.nexonstatic.com/media/qryo51rg/mystical-familiar-card.png",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://g.nexonstatic.com/media/akvp2zfv/dense-sol-erda-energy.png"
+      ]
+    },
+    {
+      "id": "operation-dive",
+      "title": "Operation: Dive",
+      "category": "event",
+      "summary": "Progress through Magatia story episodes and complete weekly collection tasks to level up your Kroma Pack pass for Sol Erda Fragments and Special Kroma Coins.",
+      "value": {
+        "progression": {
+          "new": 60,
+          "casual": 85,
+          "endgame": 90,
+          "returning": 70
+        },
+        "limited": 85,
+        "cosmetic": 80
+      },
+      "rewards": [
+        "Sol Erda Fragment Coupons",
+        "Special Kroma Coins",
+        "Althearoid",
+        "Magatia Damage Skin",
+        "Kroma Pet Package"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Weekly collection tasks; run length not stated",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/sfjf424x/image.png",
+        "https://g.nexonstatic.com/media/j4cplbxf/image.png",
+        "https://g.nexonstatic.com/media/bzqls3n4/illusion-ring-kroma.gif",
+        "https://g.nexonstatic.com/media/vpzjrzus/image.png",
+        "https://g.nexonstatic.com/media/cxwnnfe1/those-who-began-again.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/4310493/icon",
+        "https://g.nexonstatic.com/media/tmni2rch/althearoid.png",
+        "https://g.nexonstatic.com/media/tgqnc1n0/magatia-damage-skin-unit.png",
+        "https://maplestory.io/api/GMS/270/item/2832781/icon"
+      ]
+    },
+    {
+      "id": "operation-dive-dungeon",
+      "title": "Operation: Dive Dungeon",
+      "category": "event",
+      "summary": "Play as Althea in a new roguelite dungeon challenge, clear sweep stages and boss battles, collect Research Records, and unlock permanent stat upgrades and Magic Stones.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 80,
+          "endgame": 95,
+          "returning": 0
+        },
+        "limited": 75,
+        "cosmetic": 70
+      },
+      "rewards": [
+        "Research Records",
+        "Special Kroma Coins",
+        "Magic Stones",
+        "Unsanctioned Creation Furnishing Coupon"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Up to 30 min per run",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/k4hb0ruy/image.png",
+        "https://g.nexonstatic.com/media/kihf1pak/image.png",
+        "https://g.nexonstatic.com/media/jl4fc5g2/image.png",
+        "https://g.nexonstatic.com/media/3s2n3b1x/crystal-altar.png",
+        "https://g.nexonstatic.com/media/zg0fgf0b/multistrike-crystal-engraving.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/jyflvpbv/research-record.png",
+        "https://maplestory.io/api/GMS/270/item/4310493/icon",
+        "https://maplestory.io/api/GMS/270/item/4009461/icon",
+        "https://maplestory.io/api/GMS/270/item/2832871/icon"
+      ]
+    },
+    {
+      "id": "fantasia-finale",
+      "title": "Fantasia Finale",
+      "category": "event",
+      "summary": "Defeat 1,000 enemies near your level daily to complete up to 10 daily check-ins for Luxe Sauna Coupons, furnishing items, and the Illusion Ring: Ellanos.",
+      "value": {
+        "progression": {
+          "new": 70,
+          "casual": 80,
+          "endgame": 40,
+          "returning": 70
+        },
+        "limited": 85,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Luxe Sauna Coupons",
+        "Permanent Alongside Ellanos Mount",
+        "Ellanos Furnishing Item",
+        "Illusion Ring: Ellanos"
+      ],
+      "startsAt": "2026-08-26T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "1000 monsters/day for 10 days",
+        "minutesPerWeek": 140,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2638457/icon",
+        "https://g.nexonstatic.com/media/0u3fhtok/alongside-ellanos-mount.png",
+        "https://g.nexonstatic.com/media/mprmwryp/ellanos-coupon-furnishing.gif",
+        "https://g.nexonstatic.com/media/hcoe0uw5/illusion-ring-ellanos.gif"
+      ]
+    },
+    {
+      "id": "raising-ellanos",
+      "title": "Raising Ellanos",
+      "category": "event",
+      "summary": "Complete weekly research missions by defeating enemies to earn Illusion Coins, unlock the Ellanos Walk hunting skill, and gain powerful account-wide Ancient Aura passive buffs.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 90,
+          "endgame": 90,
+          "returning": 80
+        },
+        "limited": 70,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Illusion Coins",
+        "Ancient Aura Buffs (Boss Damage, EXP, Sol Erda multipliers)"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "10,000 monsters weekly for research missions",
+        "minutesPerWeek": 210,
+        "effort": "medium",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/3baifmqf/image.png",
+        "https://g.nexonstatic.com/media/anumeclo/ellanos-ii.png",
+        "https://g.nexonstatic.com/media/eugpj25u/ellanos-run-i-ii.png",
+        "https://g.nexonstatic.com/media/tkvk32cx/ellanos-iii.png",
+        "https://g.nexonstatic.com/media/nppndr1p/ellanos-iv.png"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4310444/icon",
+        null
+      ]
+    },
+    {
+      "id": "tallahart-fantasia",
+      "title": "Tallahart Fantasia",
+      "category": "event",
+      "summary": "Complete daily trace collections to earn Memotes and Nostamotes, enhancing your Phantasmal Memory stats and Phantasmal Nostalgia content reward multipliers.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 95,
+          "endgame": 95,
+          "returning": 80
+        },
+        "limited": 90,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "3x/4x EXP Coupons",
+        "Ellanosroid",
+        "Symbol Selector Coupons",
+        "Fairy Heart",
+        "Legendary Growth Potion"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Daily collection claim (1 min/day)",
+        "minutesPerWeek": 7,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/pf1n4pqp/image.png",
+        "https://g.nexonstatic.com/media/d3yjifi3/image.png",
+        "https://g.nexonstatic.com/media/tdxpdtok/phantasmal-tree-chair.png",
+        "https://g.nexonstatic.com/media/o1ph12km/phantasmal-blossoms-effect.gif",
+        "https://g.nexonstatic.com/media/c2sbdtbw/image.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/efjnmfmg/ellanosroid.png",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/1672073/icon",
+        null
+      ]
+    },
+    {
+      "id": "phantasmal-echoes",
+      "title": "Phantasmal Echoes",
+      "category": "event",
+      "summary": "Defeat weekly bosses solo to earn Faint, Clear, and Vivid Phantasmal Echoes, which can be spent at the Phantasmal Echoes Record Hall shop.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 80,
+          "endgame": 100,
+          "returning": 0
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Faint Echoes",
+        "Clear Echoes",
+        "Vivid Echoes"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Weekly solo boss clears; run length not stated",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/ju0i1ajc/image.png"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4310441/icon",
+        "https://maplestory.io/api/GMS/270/item/4310442/icon",
+        "https://maplestory.io/api/GMS/270/item/4310443/icon"
+      ]
+    },
+    {
+      "id": "challenger-world",
+      "title": "Challenger World",
+      "category": "content",
+      "summary": "Create characters in Challenger World to experience accelerated progression, exclusive buffs, and progression missions leading to major rewards and world leaps.",
+      "value": {
+        "progression": {
+          "new": 100,
+          "casual": 90,
+          "endgame": 60,
+          "returning": 100
+        },
+        "limited": 90,
+        "cosmetic": 80
+      },
+      "rewards": [
+        "Season 3 Medals",
+        "Special Skill Rings",
+        "Sol Erda Fragments",
+        "Unique/Legendary Scroll rewards"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Ongoing world play; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/cufknzs5/cozy-winter-set.png",
+        "https://g.nexonstatic.com/media/e4mdteut/season-3-diamond.png",
+        "https://g.nexonstatic.com/media/0pffxr0i/season-3-emerald.png",
+        "https://g.nexonstatic.com/media/v3ebtyzs/season-3-platinum.png",
+        "https://g.nexonstatic.com/media/o20l5u1t/season-3-gold.png"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        null
+      ]
+    },
+    {
+      "id": "beyond-hasty-hunting",
+      "title": "Beyond Hasty Hunting",
+      "category": "event",
+      "summary": "Defeat enemies near your level to unlock Haste effects, spawn Haste Treasure Boxes, and trigger Haste Fever Time for large amounts of EXP and special rewards.",
+      "value": {
+        "progression": {
+          "new": 85,
+          "casual": 85,
+          "endgame": 60,
+          "returning": 80
+        },
+        "limited": 85,
+        "cosmetic": 75
+      },
+      "rewards": [
+        "Night City Rider title",
+        "Inferno Wolf Action Damage Skin",
+        "Hasty Hero Title"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "300,000 kills during event; daily fever time (5 min)",
+        "minutesPerWeek": 210,
+        "effort": "medium",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/vihbpvtn/night-city-rider-chair-final.gif",
+        "https://g.nexonstatic.com/media/4v3jik2r/beyondhastyhunting.png",
+        "https://g.nexonstatic.com/media/zeljw4no/image.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/is0mkvew/inferno-wolf-action-damage-skin-unit.png",
+        null
+      ]
+    },
+    {
+      "id": "hyper-burning-max",
+      "title": "Hyper Burning MAX",
+      "category": "event",
+      "summary": "Set a character (Lv. 200-258 or newly created) as Hyper Burning MAX to gain +4 levels per level-up up to level 260 and claim massive milestone rewards.",
+      "value": {
+        "progression": {
+          "new": 100,
+          "casual": 80,
+          "endgame": 40,
+          "returning": 100
+        },
+        "limited": 90,
+        "cosmetic": 80
+      },
+      "rewards": [
+        "Arcane Symbols up to Lv. 10",
+        "AbsoLab Weapon / Dominator Pendant",
+        "Experience Nodestones",
+        "Sacred Symbol: Cernium Lv. 5"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Grinding to Lv. 260; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/4l5hifc0/hyperburningmax.png",
+        "https://g.nexonstatic.com/media/mztfq405/maplestorya_4kfdiwdpgb.gif"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        "https://g.nexonstatic.com/media/rzdl0olv/icon_experience-nodestone.png",
+        "https://maplestory.io/api/GMS/270/item/2639732/icon"
+      ]
+    },
+    {
+      "id": "beyond-burning",
+      "title": "Beyond Burning",
+      "category": "event",
+      "summary": "Designate a character between level 260 and 268 to gain +1 extra level per level-up up to 270, claiming Sol Erda and Sacred Symbols along the way.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 90,
+          "endgame": 85,
+          "returning": 70
+        },
+        "limited": 80,
+        "cosmetic": 80
+      },
+      "rewards": [
+        "Sol Erda",
+        "Sol Erda Fragments",
+        "Sacred Symbol: Arcus",
+        "Burning Flame Wings",
+        "Beyond Burning Title"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Leveling milestones 260-270; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/nsynevgz/image.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/py0b0pjb/sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/1713001/icon",
+        "https://g.nexonstatic.com/media/zf2pyeuc/burning-flame-wings.gif",
+        "https://g.nexonstatic.com/media/broiu4zf/beyond-burning-title-coupon.png"
+      ]
+    },
+    {
+      "id": "item-burning-plus",
+      "title": "Item Burning Plus",
+      "category": "event",
+      "summary": "Claim an Item Burning Box to receive Challenger Equipment that upgrades in star force, potentials, and stats as you reach level milestones and defeat bosses.",
+      "value": {
+        "progression": {
+          "new": 90,
+          "casual": 95,
+          "endgame": 90,
+          "returning": 90
+        },
+        "limited": 85,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Challenger Equipment Set (up to 22-Star Force)",
+        "Ignitia Set Effect keys",
+        "Challenge Crests"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:59Z",
+      "timeEstimate": {
+        "label": "Boss clears and leveling; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/ssudaver/itemburningplus.png",
+        "https://g.nexonstatic.com/media/jj3huhlr/challenger-crest.png",
+        "https://g.nexonstatic.com/media/h5flouuo/challenger-key.png"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "lightning-charge",
+      "title": "Lightning Charge",
+      "category": "event",
+      "summary": "Accumulate up to 5 hours of daily playtime in participating characters to claim cumulative Sol Erda Fragment Coupons.",
+      "value": {
+        "progression": {
+          "new": 70,
+          "casual": 85,
+          "endgame": 85,
+          "returning": 70
+        },
+        "limited": 70,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Sol Erda Fragment Coupons (up to 200 total)"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Up to 5 hours/day (35 hours/week)",
+        "minutesPerWeek": 2100,
+        "effort": "high",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/5rrphl44/lightningcharge.png"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2637690/icon"
+      ]
+    },
+    {
+      "id": "frontier-pass",
+      "title": "Frontier Pass",
+      "category": "event",
+      "summary": "Complete weekly missions on an eligible character to level up your Frontier Pass up to Lv. 30 and claim support rewards and Sol Erda fragments.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 90,
+          "endgame": 80,
+          "returning": 80
+        },
+        "limited": 85,
+        "cosmetic": 70
+      },
+      "rewards": [
+        "Experience Nodestones",
+        "Symbol Selector Coupons",
+        "Sol Erda Fragments",
+        "Transcendent Growth Potion"
+      ],
+      "startsAt": "2026-07-22T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Weekly missions; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/c0yinhyk/frontierpass.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/rzdl0olv/icon_experience-nodestone.png",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png"
+      ]
+    },
+    {
+      "id": "miracle-time",
+      "title": "Miracle Time",
+      "category": "event",
+      "summary": "Cube your gear during specific dates for double the rank-up chance, and trigger atmospheric Double Miracle Time Blessing buffs when anyone ranks up to Legendary.",
+      "value": {
+        "progression": {
+          "new": 50,
+          "casual": 90,
+          "endgame": 100,
+          "returning": 70
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Double rank-up chance on Cubing",
+        "Double Miracle Time Blessing buff"
+      ],
+      "startsAt": "2026-08-14T00:00:00Z",
+      "endsAt": "2026-08-19T23:59:59Z",
+      "timeEstimate": {
+        "label": "Specific daily windows; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [],
+      "rewardImages": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": "cash-shop-transfer",
+      "title": "Cash Shop Transfer",
+      "category": "system",
+      "summary": "Transfer Cash Inventory items between characters of eligible job categories during the limited transfer period.",
+      "value": {
+        "progression": {
+          "new": 30,
+          "casual": 80,
+          "endgame": 70,
+          "returning": 90
+        },
+        "limited": 95,
+        "cosmetic": 100
+      },
+      "rewards": [
+        "Transferred Cash items"
+      ],
+      "startsAt": "2026-09-02T00:00:00Z",
+      "endsAt": "2026-09-09T14:00:00Z",
+      "timeEstimate": {
+        "label": "5 min once",
+        "minutesPerWeek": 5,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [],
+      "rewardImages": [
+        null
+      ]
+    },
+    {
+      "id": "shine-the-power-of-starlight",
+      "title": "SHINE: The Power of Starlight",
+      "category": "event",
+      "summary": "Level up newly created SHINE characters to claim milestone rewards from the Starlight of Progress and Starlight of Fashion passes.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 85,
+          "endgame": 70,
+          "returning": 80
+        },
+        "limited": 90,
+        "cosmetic": 95
+      },
+      "rewards": [
+        "Chosen by Light Title",
+        "Sia Astelle / Erel Light Outfits",
+        "Arcane Symbols",
+        "Fairy Heart"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Character leveling; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/rncpqwew/shine-starlights-call-ui.png",
+        "https://g.nexonstatic.com/media/o20fzz3z/siriusmount.gif",
+        "https://g.nexonstatic.com/media/2onbg3kc/sia-astelle-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/vjfpo4vo/erel-light-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/ok0hp3si/erel-light-outfit-selector-seeker-of-stars-outfit-set.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/xf1l4bog/chosen-by-light.png",
+        null,
+        "https://maplestory.io/api/GMS/270/item/1712000/icon",
+        "https://maplestory.io/api/GMS/270/item/1672073/icon"
+      ]
+    },
+    {
+      "id": "arthurs-equipment-rental",
+      "title": "Arthur's Equipment Rental",
+      "category": "event",
+      "summary": "Rent high-tier Red Beryl accessories, special rings (Continuous and Ring of Restraint Lv. 4), and totems using mesos or maple points for temporary endgame progression boosts.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 95,
+          "endgame": 80,
+          "returning": 85
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Red Beryl Accessories Set",
+        "Infinite Red Beryl Ring",
+        "Finite Red Beryl Ring",
+        "Arthur / Flash / Red Beryl Totems"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:59Z",
+      "timeEstimate": {
+        "label": "Rental shop access; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/35zjs2ln/red-beryl-pendant.png",
+        "https://g.nexonstatic.com/media/o5gej531/red-beryl-earrings.png",
+        "https://g.nexonstatic.com/media/nocdeuci/red-beryl-belt.png",
+        "https://g.nexonstatic.com/media/kwedducp/red-beryl-totem.png",
+        "https://g.nexonstatic.com/media/rd1br503/arthur-totem.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/wkcgis1j/infinite-red-beryl-ring.png",
+        "https://g.nexonstatic.com/media/l4gfqymy/finite-red-beryl-ring.png",
+        null
+      ]
+    },
+    {
+      "id": "genesis-pass",
+      "title": "Genesis Pass",
+      "category": "system",
+      "summary": "Purchase the Genesis Pass for 30,000 NX to expand Genesis mission party limits to 6, triple Trace of Darkness drops, gain boss buffs, and secure a guaranteed weapon soul upon liberation.",
+      "value": {
+        "progression": {
+          "new": 0,
+          "casual": 50,
+          "endgame": 100,
+          "returning": 0
+        },
+        "limited": 85,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "3x Trace of Darkness multiplier",
+        "Commander's Soul Box",
+        "Genesis boss buff"
+      ],
+      "startsAt": "2026-06-18T00:00:00Z",
+      "endsAt": "2026-11-02T23:59:59Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/wwmito5h/image.png"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "luxe-sauna",
+      "title": "Luxe Sauna",
+      "category": "event",
+      "summary": "Charge usage time using Maple Points or Luxe Sauna Coupons and enter the sauna to idle for steady passive EXP and cumulative permanent home furnishing rewards.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 85,
+          "endgame": 50,
+          "returning": 75
+        },
+        "limited": 80,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Passive EXP",
+        "Sleepywood Sink, Bathtub, and Foot Bath Furnishings",
+        "Luxe Sauna Cafe Furnishing"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Up to 48 hours charge limit/week",
+        "minutesPerWeek": 2880,
+        "effort": "high",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/1aabrcdd/luxe-sauna-timer.gif",
+        "https://g.nexonstatic.com/media/3oyotrxn/opt-foot-bath.gif",
+        "https://g.nexonstatic.com/media/k0rnbk4g/bathtub.png",
+        "https://g.nexonstatic.com/media/boqdcpn1/sleepywood-sink.png",
+        "https://g.nexonstatic.com/media/t3zdwvdw/cafe.gif"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": "sunny-sunday",
+      "title": "Sunny Sunday",
+      "category": "event",
+      "summary": "Log in every Sunday throughout the event period to claim rotating server-wide buffs, Star Force discounts, destruction protection, and entry passes.",
+      "value": {
+        "progression": {
+          "new": 70,
+          "casual": 90,
+          "endgame": 90,
+          "returning": 80
+        },
+        "limited": 70,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Monster Park EXP bonuses",
+        "Star Force 30% discount & protection days",
+        "Golden Strawberry Farm Passes",
+        "2x Sol Erda hunting days"
+      ],
+      "startsAt": "2026-06-17T00:00:00Z",
+      "endsAt": "2026-09-08T23:59:59Z",
+      "timeEstimate": {
+        "label": "Sunday login events; time varies",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [],
+      "rewardImages": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "promptVersion": 4,
+  "classifiedAt": "2026-10-12T12:08:45.991Z"
+}

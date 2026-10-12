@@ -73,11 +73,24 @@ export function QuestItem({ item, profile, now }: QuestItemProps) {
 
         {item.rewards.length > 0 && (
           <ul className="flex flex-wrap gap-1.5" aria-label="Rewards">
-            {item.rewards.map((reward) => (
-              <li key={reward} className="chip chip-reward">
-                {reward}
-              </li>
-            ))}
+            {item.rewards.map((reward, index) => {
+              const icon = item.rewardImages[index];
+              return (
+                <li key={reward + index} className="chip chip-reward">
+                  {icon && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={icon}
+                      alt=""
+                      className="reward-icon"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
+                  {reward}
+                </li>
+              );
+            })}
           </ul>
         )}
 
@@ -102,6 +115,12 @@ export function QuestItem({ item, profile, now }: QuestItemProps) {
               {axis}: {TIER_WORD[tier]}
             </span>
           ))}
+        </p>
+        <p className="text-xs text-ink-soft">
+          From{" "}
+          <a href={item.source.url} target="_blank" rel="noreferrer" className="underline">
+            {item.source.title}
+          </a>
         </p>
       </div>
     </li>

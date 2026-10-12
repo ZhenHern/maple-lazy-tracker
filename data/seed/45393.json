@@ -1,0 +1,57 @@
+{
+  "sourceId": "45393",
+  "kind": "event",
+  "title": "Winter Countdown Event",
+  "url": "https://www.nexon.com/maplestory/news/events/45393",
+  "publishedAt": "2026-10-06T17:00:30.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/ii1mzdp2/540x304-winter-countdown-event-maplestory.png",
+  "contentHash": "c645aa262034eb52138ddc497bb9bf11df61914c877400aacaf57a1c8f3fd49d",
+  "items": [
+    {
+      "id": "winter-countdown",
+      "title": "Winter Countdown Event",
+      "category": "event",
+      "summary": "Participate in daily check-ins and complete missions to claim valuable progression items, growth potions, and cosmetics.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 90,
+          "endgame": 85,
+          "returning": 95
+        },
+        "limited": 80,
+        "cosmetic": 75
+      },
+      "rewards": [
+        "Magnificent Growth Potion",
+        "Transcendent Growth Potion",
+        "Sol Erda and Fragments",
+        "Event Ring Selector Coupon",
+        "Rosy or Flushed Skin Coupon"
+      ],
+      "startsAt": "2026-10-07T00:00:00Z",
+      "endsAt": "2026-11-24T23:59:00Z",
+      "timeEstimate": {
+        "label": "1 min/day for check-in; up to 10k kills/week for mission",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/p1tnsv51/image.png",
+        "https://g.nexonstatic.com/media/kx4hjco3/1100x225-winter-countdown-event-maplestory.png",
+        "https://g.nexonstatic.com/media/um4johnu/specialpower-special-mission.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://maplestory.io/api/GMS/270/item/2637656/icon",
+        "https://maplestory.io/api/GMS/270/item/5681263/icon"
+      ]
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "promptVersion": 4,
+  "classifiedAt": "2026-10-12T12:02:57.357Z"
+}

@@ -1,0 +1,457 @@
+{
+  "sourceId": "44597",
+  "kind": "patch",
+  "title": "[Updated 9/29] v.271 - MapleStory x Frieren: Beyond Journey's End Patch Notes",
+  "url": "https://www.nexon.com/maplestory/news/update/44597",
+  "publishedAt": "2026-09-08T18:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/jhtnq1k1/260907_ms-wgc-3168-v271-patchnotes-540x304.png",
+  "contentHash": "ca6912feace2356df2775e8948e6c22107f7cb01f9cf7abfeb199c368f9a521f",
+  "items": [
+    {
+      "id": "frierens-spell-collection",
+      "title": "Frieren's Spell Collection",
+      "category": "event",
+      "summary": "Defeat 1,000 monsters daily to progress through the adventure journal, unlocking totems, symbols, growth potions, and adventure coins.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 90,
+          "endgame": 85,
+          "returning": 95
+        },
+        "limited": 95,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Frieren Totem Selector Coupon",
+        "Symbol Selector Coupon",
+        "Magnificent Growth Potion",
+        "Transcendent Growth Potion",
+        "Spell to Create a Field of Flowers Chair"
+      ],
+      "startsAt": "2026-09-09T00:00:00Z",
+      "endsAt": "2026-10-07T23:59:00Z",
+      "timeEstimate": {
+        "label": "15-20 min/day",
+        "minutesPerWeek": 140,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/vkgouqmr/ui_spell_collection_journal.png",
+        "https://g.nexonstatic.com/media/1fshz3ri/ui_adventure-journal.png",
+        "https://g.nexonstatic.com/media/54ubpsoc/ui_defeat_1000.png",
+        "https://g.nexonstatic.com/media/0msfsy0e/ui_coin_open_shop.png",
+        "https://g.nexonstatic.com/media/a0yhfga4/icon_pendant.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/loeh2ti5/icon_frieren_beyond-journeys-end-totem-selector-coupon.png",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
+        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://g.nexonstatic.com/media/xidlnnze/icon_spell-to-create-a-field-of-flowers.png"
+      ]
+    },
+    {
+      "id": "adventure-with-frierens-companions",
+      "title": "Adventure with Frieren's Companions",
+      "category": "event",
+      "summary": "Activate the event skill while hunting to spawn Magic Replica Monsters, gaining Sol Erda Fragments and Zoltraak skill charges.",
+      "value": {
+        "progression": {
+          "new": 90,
+          "casual": 85,
+          "endgame": 90,
+          "returning": 80
+        },
+        "limited": 85,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Sol Erda Fragments",
+        "Adventure Coins",
+        "Random Mimic Box",
+        "Symbol Selector Coupons"
+      ],
+      "startsAt": "2026-09-09T00:00:00Z",
+      "endsAt": "2026-10-07T23:59:00Z",
+      "timeEstimate": {
+        "label": "Up to 500 kills/spawn, 20 spawns/day",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/pjdji4lh/ui_min_max_ex.png",
+        "https://g.nexonstatic.com/media/z0qfojal/ui_defeat-monsters-fill-gauge.png",
+        "https://g.nexonstatic.com/media/lj5hdke0/ui_activation_count.png",
+        "https://g.nexonstatic.com/media/ooriwyl5/ui_limit_20.png",
+        "https://g.nexonstatic.com/media/l51htuqh/icon_skill_demon-killing-magic_zoltraak.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/l4iddjzp/ui_reward_sol_erda.png",
+        "https://g.nexonstatic.com/media/4k0hl3js/icon_adventure_coin_x1_coupon.png",
+        "https://g.nexonstatic.com/media/pxseawhv/icon_random_mimic_box.png",
+        "https://g.nexonstatic.com/media/ypyhgff1/icon_symbol_selector_coupon.png"
+      ]
+    },
+    {
+      "id": "grimoire-collection-missions",
+      "title": "Grimoire Collection Missions",
+      "category": "event",
+      "summary": "Complete specific milestones tied to your adventure progress to claim high-value growth and enhancement items.",
+      "value": {
+        "progression": {
+          "new": 90,
+          "casual": 90,
+          "endgame": 95,
+          "returning": 90
+        },
+        "limited": 90,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Superior Extreme Growth Potion",
+        "Ultimate Nodestone",
+        "Karma Star Force 15-Star Enhancement",
+        "Advanced Profession Coupon",
+        "Frieren Background Coupon"
+      ],
+      "startsAt": "2026-09-09T00:00:00Z",
+      "endsAt": "2026-10-07T23:59:00Z",
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/vxpnalpp/icon_superior-extreme-growth-potion.png",
+        "https://g.nexonstatic.com/media/uxtlov4i/icon_ultimate-nodestone.png",
+        "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
+        "https://g.nexonstatic.com/media/0j1fayhe/icon_advanced-profession-coupon.png",
+        "https://g.nexonstatic.com/media/lkmddir1/icon_frieren-beyond-journeys-end-background-coupon.png"
+      ]
+    },
+    {
+      "id": "defeat-mighty-foes-missions",
+      "title": "Defeat Mighty Foes Missions",
+      "category": "event",
+      "summary": "Defeat solo bosses including Chaos Vellum, Lotus, Guardian Angel Slime, and Lucid to claim exclusive collaboration rewards.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 75,
+          "endgame": 85,
+          "returning": 60
+        },
+        "limited": 95,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Frieren Totem Selector Coupon",
+        "Starkroid Coupon",
+        "Odd Expression (Frieren) Coupon",
+        "I Bought This Title Coupon"
+      ],
+      "startsAt": "2026-09-09T00:00:00Z",
+      "endsAt": "2026-10-08T02:00:00Z",
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/loeh2ti5/icon_frieren_beyond-journeys-end-totem-selector-coupon.png",
+        "https://g.nexonstatic.com/media/afdfjrpi/icon_starkroid-coupon.png",
+        "https://g.nexonstatic.com/media/kmmlftoo/icon_odd-expression-frieren-coupon.png",
+        "https://g.nexonstatic.com/media/yftp5xri/icon_i_bought_this_title_coupon.png"
+      ]
+    },
+    {
+      "id": "night-troupe-mesotron-s-project",
+      "title": "Mesotron-S Project",
+      "category": "event",
+      "summary": "Earn Designer EXP from mini-games to rank up, develop festival parts, activate festival decorations, and unlock powerful account perks.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 95,
+          "endgame": 95,
+          "returning": 95
+        },
+        "limited": 90,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Troupe Coins",
+        "Transcendent Growth Potion",
+        "Equipment Transfer Coupon",
+        "Mount Transfer Certificate",
+        "Weekly Boss Clear Count Reset Ticket"
+      ],
+      "startsAt": "2026-09-30T12:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "Daily cap based on rank, mini-game dependent",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/hghb2xmz/mesotron-s-inferno-burst.gif",
+        "https://g.nexonstatic.com/media/uwql4ipm/mesotron-s-heaven-breaker.gif",
+        "https://g.nexonstatic.com/media/2idjsl0p/omega-sector.png",
+        "https://g.nexonstatic.com/media/oykhbn21/mesotron-s-heaven-breaker.png",
+        "https://g.nexonstatic.com/media/wnyjd1cu/mesotron-s-inferno-burst.png"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4310297/icon",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        null,
+        null,
+        "https://maplestory.io/api/GMS/270/item/2636033/icon"
+      ]
+    },
+    {
+      "id": "night-troupe-go-go-sidekick",
+      "title": "Go Go Sidekick!",
+      "category": "event",
+      "summary": "Remotely deploy sidekicks while hunting to battle waves of enemies and claim weekly EXP vouchers or Sol Erda Fragments.",
+      "value": {
+        "progression": {
+          "new": 85,
+          "casual": 80,
+          "endgame": 80,
+          "returning": 80
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Advanced EXP Vouchers",
+        "EXP Vouchers",
+        "Sol Erda Fragment Coupons"
+      ],
+      "startsAt": "2026-09-30T12:00:00Z",
+      "endsAt": "2026-11-03T23:59:00Z",
+      "timeEstimate": {
+        "label": "Up to 10 deployments/day, 3 claims/week; run length not stated",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/kbxdi5cd/go-go.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://g.nexonstatic.com/media/nu0ex5pu/icon_exp_voucher.png",
+        "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png"
+      ]
+    },
+    {
+      "id": "night-of-the-yeti",
+      "title": "Night of the Yeti",
+      "category": "event",
+      "summary": "Participate in the El Nath survival minigame as a Hunter or Monster Yeti to earn Hunting Points and unlock exclusive items.",
+      "value": {
+        "progression": {
+          "new": 30,
+          "casual": 50,
+          "endgame": 30,
+          "returning": 40
+        },
+        "limited": 95,
+        "cosmetic": 95
+      },
+      "rewards": [
+        "Hallowkitty’s Hat Picker Coupon",
+        "Magic School Purple Uniform Selection Box",
+        "Night Cat Damage Skin",
+        "Monster Yetiroid Coupon",
+        "Giant Monster Yeti Mount Coupon"
+      ],
+      "startsAt": "2026-10-14T12:00:00Z",
+      "endsAt": "2026-11-11T23:59:00Z",
+      "timeEstimate": {
+        "label": "Up to 1,000 points/day, 3,000 points/week",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/rdzfvtdc/night-of-the-yeti-hunter-nightime.gif",
+        "https://g.nexonstatic.com/media/vspdz5es/night-of-the-yeti-night-time.gif",
+        "https://g.nexonstatic.com/media/0jcbadsr/night-of-the-yeti-hunter-daytime.gif",
+        "https://g.nexonstatic.com/media/m0pkgwt0/mornin.gif",
+        "https://g.nexonstatic.com/media/mt2k2eyi/hallowkitty-s-neon-hat.png"
+      ],
+      "rewardImages": [
+        null,
+        "https://maplestory.io/api/GMS/270/item/2636833/icon",
+        "https://g.nexonstatic.com/media/ddxjzb0d/night-cat-damage-skin.png",
+        "https://g.nexonstatic.com/media/pqsbcbg0/monster-yetiroid.png",
+        "https://g.nexonstatic.com/media/iinpbxnb/giant-monster-yeti-mount.gif"
+      ]
+    },
+    {
+      "id": "winter-countdown",
+      "title": "Winter Countdown",
+      "category": "event",
+      "summary": "Complete daily check-ins and special missions to collect a massive array of growth potions, EXP coupons, and event rewards.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 95,
+          "endgame": 90,
+          "returning": 95
+        },
+        "limited": 80,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Magnificent Growth Potion",
+        "Transcendent Growth Potion",
+        "Sol Erda / Sol Erda Fragment Selector Coupon",
+        "Event Ring Selector Coupon",
+        "Sweet Spirit Pet Box"
+      ],
+      "startsAt": "2026-10-07T12:00:00Z",
+      "endsAt": "2026-11-24T23:59:00Z",
+      "timeEstimate": {
+        "label": "1 min/day check-in, 2,000 mobs for missions",
+        "minutesPerWeek": null,
+        "effort": null,
+        "basis": "uncertain"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/p1tnsv51/image.png",
+        "https://g.nexonstatic.com/media/um4johnu/specialpower-special-mission.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/2637656/icon",
+        null
+      ]
+    },
+    {
+      "id": "level-up-flow-revamp",
+      "title": "Level-Up Flow & Symbol Revamp",
+      "category": "system",
+      "summary": "EXP requirements for levels 210-259 have been reduced by up to 58%, and Daily/Weekly Symbol quest rewards are significantly increased.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 80,
+          "endgame": 40,
+          "returning": 95
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [],
+      "startsAt": null,
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": []
+    },
+    {
+      "id": "bonus-stat-enhancement-revamp",
+      "title": "Bonus Stat & Star Force Revamp",
+      "category": "system",
+      "summary": "Bonus stats can now be reset using mesos, and Star Catching has been removed with its success rate permanently applied.",
+      "value": {
+        "progression": {
+          "new": 80,
+          "casual": 85,
+          "endgame": 90,
+          "returning": 85
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [],
+      "startsAt": null,
+      "endsAt": null,
+      "timeEstimate": null,
+      "images": [],
+      "rewardImages": []
+    },
+    {
+      "id": "special-skill-ring-changes",
+      "title": "Special Skill Ring Changes",
+      "category": "system",
+      "summary": "Ring of Restraint, Continuous Ring, and other special rings have been adjusted. Claim compensation rewards for pre-existing Lv. 5 and Lv. 6 rings.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 75,
+          "endgame": 95,
+          "returning": 70
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Grindstone of Life",
+        "Grindstone of Faith",
+        "Mesos compensation"
+      ],
+      "startsAt": null,
+      "endsAt": "2027-09-08T23:59:00Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/2zjbzxk1/specialskillringui.gif"
+      ],
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2539001/icon",
+        "https://maplestory.io/api/GMS/270/item/2539003/icon",
+        null
+      ]
+    },
+    {
+      "id": "luxe-sauna",
+      "title": "Luxe Sauna",
+      "category": "event",
+      "summary": "Charge usage time up to 48 hours per week and idle in the sauna room to gain passive EXP and cumulative milestone furnishing rewards.",
+      "value": {
+        "progression": {
+          "new": 85,
+          "casual": 90,
+          "endgame": 75,
+          "returning": 80
+        },
+        "limited": 0,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Passive EXP",
+        "Sleepywood Sink",
+        "Sleepywood Sauna Bathtub",
+        "Sleepywood Foot Bath",
+        "Luxe Sauna Cafe"
+      ],
+      "startsAt": "2026-09-09T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "Up to 48 hours/week charged time",
+        "minutesPerWeek": 2880,
+        "effort": "high",
+        "basis": "stated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/1aabrcdd/luxe-sauna-timer.gif",
+        "https://g.nexonstatic.com/media/3oyotrxn/opt-foot-bath.gif",
+        "https://g.nexonstatic.com/media/k0rnbk4g/bathtub.png",
+        "https://g.nexonstatic.com/media/t3zdwvdw/cafe.gif"
+      ],
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/boqdcpn1/sleepywood-sink.png",
+        "https://maplestory.io/api/GMS/270/item/4037416/icon",
+        "https://maplestory.io/api/GMS/270/item/4037442/icon",
+        "https://maplestory.io/api/GMS/270/item/4037458/icon"
+      ]
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "promptVersion": 4,
+  "classifiedAt": "2026-10-12T12:04:40.340Z"
+}

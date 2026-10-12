@@ -1,12 +1,8 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { QuestLog } from "@/components/quest-log";
-import { nexonImagesEnabled } from "@/lib/images";
-import { getClassifiedPost } from "@/lib/pipeline";
-import { listTrackedPosts } from "@/lib/scraper/nexon";
-import type { ClassifiedPost, PostSummary } from "@/lib/types";
+import { getOngoing } from "@/lib/tracker";
 
-export default function Home(props: PageProps<"/">) {
+export default function Home() {
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-10">
       <header className="mb-6 flex items-center gap-3">
@@ -16,14 +12,14 @@ export default function Home(props: PageProps<"/">) {
             Lazy Tracker
           </h1>
           <p className="mt-1 text-sm font-bold text-wood-dark">
-            Play less. Miss nothing. Your GMS patch to-do list.
+            Play less. Miss nothing. Everything worth doing in GMS right now.
           </p>
         </div>
       </header>
 
       <main>
-        <Suspense fallback={<Notice title="Loading">Reading the patch notes...</Notice>}>
-          <Tracker searchParams={props.searchParams} />
+        <Suspense fallback={<Notice title="Loading">Checking what is running...</Notice>}>
+          <Tracker />
         </Suspense>
       </main>
 
@@ -67,62 +63,61 @@ function Notice({ title, children }: { title: string; children: React.ReactNode 
   );
 }
 
-type LoadResult =
-  | { ok: true; post: ClassifiedPost; recent: PostSummary[] }
-  | { ok: false; message: string };
-
-async function load(id: string | undefined): Promise<LoadResult> {
-  try {
-    const [post, tracked] = await Promise.all([getClassifiedPost(id), listTrackedPosts()]);
-    const showImages = nexonImagesEnabled();
-    const recent = tracked
-      .slice(0, 8)
-      .map((summary) => (showImages ? summary : { ...summary, thumbnailUrl: null }));
-    return { ok: true, post, recent };
-  } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Unknown error" };
-  }
+function formatDay(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
-async function Tracker({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
-  const { id } = await searchParams;
-  const result = await load(typeof id === "string" && /^\d+$/.test(id) ? id : undefined);
+// Reads the store on every request, inside <Suspense>, so the page shell is
+// sent at once and the list streams in. No AI call ever happens here.
+async function Tracker() {
+  const { items, sources, updatedAt } = await getOngoing();
 
-  if (!result.ok) {
+  if (items.length === 0) {
     return (
-      <Notice title="Quest failed">
-        <span role="alert">Could not load the tracker: {result.message}</span>
+      <Notice title="Nothing to show">
+        No ongoing events are stored yet. Run the ingest step to fetch and classify the latest
+        posts.
       </Notice>
     );
   }
 
   return (
     <div className="grid gap-5">
-      <QuestLog post={result.post} />
+      <QuestLog items={items} updated={updatedAt ? formatDay(updatedAt) : null} />
 
       <section className="panel">
-        <h2 className="panel-title">Notice Board</h2>
-        <ul className="panel-body grid gap-3 text-sm sm:grid-cols-2">
-          {result.recent.map((summary) => (
-            <li key={summary.sourceId}>
-              <Link href={`/?id=${summary.sourceId}`} className="notice">
-                {summary.thumbnailUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={summary.thumbnailUrl}
-                    alt=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                )}
-                <span>
-                  <span className="font-bold underline">{summary.title}</span>{" "}
-                  <span className="chip chip-quiet">{summary.kind}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <h2 className="panel-title">Sources</h2>
+        <div className="panel-body">
+          <p className="mb-3 text-sm">The official posts this list was built from:</p>
+          <ul className="grid gap-3 text-sm sm:grid-cols-2">
+            {sources.map((source) => (
+              <li key={source.sourceId}>
+                <a href={source.url} target="_blank" rel="noreferrer" className="notice">
+                  {source.thumbnailUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={source.thumbnailUrl}
+                      alt=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
+                  <span>
+                    <span className="font-bold underline">{source.title}</span>
+                    <span className="block text-xs text-ink-soft">
+                      {formatDay(source.publishedAt)}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </div>
   );

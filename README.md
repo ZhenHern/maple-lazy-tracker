@@ -10,6 +10,8 @@ See [SPEC.md](SPEC.md) for the architecture, data schema and build phases.
 2. Copy `.env.example` to `.env.local` and add a Gemini API key from https://aistudio.google.com/apikey
 3. Start the dev server: `npm run dev`, then open http://localhost:3000
 
+The page starts with sample data from `data/seed`. To fetch and classify the latest posts yourself, open http://localhost:3000/api/dev/ingest?limit=3 and repeat until nothing is reported as `deferred`. Each classified post is one Gemini call; results are saved under `.data/` and unchanged posts are skipped on later runs.
+
 ## Scripts
 
 | Command | What it does |

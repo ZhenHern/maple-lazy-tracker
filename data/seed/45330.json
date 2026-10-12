@@ -1,0 +1,324 @@
+{
+  "sourceId": "45330",
+  "kind": "event",
+  "title": "Defend the Omega Sector!",
+  "url": "https://www.nexon.com/maplestory/news/events/45330",
+  "publishedAt": "2026-09-29T17:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/tx2gr0ua/540x304-midnight-carnival-omega-sector-maplestory.png",
+  "contentHash": "dde61604e49202dd9fea524346bc5e63d6ed7bc87d1bdeb86a62b9f587ab5be4",
+  "items": [
+    {
+      "id": "mesotron-s-project",
+      "title": "Mesotron-S Project",
+      "category": "event",
+      "summary": "Build the Mesotron-S by enhancing parts using Troupe Coins and earn Designer EXP from mini-games to rank up, unlocking transfer perks and daily buffs.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 90,
+          "endgame": 90,
+          "returning": 95
+        },
+        "limited": 95,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Hair Transfer",
+        "Face Transfer",
+        "Equipment Transfer",
+        "Mount Transfer",
+        "Transcendent Growth Potion"
+      ],
+      "startsAt": "2026-09-30T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/hghb2xmz/mesotron-s-inferno-burst.gif",
+        "https://g.nexonstatic.com/media/uwql4ipm/mesotron-s-heaven-breaker.gif",
+        "https://g.nexonstatic.com/media/2idjsl0p/omega-sector.png",
+        "https://g.nexonstatic.com/media/oykhbn21/mesotron-s-heaven-breaker.png",
+        "https://g.nexonstatic.com/media/wnyjd1cu/mesotron-s-inferno-burst.png"
+      ],
+      "rewardImages": [
+        null,
+        null,
+        null,
+        null,
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png"
+      ]
+    },
+    {
+      "id": "go-go-sidekick",
+      "title": "Go Go Sidekick!",
+      "category": "event",
+      "summary": "Deploy Sidekicks to battle alien enemies by hunting near your level range, clearing waves to claim weekly rewards like EXP vouchers or Sol Erda fragments.",
+      "value": {
+        "progression": {
+          "new": 90,
+          "casual": 85,
+          "endgame": 80,
+          "returning": 85
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [
+        "Advanced EXP Voucher",
+        "EXP Voucher",
+        "Sol Erda Fragment"
+      ],
+      "startsAt": "2026-09-30T00:00:00Z",
+      "endsAt": "2026-11-03T23:59:00Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/kbxdi5cd/go-go.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://g.nexonstatic.com/media/nu0ex5pu/icon_exp_voucher.png",
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png"
+      ]
+    },
+    {
+      "id": "jennys-meet-and-greet",
+      "title": "Jenny’s Meet and Greet",
+      "category": "event",
+      "summary": "Use VIP tickets to enter VIP seating at the Meet and Greet venue, using the Cheer Performance skill to earn Designer EXP and character EXP.",
+      "value": {
+        "progression": {
+          "new": 70,
+          "casual": 60,
+          "endgame": 40,
+          "returning": 60
+        },
+        "limited": 85,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "One, Two, Woo!",
+        "Three, Four, Woo!",
+        "Space Star Jenny Photo Card 1"
+      ],
+      "startsAt": "2026-09-30T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/ro0pjexf/image-24.png",
+        "https://g.nexonstatic.com/media/oamh5ryn/image.png",
+        "https://g.nexonstatic.com/media/hv2n5sy2/image.png",
+        "https://g.nexonstatic.com/media/grtiludc/meet-and-greet-assigned-seating-ticket.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/mgfggtga/one-two-woo.gif",
+        "https://g.nexonstatic.com/media/ffzfbogv/three-four-woo.gif",
+        null
+      ]
+    },
+    {
+      "id": "real-gains-in-virtual-training",
+      "title": "Real Gains in Virtual Training",
+      "category": "event",
+      "summary": "Shoot targets matching the display within 1 minute 30 seconds to earn Designer EXP and accumulate points toward a permanent chair.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 35,
+          "endgame": 10,
+          "returning": 35
+        },
+        "limited": 80,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Virtual Master Chair"
+      ],
+      "startsAt": "2026-09-30T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "1 min 30 sec per play",
+        "minutesPerWeek": null,
+        "effort": "low",
+        "basis": "stated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/iy3f3mrl/virtual-training.gif"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/ozsivikt/virtual-master.gif"
+      ]
+    },
+    {
+      "id": "surveillance-agent-gunny",
+      "title": "Surveillance Agent Gunny",
+      "category": "event",
+      "summary": "Find the wanted Gray enemies matching current targets within 2 minutes to earn Designer EXP and accumulate points for a chair.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 35,
+          "endgame": 10,
+          "returning": 35
+        },
+        "limited": 80,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Target Acquired Chair"
+      ],
+      "startsAt": "2026-10-14T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "2 min per play",
+        "minutesPerWeek": null,
+        "effort": "low",
+        "basis": "stated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/w3bl02h5/surveilla.gif"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/xbjdyogg/target-acquired-chair.gif"
+      ]
+    },
+    {
+      "id": "overclock-mesotron-s",
+      "title": "Overclock Mesotron-S",
+      "category": "event",
+      "summary": "Use special materials to overclock and temporarily enhance your Mesotron-S skills with randomized success chances.",
+      "value": {
+        "progression": {
+          "new": 60,
+          "casual": 60,
+          "endgame": 75,
+          "returning": 50
+        },
+        "limited": 0,
+        "cosmetic": 0
+      },
+      "rewards": [],
+      "startsAt": "2026-10-14T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": null,
+      "images": [
+        "https://g.nexonstatic.com/media/5x5aucwz/image.png",
+        "https://g.nexonstatic.com/media/4saakbit/liquid-nitrogen.png",
+        "https://g.nexonstatic.com/media/uq3fsrpy/condensed-energy.png"
+      ],
+      "rewardImages": []
+    },
+    {
+      "id": "festival-guardian",
+      "title": "Festival Guardian",
+      "category": "event",
+      "summary": "Defeat waves of Rombot OMNI-CLN in a solo boss battle arena to earn points, EXP, and a permanent chair reward.",
+      "value": {
+        "progression": {
+          "new": 65,
+          "casual": 60,
+          "endgame": 50,
+          "returning": 60
+        },
+        "limited": 80,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "We Are M-Force Chair"
+      ],
+      "startsAt": "2026-10-14T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "2 min preparation plus 2 min battle",
+        "minutesPerWeek": 4,
+        "effort": "low",
+        "basis": "stated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/ebaljeqm/rombot.gif"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/larb345u/we-are-m-force.gif"
+      ]
+    },
+    {
+      "id": "victory-pose-practice",
+      "title": "Victory Pose Practice",
+      "category": "event",
+      "summary": "Memorize and recreate the correct poses of M-Force Rangers within 2 minutes 30 seconds to earn Designer EXP and a permanent chair.",
+      "value": {
+        "progression": {
+          "new": 40,
+          "casual": 35,
+          "endgame": 10,
+          "returning": 35
+        },
+        "limited": 80,
+        "cosmetic": 85
+      },
+      "rewards": [
+        "Quirky M-Force Chair"
+      ],
+      "startsAt": "2026-10-28T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "2 min 30 sec per play",
+        "minutesPerWeek": null,
+        "effort": "low",
+        "basis": "stated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/kcwlxuh2/victory-pose-practice.gif"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/oxmdxjzx/quirky-m-force-chair.gif"
+      ]
+    },
+    {
+      "id": "hello-world-hello-robot",
+      "title": "Hello World, Hello Robot",
+      "category": "event",
+      "summary": "Talk to Strange Mateon daily at the festival venue to receive a random gift box containing high-value enhancement items or cosmetics.",
+      "value": {
+        "progression": {
+          "new": 95,
+          "casual": 95,
+          "endgame": 95,
+          "returning": 95
+        },
+        "limited": 90,
+        "cosmetic": 90
+      },
+      "rewards": [
+        "Karma Star Force 22-Star Enhancement (Lv. 200)",
+        "Special Arcane Symbol Box",
+        "Special Sacred Symbol Box",
+        "Karma Legendary Potential Scroll 100%",
+        "Floating UFO Mount"
+      ],
+      "startsAt": "2026-10-28T00:00:00Z",
+      "endsAt": "2026-11-10T23:59:00Z",
+      "timeEstimate": {
+        "label": "1 min/day",
+        "minutesPerWeek": 7,
+        "effort": "low",
+        "basis": "calculated"
+      },
+      "images": [
+        "https://g.nexonstatic.com/media/p1pfsn2e/mesotron-s-liquid-nitrogen-fridge.gif",
+        "https://g.nexonstatic.com/media/reyhzu1l/strange-mateon-hat.gif",
+        "https://g.nexonstatic.com/media/zzfpp0ra/quirky-intruder.gif",
+        "https://g.nexonstatic.com/media/z2clwjn0/omega-sector-festival-intruder-eye-accessory.gif",
+        "https://g.nexonstatic.com/media/3imdtjqq/night-troupe-bed-furnishing.png"
+      ],
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
+        null,
+        null,
+        "https://maplestory.io/api/GMS/270/item/2644103/icon",
+        "https://g.nexonstatic.com/media/pvlb03em/floating-ufo-mount.png"
+      ]
+    }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "promptVersion": 4,
+  "classifiedAt": "2026-10-12T12:03:07.118Z"
+}

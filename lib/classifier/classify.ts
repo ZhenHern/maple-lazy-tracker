@@ -1,8 +1,7 @@
 import "server-only";
 import { ApiError, GoogleGenAI } from "@google/genai";
 import { z } from "zod";
-import type { ScrapedPost, TrackerItem } from "@/lib/types";
-import { calibrate } from "./calibrate";
+import type { ScoredItem, ScrapedPost } from "@/lib/types";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
 import {
   classificationSchema,
@@ -53,9 +52,9 @@ function slugify(value: string): string {
   );
 }
 
-// IDs key the player's checklist, so they must be clean and unique per post.
-// Array caps are applied here because Gemini cannot be given them in the schema.
-function normalizeItems(items: TrackerItem[]): TrackerItem[] {
+// IDs must be clean and unique per post. Array caps are applied here because
+// Gemini cannot be given them in the schema.
+function normalizeItems(items: ScoredItem[]): ScoredItem[] {
   const seen = new Map<string, number>();
   return items.map((item) => {
     const base = slugify(item.id);
@@ -90,7 +89,7 @@ async function generate(model: string, post: ScrapedPost): Promise<string> {
   return response.text;
 }
 
-function parseItems(raw: string, post: ScrapedPost): TrackerItem[] {
+function parseItems(raw: string, post: ScrapedPost): ScoredItem[] {
   let json: unknown;
   try {
     json = JSON.parse(raw);
@@ -104,12 +103,12 @@ function parseItems(raw: string, post: ScrapedPost): TrackerItem[] {
       `Gemini output failed validation for post ${post.sourceId}: ${z.prettifyError(parsed.error)}`,
     );
   }
-  return normalizeItems(calibrate(parsed.data.items.slice(0, MAX_ITEMS)));
+  return normalizeItems(parsed.data.items.slice(0, MAX_ITEMS));
 }
 
 export async function classifyPost(
   post: ScrapedPost,
-): Promise<{ items: TrackerItem[]; model: string }> {
+): Promise<{ items: ScoredItem[]; model: string }> {
   const failures: string[] = [];
   for (const model of geminiModels()) {
     let raw: string;

@@ -1,7 +1,7 @@
-import type { ScoredItem, Tier, TrackerItem } from "@/lib/types";
+import type { ItemSource, StoredItem, Tier, TrackerItem } from "@/lib/types";
 
-// An item is must_do only if it scores well AND ranks in the top share of its
-// post for that axis. The rank cap is what keeps must_do rare even when a
+// An item is must_do only if it scores well AND ranks in the top share of the
+// list for that axis. The rank cap is what keeps must_do rare even when a
 // model scores everything highly.
 const MUST_DO_MIN_SCORE = 70;
 const IF_FREE_MIN_SCORE = 35;
@@ -23,9 +23,15 @@ function toTiers(scores: number[]): Tier[] {
   });
 }
 
-/** Turns per-axis scores into tiers, ranking each axis across the whole post. */
-export function calibrate(items: ScoredItem[]): TrackerItem[] {
-  const column = (pick: (item: ScoredItem) => number) => toTiers(items.map(pick));
+type SourcedItem = StoredItem & { source: ItemSource };
+
+/**
+ * Turns per-axis scores into tiers, ranking each axis across the whole list.
+ * Pass every item the player will see together, so that items from different
+ * posts compete for the same must_do slots.
+ */
+export function calibrate(items: SourcedItem[]): TrackerItem[] {
+  const column = (pick: (item: SourcedItem) => number) => toTiers(items.map(pick));
   const progression = {
     new: column((item) => item.value.progression.new),
     casual: column((item) => item.value.progression.casual),
@@ -37,7 +43,6 @@ export function calibrate(items: ScoredItem[]): TrackerItem[] {
 
   return items.map((item, index) => ({
     ...item,
-    images: [],
     value: {
       progression: {
         new: progression.new[index],

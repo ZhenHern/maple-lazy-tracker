@@ -42,3 +42,6 @@ next-env.d.ts
 
 # keep the template so others know which vars to set
 !.env.example
+
+# local post store (stand-in for Supabase)
+/.data/

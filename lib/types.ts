@@ -3,15 +3,34 @@ import type {
   PRIORITIES,
   PROFILES,
   scoredItemSchema,
+  storedItemSchema,
+  storedPostSchema,
+  tieredItemSchema,
   TIERS,
-  trackerItemSchema,
 } from "@/lib/classifier/schema";
 
 export type Tier = (typeof TIERS)[number];
 export type Profile = (typeof PROFILES)[number];
 export type Priority = (typeof PRIORITIES)[number];
-export type TrackerItem = z.infer<typeof trackerItemSchema>;
+
+/** Gemini's reply: an item with a 0-100 score per axis. */
 export type ScoredItem = z.infer<typeof scoredItemSchema>;
+/** A scored item plus its images, as saved in the store. */
+export type StoredItem = z.infer<typeof storedItemSchema>;
+export type StoredPost = z.infer<typeof storedPostSchema>;
+
+/** Which official post an item came from. */
+export interface ItemSource {
+  sourceId: string;
+  title: string;
+  url: string;
+}
+
+/** What the UI shows: scores resolved to tiers, plus where the item came from. */
+export type TrackerItem = Omit<StoredItem, "value"> & {
+  value: z.infer<typeof tieredItemSchema>["value"];
+  source: ItemSource;
+};
 
 export type PostKind = "patch" | "event";
 
@@ -35,12 +54,4 @@ export interface ScrapedPost extends PostSummary {
   text: string;
   contentHash: string;
   sections: PostSection[];
-}
-
-export interface ClassifiedPost extends PostSummary {
-  contentHash: string;
-  items: TrackerItem[];
-  model: string;
-  promptVersion: number;
-  classifiedAt: string;
 }
