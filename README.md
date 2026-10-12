@@ -32,7 +32,7 @@ The report ends with each model's use of today's quota. Gemini's free tier allow
 | URL | What it gives you |
 |---|---|
 | `/api/status` | Health check: which store is in use, how many posts have a final rating, when the last run was, today's quota use |
-| `/api/calendar` | The end dates of worthwhile quests as an `.ics` calendar file. Optional: `?profile=new|casual|endgame|returning`, `&priorities=progression,limited,cosmetic`, `&tier=must_do|worth|all` |
+| `/api/calendar` | The end dates of worthwhile quests as an `.ics` calendar file. Optional: `?profile=` one of `new`, `casual`, `endgame`, `returning`; `&priorities=progression,limited,cosmetic`; `&tier=` one of `must_do`, `worth`, `all` |
 | `/sitemap.xml`, `/robots.txt` | For search engines |
 
 ## Deploying

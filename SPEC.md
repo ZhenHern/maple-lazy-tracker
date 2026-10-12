@@ -54,6 +54,9 @@ Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `app/page.tsx` | Home: one list of everything ongoing, across all recent posts |
 | `app/archive/` | `page.tsx` lists every stored post; `[sourceId]/page.tsx` shows one post's quests, ended ones included |
 | `app/api/cron/ingest/route.ts` | The scheduled refresh, protected by `CRON_SECRET` |
+| `app/api/status/route.ts` | Health check for the operator: rating counts, last run, quota use. No secrets |
+| `app/api/calendar/route.ts`, `lib/calendar.ts` | Quest end dates as an iCalendar file for a chosen job and priorities |
+| `app/robots.ts`, `app/sitemap.ts`, `app/opengraph-image.tsx`, `app/error.tsx` | robots.txt, sitemap.xml, the share picture, and the page shown when rendering fails |
 | `app/api/dev/ingest/route.ts` | The same run, triggered by hand. Development only (404 in production) |
 | `lib/ingest.ts` | Scrape recent posts, queue the ones that need work, classify in batches, attach images, save |
 | `lib/tracker.ts` | Cached reads: `getOngoing()` for the home page, `getArchive()` and `getArchivedPost()` for the archive |
@@ -151,6 +154,7 @@ interface TrackerItem {
   title: string;
   category: 'event' | 'content' | 'system';
   summary: string;               // one or two sentences
+  why: string;                   // one sentence justifying the scores
   value: {
     progression: Record<Profile, Tier>;
     limited: Tier;               // rewards that may never return
