@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { PostKind, PostSummary, ScrapedPost } from "@/lib/types";
 import { htmlToText } from "./html-to-text";
+import { extractSections, toImageUrl } from "./sections";
 
 // The public news site is a client-rendered shell; this is the JSON API it calls.
 const NEWS_API = "https://g.nexonstatic.com/maplestory/cms/v1/news";
@@ -15,6 +16,7 @@ const listItemSchema = z.object({
   liveDate: z.string(),
   // Older posts send null here; newer ones send a boolean or omit the field.
   isMSCW: z.boolean().nullish(),
+  imageThumbnail: z.string().nullish(),
 });
 const detailSchema = listItemSchema.extend({ body: z.string() });
 
@@ -46,6 +48,7 @@ function toSummary(item: ListItem, kind: PostKind): PostSummary {
     title: item.name,
     url: `${NEWS_SITE}/${item.category}/${item.id}`,
     publishedAt: new Date(item.liveDate).toISOString(),
+    thumbnailUrl: toImageUrl(item.imageThumbnail),
   };
 }
 
@@ -62,6 +65,31 @@ export async function listTrackedPosts(): Promise<PostSummary[]> {
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
+/**
+ * File size in bytes of each image, read from a HEAD request (headers only, the
+ * image itself is not downloaded). Images that fail to answer count as 0.
+ */
+export async function fetchImageSizes(urls: string[]): Promise<Map<string, number>> {
+  const sizes = new Map<string, number>();
+  const BATCH = 12;
+  for (let start = 0; start < urls.length; start += BATCH) {
+    await Promise.all(
+      urls.slice(start, start + BATCH).map(async (url) => {
+        try {
+          const response = await fetch(url, {
+            method: "HEAD",
+            signal: AbortSignal.timeout(8_000),
+          });
+          sizes.set(url, Number(response.headers.get("content-length")) || 0);
+        } catch {
+          sizes.set(url, 0);
+        }
+      }),
+    );
+  }
+  return sizes;
+}
+
 export async function fetchPost(sourceId: string): Promise<ScrapedPost> {
   const parsed = detailSchema.safeParse(await fetchJson(`${NEWS_API}/${sourceId}`));
   if (!parsed.success) {
@@ -76,6 +104,7 @@ export async function fetchPost(sourceId: string): Promise<ScrapedPost> {
   return {
     ...toSummary(detail, kind),
     text,
+    sections: extractSections(detail.body),
     contentHash: createHash("sha256").update(text).digest("hex"),
   };
 }

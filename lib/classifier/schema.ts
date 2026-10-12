@@ -50,7 +50,11 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
   });
 }
 
-export const trackerItemSchema = itemSchema(tier);
+// Stored items also carry image URLs. These come from the post's HTML, never
+// from Gemini, so they are not part of the schema Gemini is given.
+export const trackerItemSchema = itemSchema(tier).extend({
+  images: z.array(z.string()).default([]),
+});
 export const scoredItemSchema = itemSchema(z.number());
 
 export const classificationSchema = z.object({

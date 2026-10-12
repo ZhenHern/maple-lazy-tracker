@@ -1,6 +1,6 @@
 # maple-lazy-tracker
 
-Lazy Tracker tells Global MapleStory players what in the latest patch is worth their time. It reads the official patch notes and event notices, has Gemini sort each item into `must_do`, `if_free` or `skip` for four player profiles, and shows the result as a checklist.
+Lazy Tracker tells Global MapleStory players what in the latest patch is worth their time. It reads the official patch notes and event notices, has Gemini sort each item into `must_do`, `if_free` or `skip` for four player profiles, and shows the result as an illustrated quest log.
 
 See [SPEC.md](SPEC.md) for the architecture, data schema and build phases.
 

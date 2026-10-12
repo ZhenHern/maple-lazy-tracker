@@ -16,8 +16,6 @@ const TIER_WORD: Record<Tier, string> = {
 interface QuestItemProps {
   item: TrackerItem;
   profile: Profile;
-  done: boolean;
-  onToggle: () => void;
   now: number | null;
 }
 
@@ -38,28 +36,41 @@ function TimeEstimate({ estimate }: { estimate: TrackerItem["timeEstimate"] }) {
   );
 }
 
-export function QuestItem({ item, profile, done, onToggle, now }: QuestItemProps) {
+// Images load straight from Nexon's CDN in the visitor's browser. next/image is
+// avoided on purpose: it would copy and re-serve them from our own server.
+function NexonImage({ src, alt, className }: { src: string; alt: string; className: string }) {
+  return (
+    <a href={src} target="_blank" rel="noreferrer" className={className}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+    </a>
+  );
+}
+
+export function QuestItem({ item, profile, now }: QuestItemProps) {
   const ratings: [string, Tier][] = [
     ["Progression", item.value.progression[profile]],
     ["Limited", item.value.limited],
     ["Cosmetic", item.value.cosmetic],
   ];
+  const [preview, ...gallery] = item.images;
 
   return (
-    <li className={`quest ${done ? "quest-done" : ""}`}>
-      <label className="flex cursor-pointer items-start gap-3">
-        <input type="checkbox" className="quest-check" checked={done} onChange={onToggle} />
-        <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+    <li className={`quest ${preview ? "quest-with-preview" : ""}`}>
+      {preview && (
+        <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
+      )}
+
+      <div className="grid min-w-0 gap-2">
+        <div>
+          <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="quest-title">{item.title}</span>
             <span className="chip chip-quiet">{CATEGORY_LABEL[item.category]}</span>
             <Countdown endsAt={item.endsAt} now={now} />
-          </span>
-          <span className="mt-1 block text-sm">{item.summary}</span>
-        </span>
-      </label>
+          </h3>
+          <p className="mt-1 text-sm">{item.summary}</p>
+        </div>
 
-      <div className="mt-2 grid gap-2 pl-9">
         {item.rewards.length > 0 && (
           <ul className="flex flex-wrap gap-1.5" aria-label="Rewards">
             {item.rewards.map((reward) => (
@@ -69,6 +80,20 @@ export function QuestItem({ item, profile, done, onToggle, now }: QuestItemProps
             ))}
           </ul>
         )}
+
+        {gallery.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {gallery.map((src, index) => (
+              <NexonImage
+                key={src}
+                src={src}
+                alt={`${item.title} image ${index + 2}`}
+                className="quest-thumb"
+              />
+            ))}
+          </div>
+        )}
+
         <TimeEstimate estimate={item.timeEstimate} />
         <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-soft">
           {ratings.map(([axis, tier]) => (

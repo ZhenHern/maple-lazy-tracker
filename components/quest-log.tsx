@@ -27,15 +27,6 @@ function sanitizePriorities(stored: unknown): Priority[] {
   return Array.isArray(stored) ? PRIORITIES.filter((priority) => stored.includes(priority)) : [];
 }
 
-function sanitizeDone(stored: unknown): Record<string, true> {
-  if (typeof stored !== "object" || stored === null) return {};
-  return Object.fromEntries(
-    Object.entries(stored)
-      .filter(([, value]) => value === true)
-      .map(([key]) => [key, true as const]),
-  );
-}
-
 // Soonest deadline first; items with no end date go last.
 function byDeadline(a: TrackerItem, b: TrackerItem): number {
   return (a.endsAt ?? "9999").localeCompare(b.endsAt ?? "9999");
@@ -47,7 +38,6 @@ export function QuestLog({ post }: { post: ClassifiedPost }) {
     "lazy-tracker:priorities",
     sanitizePriorities,
   );
-  const [done, setDone] = useLocalStorage("lazy-tracker:done:v1", sanitizeDone);
   const now = useNow();
 
   const groups = useMemo(() => {
@@ -63,20 +53,6 @@ export function QuestLog({ post }: { post: ClassifiedPost }) {
     }
     return grouped;
   }, [post.items, profile, priorities, now]);
-
-  const doneKey = (item: TrackerItem) => `${post.sourceId}:${item.id}`;
-
-  function toggle(item: TrackerItem) {
-    const key = doneKey(item);
-    const next = { ...done };
-    if (next[key]) delete next[key];
-    else next[key] = true;
-    setDone(next);
-  }
-
-  const mustDoTotal = groups.must_do.length;
-  const mustDoDone = groups.must_do.filter((item) => done[doneKey(item)]).length;
-  const percent = mustDoTotal === 0 ? 100 : Math.round((mustDoDone / mustDoTotal) * 100);
 
   return (
     <div className="grid gap-5">
@@ -95,29 +71,19 @@ export function QuestLog({ post }: { post: ClassifiedPost }) {
       <section className="panel" aria-label="Quest log">
         <h2 className="panel-title">Quest Log</h2>
         <div className="panel-body grid gap-4">
-          <div>
-            <p className="text-sm">
-              <a href={post.url} className="font-bold underline" target="_blank" rel="noreferrer">
-                {post.title}
-              </a>
-            </p>
-            <div className="mt-3 flex items-center gap-3">
-              <span className="label mb-0 shrink-0">Must-do progress</span>
-              <div
-                className="exp-bar"
-                role="progressbar"
-                aria-label="Must-do quests completed"
-                aria-valuemin={0}
-                aria-valuemax={mustDoTotal}
-                aria-valuenow={mustDoDone}
-              >
-                <div className="exp-fill" style={{ width: `${percent}%` }} />
-                <span className="exp-text">
-                  {mustDoDone} / {mustDoTotal}
-                </span>
-              </div>
-            </div>
-          </div>
+          <a href={post.url} target="_blank" rel="noreferrer" className="post-banner">
+            {post.thumbnailUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={post.thumbnailUrl} alt="" referrerPolicy="no-referrer" />
+            )}
+            <span>
+              <span className="label mb-1">Current patch</span>
+              <span className="block font-bold underline">{post.title}</span>
+              <span className="mt-1 block text-xs text-ink-soft">
+                Read the official notes on nexon.com
+              </span>
+            </span>
+          </a>
 
           {SECTIONS.map(({ key, title, blurb, open }) => {
             const items = groups[key];
@@ -138,14 +104,7 @@ export function QuestLog({ post }: { post: ClassifiedPost }) {
                 ) : (
                   <ul className="grid gap-2 p-2">
                     {items.map((item) => (
-                      <QuestItem
-                        key={item.id}
-                        item={item}
-                        profile={profile}
-                        done={Boolean(done[doneKey(item)])}
-                        onToggle={() => toggle(item)}
-                        now={now}
-                      />
+                      <QuestItem key={item.id} item={item} profile={profile} now={now} />
                     ))}
                   </ul>
                 )}

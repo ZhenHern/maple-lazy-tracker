@@ -37,6 +37,7 @@ export function calibrate(items: ScoredItem[]): TrackerItem[] {
 
   return items.map((item, index) => ({
     ...item,
+    images: [],
     value: {
       progression: {
         new: progression.new[index],

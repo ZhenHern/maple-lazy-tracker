@@ -103,34 +103,6 @@ body {
   color: #ffffff;
 }
 
-/* EXP bar. */
-.exp-bar {
-  position: relative;
-  flex: 1;
-  height: 1.5rem;
-  overflow: hidden;
-  border: 3px solid var(--color-wood-dark);
-  border-radius: 6px;
-  background: var(--color-ink);
-}
-
-.exp-fill {
-  height: 100%;
-  background: linear-gradient(#e4f76a, #86c81e);
-  transition: width 300ms ease-out;
-}
-
-.exp-text {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
-  font-family: var(--font-pixel), monospace;
-  font-size: 0.8rem;
-  text-shadow: 1px 1px 0 #000000;
-}
-
 /* Tier sections. */
 .tier {
   overflow: hidden;
@@ -210,30 +182,88 @@ body {
   font-weight: 800;
 }
 
-.quest-done {
-  opacity: 0.6;
+/* Images come from Nexon's CDN at unknown sizes: big screenshots shrink to fit,
+   small item icons keep their size and stay crisp instead of being blown up. */
+.quest-with-preview {
+  display: grid;
+  gap: 0.75rem;
 }
 
-.quest-done .quest-title {
-  text-decoration: line-through;
+@media (min-width: 640px) {
+  .quest-with-preview {
+    grid-template-columns: 11rem 1fr;
+  }
 }
 
-.quest-check {
+.quest-preview,
+.quest-thumb,
+.post-banner img {
+  border: 2px solid #d9b97a;
+  border-radius: 6px;
+  background: var(--color-parchment-deep);
+}
+
+.quest-preview,
+.quest-thumb {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.quest-preview {
+  height: 9rem;
+}
+
+@media (min-width: 640px) {
+  .quest-preview {
+    height: 7.5rem;
+  }
+}
+
+.quest-thumb {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.quest-preview img,
+.quest-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.post-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.post-banner img {
+  width: 100%;
+  max-width: 15rem;
+  aspect-ratio: 540 / 304;
+  object-fit: cover;
+}
+
+.post-banner > span {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.notice img {
+  width: 5.5rem;
   flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: 0.1rem;
-  border: 3px solid var(--color-wood-dark);
-  border-radius: 5px;
-  background: #ffffff;
-  cursor: pointer;
-  appearance: none;
-}
-
-.quest-check:checked {
-  background: #86c81e
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 5' fill='none' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E")
-    center / 100% no-repeat;
+  aspect-ratio: 540 / 304;
+  border: 2px solid #d9b97a;
+  border-radius: 6px;
+  object-fit: cover;
 }
 
 /* Small labels. */
@@ -303,7 +333,6 @@ body {
     animation: none;
   }
   .btn,
-  .exp-fill,
   .tier-head::before {
     transition: none;
   }

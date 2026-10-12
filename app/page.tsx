@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { QuestLog } from "@/components/quest-log";
+import { nexonImagesEnabled } from "@/lib/images";
 import { getClassifiedPost } from "@/lib/pipeline";
 import { listTrackedPosts } from "@/lib/scraper/nexon";
 import type { ClassifiedPost, PostSummary } from "@/lib/types";
@@ -28,7 +29,7 @@ export default function Home(props: PageProps<"/">) {
 
       <footer className="mt-8 text-center text-xs font-bold text-wood-dark">
         Fan project, not affiliated with Nexon. Tiers and time estimates are AI-generated from the
-        official patch notes and can be wrong.
+        official patch notes and can be wrong. MapleStory and all related images belong to Nexon.
       </footer>
     </div>
   );
@@ -73,7 +74,11 @@ type LoadResult =
 async function load(id: string | undefined): Promise<LoadResult> {
   try {
     const [post, tracked] = await Promise.all([getClassifiedPost(id), listTrackedPosts()]);
-    return { ok: true, post, recent: tracked.slice(0, 8) };
+    const showImages = nexonImagesEnabled();
+    const recent = tracked
+      .slice(0, 8)
+      .map((summary) => (showImages ? summary : { ...summary, thumbnailUrl: null }));
+    return { ok: true, post, recent };
   } catch (error) {
     return { ok: false, message: error instanceof Error ? error.message : "Unknown error" };
   }
@@ -97,13 +102,24 @@ async function Tracker({ searchParams }: { searchParams: PageProps<"/">["searchP
 
       <section className="panel">
         <h2 className="panel-title">Notice Board</h2>
-        <ul className="panel-body grid gap-1.5 text-sm">
+        <ul className="panel-body grid gap-3 text-sm sm:grid-cols-2">
           {result.recent.map((summary) => (
             <li key={summary.sourceId}>
-              <Link href={`/?id=${summary.sourceId}`} className="font-bold underline">
-                {summary.title}
-              </Link>{" "}
-              <span className="chip chip-quiet">{summary.kind}</span>
+              <Link href={`/?id=${summary.sourceId}`} className="notice">
+                {summary.thumbnailUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={summary.thumbnailUrl}
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <span>
+                  <span className="font-bold underline">{summary.title}</span>{" "}
+                  <span className="chip chip-quiet">{summary.kind}</span>
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
