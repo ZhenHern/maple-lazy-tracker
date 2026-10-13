@@ -52,7 +52,7 @@ export interface IngestOptions {
  * posts (`iconPool`), then from maplestory.io by exact item name. The remaining
  * pictures in the item's section become its gallery, largest first.
  */
-async function withImages(
+export async function withImages(
   items: ScoredItem[],
   post: ScrapedPost,
   iconPool: string[],
@@ -132,7 +132,7 @@ function planJob(
   return null;
 }
 
-async function loadQuota(): Promise<QuotaTracker> {
+export async function loadQuota(): Promise<QuotaTracker> {
   const store = getStore();
   let saved: unknown = null;
   try {

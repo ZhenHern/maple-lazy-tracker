@@ -5,11 +5,13 @@ import { z } from "zod";
 // models have told us to stop and for how long, so a run never wastes a
 // request on a model that is certain to refuse it.
 //
-// The rule it follows was learned the hard way: trust what Google says, not
-// what we assume. An earlier version assumed the daily quota returned at
-// midnight Pacific time and blocked models until then. Google's own refusal
-// said otherwise (its "retry in" pointed at about 00:00 UTC), so the ledger
-// now blocks a model for exactly as long as the refusal asks.
+// When does a daily quota come back? Two sources disagree, and we measured:
+// - Google's documentation says daily quotas reset at midnight Pacific time.
+// - Its 429 body carries a "retry in" that pointed at 00:00 UTC on two days
+//   running. On 2026-10-13 at 00:27 UTC the quota was still exhausted, so
+//   that hint is not a reset time.
+// A per-day refusal therefore blocks the model until the next Pacific
+// midnight. Per-minute refusals do use the hint, where it is accurate.
 //
 // Everything here is pure (no I/O): the caller loads and saves the ledger.
 
@@ -20,7 +22,7 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 const usageSchema = z.object({
-  /** The UTC date that `used` belongs to. */
+  /** The quota day (Pacific date) that `used` belongs to. */
   day: z.string(),
   used: z.number(),
   /** Do not call this model before this time (ISO), or null. */
@@ -51,9 +53,34 @@ export function minGapMs(): number {
   return Math.ceil(MINUTE / perMinute) + 500;
 }
 
-/** The day `now` falls in, as YYYY-MM-DD in UTC. Used only to label the count. */
+const pacificClock = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Los_Angeles",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+function pacific(now: number): Record<string, string> {
+  return Object.fromEntries(
+    pacificClock.formatToParts(new Date(now)).map((part) => [part.type, part.value]),
+  );
+}
+
+/** The quota day `now` falls in, as YYYY-MM-DD in Pacific time. */
 export function quotaDay(now: number): string {
-  return new Date(now).toISOString().slice(0, 10);
+  const { year, month, day } = pacific(now);
+  return `${year}-${month}-${day}`;
+}
+
+/** When the daily quota next resets (the coming Pacific midnight), in ms. */
+export function nextQuotaReset(now: number): number {
+  const { hour, minute, second } = pacific(now);
+  const elapsed = (Number(hour) * 60 + Number(minute)) * MINUTE + Number(second) * 1000;
+  return now + (DAY - elapsed);
 }
 
 function usage(ledger: QuotaLedger, model: string, now: number) {
@@ -109,15 +136,16 @@ export function recordRateLimit(
   now: number,
 ): QuotaLedger {
   const entry = usage(ledger, model, now);
-  // Google's own "retry in" is the best information there is. Without one, a
-  // per-day refusal is rechecked after an hour and a per-minute one after a
-  // minute. Nothing is ever blocked for more than a day.
-  const fallback = limit.scope === "day" ? HOUR : MINUTE;
-  const wait = Math.min(limit.retryMs ?? fallback, DAY);
+  // Per day: until the documented reset, plus a few minutes of slack.
+  // Per minute: for as long as Google asks, or a minute when it does not say.
+  const until =
+    limit.scope === "day"
+      ? nextQuotaReset(now) + 5 * MINUTE
+      : now + Math.min(limit.retryMs ?? MINUTE, HOUR);
   return {
     models: {
       ...ledger.models,
-      [model]: { ...entry, blockedUntil: new Date(now + wait).toISOString() },
+      [model]: { ...entry, blockedUntil: new Date(until).toISOString() },
     },
   };
 }

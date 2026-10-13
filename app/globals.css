@@ -1346,6 +1346,106 @@ body {
   animation: nudge 1.6s ease-in-out infinite;
 }
 
+/* ---------- Prompt lab (/dev/review, development only) ---------- */
+
+.review-page {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+  background: var(--color-panel);
+}
+
+.review-scroll {
+  overflow-x: auto;
+}
+
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.review-table th,
+.review-table td {
+  padding: 0.45rem 0.5rem;
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.review-table thead th {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.review-table tbody th {
+  min-width: 18rem;
+  font-weight: 400;
+}
+
+.review-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.review-why {
+  display: block;
+  margin-top: 0.2rem;
+  font-weight: 700;
+}
+
+.review-note {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--color-ink-soft);
+  font-size: 0.75rem;
+}
+
+.review-tier {
+  display: block;
+  color: var(--tier-color);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.review-tier small {
+  color: var(--color-ink-soft);
+  font-weight: 700;
+}
+
+.review-after {
+  margin-top: 0.15rem;
+}
+
+.review-moved {
+  background: #fff3c9;
+}
+
+.review-gone {
+  opacity: 0.6;
+}
+
+.review-help {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.review-help a {
+  font-weight: 800;
+  text-decoration: underline;
+}
+
 /* ---------- Motion ---------- */
 
 @keyframes nudge {

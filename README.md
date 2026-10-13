@@ -25,7 +25,18 @@ Each post gets a status:
 | `deferred` | Waiting: the request limit was reached, or no trusted model has quota left today |
 | `failed` | An error. The previous version, if any, stays live |
 
-The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day. A refused model is left alone until the time Google's refusal names (about 00:00 UTC when measured). The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
+The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day. A model that refuses for the day is left alone until Google's documented reset, midnight Pacific time (07:00 or 08:00 UTC). The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
+
+## Tuning the prompt
+
+The scheduled job only re-rates a post when it is new, its text changed, or `PROMPT_VERSION` in `lib/classifier/prompt.ts` moved on, and then it overwrites the live data. To judge a prompt edit first, use the prompt lab (development server only):
+
+1. Edit `lib/classifier/prompt.ts`. Do not bump the version yet.
+2. Open `/api/dev/try`. It runs the edited prompt on the posts behind today's quest list and saves the answer to `.data/trials/latest.json`. Nothing live changes. One request by default; event notices share it.
+   - `?tier=fallback` uses the backup model, which has its own daily quota. Use it for rough first passes.
+   - `?ids=45330,45393` picks posts. `?limit=2` allows more requests (patch notes need one each).
+3. Open `/dev/review`. Every running quest is listed with the tier each kind of player gets and the model's raw score. An arrow shows the trial's value, and a yellow cell means the tier moved.
+4. Happy with it? `/api/dev/try?promote` saves the trial as the live data without spending the requests again. Then bump `PROMPT_VERSION` so the posts the trial did not cover are re-rated on the next run.
 
 ## Useful URLs
 

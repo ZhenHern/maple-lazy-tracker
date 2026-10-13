@@ -34,7 +34,7 @@ Profiles:
 Stack: Next.js App Router + TypeScript on Vercel, Supabase (Postgres) for cache, Gemini via `@google/genai`, Tailwind for styling.
 
 ```
-Vercel Cron (daily, 00:30 UTC, just after Gemini's quota returns)
+Vercel Cron (daily, 08:30 UTC, just after Gemini's quota resets)
    └─> GET /api/cron/ingest        (checks Authorization: Bearer CRON_SECRET)
          1. scraper   list recent posts, fetch body, HTML -> clean text, hash
          2. plan      queue posts that are new, changed, or only provisionally rated
@@ -57,6 +57,9 @@ Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `app/api/status/route.ts` | Health check for the operator: rating counts, last run, quota use. No secrets |
 | `app/api/calendar/route.ts`, `lib/calendar.ts` | Quest end dates as an iCalendar file for a chosen job and priorities |
 | `app/robots.ts`, `app/sitemap.ts`, `app/opengraph-image.tsx`, `app/error.tsx` | robots.txt, sitemap.xml, the share picture, and the page shown when rendering fails |
+| `app/api/dev/try/route.ts`, `lib/dev/trial.ts` | The prompt lab: run the current prompt on chosen posts without saving, then optionally promote the result. Development only |
+| `app/dev/review/page.tsx`, `lib/dev/review.ts` | Every running quest with its tiers and raw scores, and what the latest trial would change. Development only |
+| `lib/ongoing.ts` | The rules for what counts as running, shared by the home page, the calendar and the prompt lab |
 | `app/api/dev/ingest/route.ts` | The same run, triggered by hand. Development only (404 in production) |
 | `lib/ingest.ts` | Scrape recent posts, queue the ones that need work, classify in batches, attach images, save |
 | `lib/tracker.ts` | Cached reads: `getOngoing()` for the home page, `getArchive()` and `getArchivedPost()` for the archive |
@@ -124,7 +127,7 @@ The patch notes carry a preview and reward pictures under each event's heading. 
 
 ### Gemini free-tier limits (measured in Phase 1)
 
-- 5 requests per minute and 20 requests per day, per model. Failed requests count. The daily quota came back at about 00:00 UTC when measured on 2026-10-12 (Google's refusal said "retry in 32779s" at 14:54 UTC), not at midnight Pacific as first assumed, so the cron runs at 00:30 UTC. The ledger never relies on that time: it blocks a refused model for exactly as long as the refusal asks. The hash check, batching and the 3-requests-per-run cap keep the cron far inside the daily figure; development re-runs are what exhaust it.
+- 5 requests per minute and 20 requests per day, per model. Failed requests count. Google documents that daily quotas reset at midnight Pacific time (07:00 or 08:00 UTC), so the cron runs at 08:30 UTC and the ledger blocks a refused model until then. The 429 body's "retry in" is not a reset time: on two days it pointed at 00:00 UTC, and on 2026-10-13 at 00:27 UTC the quota was still exhausted. The hash check, batching and the 3-requests-per-run cap keep the cron far inside the daily figure; development re-runs are what exhaust it.
 - Three short event notices in one request came back in about 5 seconds with every post answered (measured against `flash-lite`).
 - Google Search grounding returns 429 on the free tier, so automatic lookup of an event's history on other servers needs a billed key.
 - Gemini rejects the response schema with a bare 400 if it contains `minItems`/`maxItems`, so size and range limits are enforced in our code instead.

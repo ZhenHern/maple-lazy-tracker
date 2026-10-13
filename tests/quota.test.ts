@@ -3,6 +3,7 @@ import {
   emptyLedger,
   isAvailable,
   minGapMs,
+  nextQuotaReset,
   parseRateLimit,
   quotaDay,
   recordCall,
@@ -11,16 +12,23 @@ import {
 } from "@/lib/classifier/quota";
 
 const MODEL = "gemini-test";
+// 2026-10-12 12:00 UTC is 05:00 in California (PDT, UTC-7).
 const NOON = Date.UTC(2026, 9, 12, 12, 0, 0);
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 
-describe("ledger", () => {
-  it("labels the count with the UTC date", () => {
-    expect(quotaDay(Date.UTC(2026, 9, 12, 23, 59))).toBe("2026-10-12");
-    expect(quotaDay(Date.UTC(2026, 9, 13, 0, 0))).toBe("2026-10-13");
+describe("quota day", () => {
+  it("follows Pacific time, not UTC", () => {
+    expect(quotaDay(Date.UTC(2026, 9, 12, 6, 59))).toBe("2026-10-11");
+    expect(quotaDay(Date.UTC(2026, 9, 12, 7, 0))).toBe("2026-10-12");
   });
 
+  it("resets at the next Pacific midnight", () => {
+    expect(new Date(nextQuotaReset(NOON)).toISOString()).toBe("2026-10-13T07:00:00.000Z");
+  });
+});
+
+describe("ledger", () => {
   it("counts requests without blocking on the count alone", () => {
     let ledger = emptyLedger();
     for (let call = 0; call < 30; call += 1) ledger = recordCall(ledger, MODEL, NOON);
@@ -30,42 +38,32 @@ describe("ledger", () => {
     expect(isAvailable(ledger, MODEL, NOON)).toBe(true);
   });
 
-  it("starts a fresh count on a new day", () => {
+  it("starts a fresh count on a new quota day", () => {
     let ledger = emptyLedger();
     for (let call = 0; call < 20; call += 1) ledger = recordCall(ledger, MODEL, NOON);
     ledger = recordCall(ledger, MODEL, NOON + 24 * HOUR);
     expect(ledger.models[MODEL].used).toBe(1);
   });
 
-  it("blocks a model for as long as Google's refusal asks", () => {
-    // The real refusal seen on 2026-10-12: per day, retry in 32779s (about 9 hours).
+  it("blocks a model until the Pacific reset after a per-day refusal", () => {
+    // Measured on 2026-10-12: Google's hint said "retry in 32779s" (00:00 UTC),
+    // but the quota was still gone at 00:27 UTC. The hint is ignored here.
     const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: 32_779_000 }, NOON);
-    expect(isAvailable(ledger, MODEL, NOON + 9 * HOUR)).toBe(false);
-    expect(isAvailable(ledger, MODEL, NOON + 9.2 * HOUR)).toBe(true);
+    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 0, 30))).toBe(false);
+    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 6, 59))).toBe(false);
+    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 7, 6))).toBe(true);
   });
 
-  it("keeps a block across midnight until its time has passed", () => {
-    const late = Date.UTC(2026, 9, 12, 23, 0);
-    const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: 3 * HOUR }, late);
-    expect(isAvailable(ledger, MODEL, late + 2 * HOUR)).toBe(false);
-    expect(isAvailable(ledger, MODEL, late + 3 * HOUR + 1)).toBe(true);
-  });
-
-  it("rechecks after an hour when a per-day refusal gives no wait", () => {
-    const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: null }, NOON);
-    expect(isAvailable(ledger, MODEL, NOON + 59 * MINUTE)).toBe(false);
-    expect(isAvailable(ledger, MODEL, NOON + 61 * MINUTE)).toBe(true);
-  });
-
-  it("blocks a model only briefly after a per-minute refusal", () => {
+  it("blocks a model only as long as asked after a per-minute refusal", () => {
     const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "minute", retryMs: 30_000 }, NOON);
     expect(isAvailable(ledger, MODEL, NOON + 10_000)).toBe(false);
     expect(isAvailable(ledger, MODEL, NOON + 31_000)).toBe(true);
   });
 
-  it("never blocks for more than a day", () => {
-    const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: 99 * HOUR }, NOON);
-    expect(isAvailable(ledger, MODEL, NOON + 24 * HOUR + 1)).toBe(true);
+  it("waits a minute when a per-minute refusal gives no time", () => {
+    const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "minute", retryMs: null }, NOON);
+    expect(isAvailable(ledger, MODEL, NOON + 59_000)).toBe(false);
+    expect(isAvailable(ledger, MODEL, NOON + 61_000)).toBe(true);
   });
 
   it("spaces calls to respect the per-minute limit", () => {
@@ -77,7 +75,7 @@ describe("ledger", () => {
 });
 
 describe("parseRateLimit", () => {
-  it("recognises a per-day quota and its wait", () => {
+  it("recognises a per-day quota and its hint", () => {
     const body = JSON.stringify({
       error: {
         code: 429,
