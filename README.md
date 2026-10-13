@@ -25,7 +25,7 @@ Each post gets a status:
 | `deferred` | Waiting: the request limit was reached, or no trusted model has quota left today |
 | `failed` | An error. The previous version, if any, stays live |
 
-The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day. A model that refuses for the day is left alone until Google's documented reset, midnight Pacific time (07:00 or 08:00 UTC). The ledger behind that line is `.data/meta/gemini-quota.json`; delete it if you change keys or enable billing and want the models tried again at once.
+The report ends with each model's use of today's quota. Gemini's free tier allows 20 requests per model per day. A model that refuses for the day is left alone for two hours and then asked again; no reset time is assumed, because neither the documented one nor the one in Google's error held when measured. The ledger behind that line is the `gemini-quota` row of the `meta` table in Supabase (`.data/meta/gemini-quota.json` when running on local files).
 
 ## Tuning the prompt
 

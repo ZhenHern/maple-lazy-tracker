@@ -5,13 +5,15 @@ import { z } from "zod";
 // models have told us to stop and for how long, so a run never wastes a
 // request on a model that is certain to refuse it.
 //
-// When does a daily quota come back? Two sources disagree, and we measured:
+// When does a daily quota come back? Nothing we were told held up when measured:
 // - Google's documentation says daily quotas reset at midnight Pacific time.
 // - Its 429 body carries a "retry in" that pointed at 00:00 UTC on two days
-//   running. On 2026-10-13 at 00:27 UTC the quota was still exhausted, so
-//   that hint is not a reset time.
-// A per-day refusal therefore blocks the model until the next Pacific
-// midnight. Per-minute refusals do use the hint, where it is accurate.
+//   running, yet on 2026-10-13 at 00:27 UTC the quota was still exhausted.
+// - That same day at 03:50 UTC, three hours before Pacific midnight, two of
+//   the refused models answered again.
+// So no reset time is assumed. A per-day refusal blocks the model for a
+// couple of hours, and then it is simply asked again; a refusal costs one
+// tiny request. Per-minute refusals use Google's hint, where it is accurate.
 //
 // Everything here is pure (no I/O): the caller loads and saves the ledger.
 
@@ -20,6 +22,8 @@ const DEFAULT_PER_MINUTE = 5;
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
+// How long a model is left alone after it says its daily quota is gone.
+const DAY_REFUSAL_PAUSE = 2 * HOUR;
 
 const usageSchema = z.object({
   /** The quota day (Pacific date) that `used` belongs to. */
@@ -76,7 +80,7 @@ export function quotaDay(now: number): string {
   return `${year}-${month}-${day}`;
 }
 
-/** When the daily quota next resets (the coming Pacific midnight), in ms. */
+/** The coming Pacific midnight, in ms: when the documented quota day ends. */
 export function nextQuotaReset(now: number): number {
   const { hour, minute, second } = pacific(now);
   const elapsed = (Number(hour) * 60 + Number(minute)) * MINUTE + Number(second) * 1000;
@@ -136,11 +140,11 @@ export function recordRateLimit(
   now: number,
 ): QuotaLedger {
   const entry = usage(ledger, model, now);
-  // Per day: until the documented reset, plus a few minutes of slack.
+  // Per day: a fixed pause, then it is asked again (see the note at the top).
   // Per minute: for as long as Google asks, or a minute when it does not say.
   const until =
     limit.scope === "day"
-      ? nextQuotaReset(now) + 5 * MINUTE
+      ? now + DAY_REFUSAL_PAUSE
       : now + Math.min(limit.retryMs ?? MINUTE, HOUR);
   return {
     models: {

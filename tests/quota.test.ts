@@ -45,13 +45,12 @@ describe("ledger", () => {
     expect(ledger.models[MODEL].used).toBe(1);
   });
 
-  it("blocks a model until the Pacific reset after a per-day refusal", () => {
-    // Measured on 2026-10-12: Google's hint said "retry in 32779s" (00:00 UTC),
-    // but the quota was still gone at 00:27 UTC. The hint is ignored here.
+  it("leaves a model alone for two hours after a per-day refusal, then asks again", () => {
+    // No reset time is trusted: Google's hint ("retry in 32779s") and the
+    // documented Pacific midnight were both wrong when measured.
     const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: 32_779_000 }, NOON);
-    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 0, 30))).toBe(false);
-    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 6, 59))).toBe(false);
-    expect(isAvailable(ledger, MODEL, Date.UTC(2026, 9, 13, 7, 6))).toBe(true);
+    expect(isAvailable(ledger, MODEL, NOON + 119 * 60_000)).toBe(false);
+    expect(isAvailable(ledger, MODEL, NOON + 121 * 60_000)).toBe(true);
   });
 
   it("blocks a model only as long as asked after a per-minute refusal", () => {
