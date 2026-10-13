@@ -130,10 +130,16 @@ function demote(tier: Tier): Tier {
  *    full: the highest score that still fits goes in next, and the ones that
  *    do not fit become If Free. Best first, not cheapest first: the top
  *    reward of a patch must not lose its place to several small ones.
+ *    These quick quests do not use up the playtime the bigger quests compete
+ *    for: three check-ins must not push the patch's best reward out of a
+ *    15-minute day.
  * 5. When the player picked no priority, quests that are Must Do for
  *    progression fill the day before quests that are Must Do only for looks
  *    or collecting. Someone who has not said they care about cosmetics should
  *    not see an outfit event ahead of the patch's best progression reward.
+ * 6. A quest that unlocks another one (it grants the rank the other needs) is
+ *    never rated below the quest it unlocks: skipping the "If Free" track
+ *    would make the Must Do impossible to claim.
  */
 export function planDay(
   items: TrackerItem[],
@@ -144,10 +150,32 @@ export function planDay(
 ): Map<string, Plan> {
   const plans = new Map<string, Plan>();
   const competing: { item: TrackerItem; minutes: number; score: number; core: boolean }[] = [];
+  // Minutes taken by the Must Do quests that compete for the day.
   let used = 0;
 
+  // What each quest is worth by its own rewards, then lifted to the best
+  // quest it unlocks (rule 6).
+  const worth = new Map(
+    items.map((item) => [
+      item.id,
+      {
+        tier: resolveTier(item, profile, priorities),
+        score: bestScore(item, profile, priorities),
+        core: priorities.length > 0 || item.value.progression[profile] === "must_do",
+      },
+    ]),
+  );
   for (const item of items) {
-    const base = resolveTier(item, profile, priorities);
+    const mine = worth.get(item.id)!;
+    const gate = item.requires ? worth.get(item.requires) : undefined;
+    if (!gate || gate === mine) continue;
+    if (TIERS.indexOf(mine.tier) < TIERS.indexOf(gate.tier)) gate.tier = mine.tier;
+    gate.score = Math.max(gate.score, mine.score);
+    gate.core ||= mine.core;
+  }
+
+  for (const item of items) {
+    const { tier: base, score, core } = worth.get(item.id)!;
     const minutes = dailyMinutes(item);
 
     if (notOpenYet(item, now)) {
@@ -163,17 +191,11 @@ export function planDay(
       plans.set(item.id, { tier: base, note: null });
     } else if (minutes <= QUICK_MINUTES && base !== "skip") {
       plans.set(item.id, { tier: "must_do", note: base === "must_do" ? null : "quick" });
-      used += minutes;
     } else if (playtime !== 0 && minutes > playtime && base !== "skip") {
       plans.set(item.id, { tier: demote(base), note: "over" });
     } else if (base === "must_do") {
-      competing.push({
-        item,
-        minutes,
-        score: bestScore(item, profile, priorities),
-        // "Core" = what the player asked for. With nothing picked, that is progression.
-        core: priorities.length > 0 || item.value.progression[profile] === "must_do",
-      });
+      // "Core" = what the player asked for. With nothing picked, that is progression.
+      competing.push({ item, minutes, score, core });
     } else {
       plans.set(item.id, { tier: base, note: null });
     }

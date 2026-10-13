@@ -61,6 +61,10 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
       cosmetic: rating,
     }),
     rewards: z.array(z.string()),
+    // The id of another item of the same post that must be done first: the
+    // one that grants the rank, level or unlock this item needs. null when
+    // it stands alone.
+    requires: z.string().nullable(),
     // The activities that make up the quest. Empty for a single-activity quest.
     steps: z.array(stepSchema),
     startsAt: isoDate.nullable(),
@@ -95,6 +99,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   daysPerWeek: z.number().default(7),
   claimUntil: isoDate.nullable().default(null),
   steps: z.array(stepSchema).default([]),
+  requires: z.string().nullable().default(null),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

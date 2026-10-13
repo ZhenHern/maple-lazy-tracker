@@ -22,6 +22,11 @@ describe("rewardKind", () => {
     ["Unique/Legendary Scroll rewards", "scroll"],
     ["Pitched Whispers Coupon", "ticket"],
     ["Luxe Sauna Cafe Furnishing", "chair"],
+    ["Chance at 22-Star Enhancement (Lv. 200)", "scroll"],
+    ["Event Ring Legendary Potential Scroll", "scroll"],
+    ["Hair/Face/Mount Transfer Coupons", "ticket"],
+    ["Chance at Random Mimic Box x3", "gift"],
+    ["Chance at Hidden Mission", "gift"],
     ["Inspector Boxes", "gift"],
   ])("%s -> %s", (name, sprite) => {
     expect(rewardKind(name).sprite).toBe(sprite);

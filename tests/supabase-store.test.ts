@@ -108,6 +108,7 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         daysPerWeek: 7,
         claimUntil: null,
         steps: [],
+        requires: null,
         value: {
           progression: { casual: 2, endgame: 3, returning: 4 },
           limited: 5,

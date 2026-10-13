@@ -163,6 +163,8 @@ export function selectOngoing(
         ...(showImages ? item : stripImages(item)),
         // Item ids are unique per post only, so the post id is added.
         id: `${post.sourceId}-${item.id}`,
+        // Ids are made unique across posts, so the link is rewritten to match.
+        requires: item.requires ? `${post.sourceId}-${item.requires}` : null,
         source,
       });
     }

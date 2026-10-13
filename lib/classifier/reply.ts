@@ -26,7 +26,7 @@ function slugify(value: string): string {
 // Gemini cannot be given them in the schema.
 function normalizeItems(items: ScoredItem[]): ScoredItem[] {
   const seen = new Map<string, number>();
-  return items.map((item) => {
+  const cleaned = items.map((item) => {
     const base = slugify(item.id);
     const count = (seen.get(base) ?? 0) + 1;
     seen.set(base, count);
@@ -44,6 +44,12 @@ function normalizeItems(items: ScoredItem[]): ScoredItem[] {
           ? { ...item.timeEstimate, minutesPerWeek: null, effort: null }
           : item.timeEstimate,
     };
+  });
+  // A link must point at another item of this post, or it means nothing.
+  const ids = new Set(cleaned.map((item) => item.id));
+  return cleaned.map((item) => {
+    const requires = item.requires ? slugify(item.requires) : null;
+    return { ...item, requires: requires && requires !== item.id && ids.has(requires) ? requires : null };
   });
 }
 

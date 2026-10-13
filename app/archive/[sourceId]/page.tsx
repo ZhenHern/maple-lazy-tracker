@@ -70,6 +70,11 @@ export default async function ArchivedPostPage({ params }: PageProps<"/archive/[
                   <span className="chip chip-quiet">
                     {post.itemCount} {post.itemCount === 1 ? "quest" : "quests"}
                   </span>
+                  {post.newsCount > 0 && (
+                    <span className="chip chip-quiet">
+                      {post.newsCount} {post.newsCount === 1 ? "change" : "changes"}
+                    </span>
+                  )}
                   {post.ongoingCount > 0 && (
                     <span className="chip chip-live">{post.ongoingCount} still running</span>
                   )}

@@ -92,6 +92,7 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
       },
       rewards: [],
       steps: [],
+      requires: null,
       ...eventPeriod(post),
       timeEstimate: {
         label: "Not rated yet",

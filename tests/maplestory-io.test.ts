@@ -71,6 +71,21 @@ describe("pickItem", () => {
     expect(picked("17-Star Enhancement", "Karma Star Force 17-Star Enhancement")).toBeNull();
   });
 
+  it("refuses a selector coupon for the thing it selects", () => {
+    expect(picked("Arcane Symbols", "Arcane Symbol x5 Selector Coupon")).toBeNull();
+    expect(picked("Sol Erda Fragment", "Sol Erda/Sol Erda Fragment Selector Coupon")).toBeNull();
+  });
+
+  it("refuses an item whose bracket states another level or duration", () => {
+    const scrolls = items("100% 18-star Enhancement (Lv. 160)");
+    expect(pickItem("18-Star Enhancement", scrolls, "18-Star Enhancement (Lv 250)")).toBeNull();
+    expect(pickItem("18-Star Enhancement", scrolls, "18-Star Enhancement (Lv 160)")?.name).toBe(
+      "100% 18-star Enhancement (Lv. 160)",
+    );
+    // A reward that states no level accepts any.
+    expect(pickItem("18-Star Enhancement", scrolls)?.name).toBe("100% 18-star Enhancement (Lv. 160)");
+  });
+
   it("lets the reward drop a kind word the game leaves out, but not add one", () => {
     expect(picked("Sweet Spirit Pet", "Sweet Spirit")).toBe("Sweet Spirit");
     expect(picked("Hasty Hero Title", "Hasty Hero Title Coupon")).toBe("Hasty Hero Title Coupon");

@@ -42,6 +42,7 @@ function item(overrides: Partial<ScoredItem> = {}): ScoredItem {
     daysPerWeek: 7,
     claimUntil: null,
     steps: [],
+    requires: null,
     value: {
       progression: { casual: 70, endgame: 40, returning: 85 },
       limited: 10,

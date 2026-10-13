@@ -61,6 +61,7 @@ function scored(title: string): ScoredItem {
     daysPerWeek: 7,
     claimUntil: null,
     steps: [],
+    requires: null,
     value: {
       progression: { casual: 60, endgame: 60, returning: 60 },
       limited: 0,

@@ -5,6 +5,7 @@ import { ratingOf, type Rating } from "@/lib/classifier/models";
 import { readAllPosts } from "@/lib/db/store";
 import { nexonImagesEnabled } from "@/lib/images";
 import { buildOngoing, type OngoingTracker } from "@/lib/ongoing";
+import { isTask } from "@/lib/tiering";
 import type { PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
 
 /** The cache tag on everything read from the post store. Ingest revalidates it. */
@@ -32,27 +33,20 @@ export async function getOngoing(): Promise<OngoingTracker> {
 
 /** One stored post as the archive lists it. */
 export interface ArchiveEntry extends PostSummary {
+  /** Quests: dated activities. Changes with no deadline are counted apart. */
   itemCount: number;
-  /** Items that have not ended yet. */
+  /** System changes and permanent content: news, with nothing to do. */
+  newsCount: number;
+  /** Quests that have not ended yet. */
   ongoingCount: number;
   rating: Rating;
 }
 
-/** The newest patch notes' publish date: only that patch's permanent items count as current. */
-function latestPatchDate(posts: StoredPost[]): string | undefined {
-  return posts
-    .filter((post) => post.kind === "patch")
-    .map((post) => post.publishedAt)
-    .sort()
-    .at(-1);
-}
-
-// The same rule the home page uses, so the archive's "still running" count
-// matches what a visitor sees there.
-function countRunning(post: StoredPost, now: number, latestPatch: string | undefined): number {
-  const current = post.kind !== "patch" || post.publishedAt === latestPatch;
-  return post.items.filter((item) =>
-    item.endsAt === null ? current : Date.parse(item.claimUntil ?? item.endsAt) > now,
+// Quests whose deadline (or claim deadline) is still ahead. News has no
+// deadline and is never "running".
+function countRunning(post: StoredPost, now: number): number {
+  return post.items.filter(
+    (item) => isTask(item) && Date.parse(item.claimUntil ?? item.endsAt!) > now,
   ).length;
 }
 
@@ -70,13 +64,13 @@ export async function getArchive(): Promise<ArchiveEntry[]> {
   const now = Date.now();
   const showImages = nexonImagesEnabled();
   const posts = await readAllPosts();
-  const latestPatch = latestPatchDate(posts);
   return posts
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .map((post) => ({
       ...toSummary(post, showImages),
-      itemCount: post.items.length,
-      ongoingCount: countRunning(post, now, latestPatch),
+      itemCount: post.items.filter(isTask).length,
+      newsCount: post.items.filter((item) => !isTask(item)).length,
+      ongoingCount: countRunning(post, now),
       rating: ratingOf(post.model),
     }));
 }
@@ -111,8 +105,9 @@ export async function getArchivedPost(sourceId: string): Promise<ArchivedPost | 
   return {
     post: {
       ...toSummary(stored, showImages),
-      itemCount: stored.items.length,
-      ongoingCount: countRunning(stored, now, latestPatchDate(posts)),
+      itemCount: stored.items.filter(isTask).length,
+      newsCount: stored.items.filter((item) => !isTask(item)).length,
+      ongoingCount: countRunning(stored, now),
       rating,
     },
     // Here tiers are ranked inside the one post: the archive answers "what

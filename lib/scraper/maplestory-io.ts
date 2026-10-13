@@ -44,7 +44,9 @@ export async function latestGmsVersion(): Promise<string | null> {
 // Words that say what form an item comes in, not which item it is. The post
 // says "Hyper Burninator Coupon" where the game says "Hyper Burninator", and
 // "Symbol Selector" where the game says "Symbol Selector Coupon".
-const FORM_WORDS = new Set(["coupon", "voucher", "scroll", "ticket", "selector", "item"]);
+// "Selector" and "Box" are not form words: a selector coupon is a different
+// item from the thing it lets you pick.
+const FORM_WORDS = new Set(["coupon", "voucher", "scroll", "ticket", "item"]);
 // Words a post adds to say what kind of thing a reward is ("Sweet Spirit Pet",
 // "Hasty Hero Title"). The game's own name often leaves them out, so the
 // reward may drop them, but an item may not add them: "Nodestone Chair" is not
@@ -65,7 +67,13 @@ function words(value: string): string[] {
 }
 
 const withoutBrackets = (value: string) => value.replace(/\(.*?\)/g, " ");
-const tidy = (value: string) => value.replace(/\s+/g, " ").trim();
+/** The numbers written inside brackets: the level, range or duration of an item. */
+function bracketNumbers(value: string): Set<string> {
+  const inside = (value.match(/\(.*?\)/g) ?? []).join(" ");
+  return new Set(inside.match(/\d+/g) ?? []);
+}
+
+const tidy =(value: string) => value.replace(/\s+/g, " ").trim();
 
 /**
  * The names to search for, most specific first. A reward line carries more
@@ -121,8 +129,9 @@ export function searchNames(reward: string): string[] {
  * Coupon" and "Nodestone Chair" are different items and are refused. Among the
  * items that pass, the one that adds least wins.
  */
-export function pickItem(name: string, items: FoundItem[]): FoundItem | null {
+export function pickItem(name: string, items: FoundItem[], reward = name): FoundItem | null {
   const named = new Set(words(name));
+  const stated = bracketNumbers(reward);
   const wanted = new Set(
     [...named].filter((word) => !FORM_WORDS.has(word) && !KIND_WORDS.has(word)),
   );
@@ -133,6 +142,10 @@ export function pickItem(name: string, items: FoundItem[]): FoundItem | null {
     const outside = words(withoutBrackets(item.name));
     const all = new Set(words(item.name));
     if (![...wanted].every((word) => all.has(word))) continue;
+    // "(Lv. 250)" and "(Lv. 160)" are different scrolls, "(30 min)" and
+    // "(15 min)" different coupons: brackets that both carry numbers must agree.
+    const theirs = bracketNumbers(item.name);
+    if (stated.size > 0 && theirs.size > 0 && ![...stated].some((n) => theirs.has(n))) continue;
     const extra = outside.filter((word) => !named.has(word));
     if (!extra.every((word) => FORM_WORDS.has(word) || /^x\d+$|^\d+%$/.test(word))) continue;
 
@@ -182,7 +195,7 @@ export async function findItemIcon(reward: string, version: string): Promise<str
       for (let attempt = 0; attempt < 3; attempt++) {
         // The fullest name is tried on every answer: a search for the plain name
         // can return the item that also fits the bracketed one ("(Lv. 160)").
-        const match = pickItem(names[0], found) ?? pickItem(name, found);
+        const match = pickItem(names[0], found) ?? pickItem(name, found, names[0]);
         if (!match) break;
         const icon = `${API}/GMS/${version}/item/${match.id}/icon`;
         if (await hasPicture(icon)) return icon;

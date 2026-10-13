@@ -16,6 +16,7 @@ function item(title: string, overrides: Partial<StoredItem> = {}): StoredItem {
     daysPerWeek: 7,
     claimUntil: null,
     steps: [],
+    requires: null,
     value: { progression: { casual: 80, endgame: 80, returning: 80 }, limited: 0, cosmetic: 0 },
     rewards: [],
     startsAt: null,

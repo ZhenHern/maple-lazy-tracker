@@ -22,6 +22,7 @@ function quest(
     daysPerWeek: 7,
     claimUntil: null,
     steps: [],
+    requires: null,
     value: {
       progression: { casual: tier, endgame: tier, returning: tier },
       limited: "skip",
@@ -86,6 +87,33 @@ describe("planDay", () => {
     expect(plans.get("junk-claim")).toEqual({ tier: "skip", note: null });
     // A short run once a week averages under two minutes a day.
     expect(plans.get("weekly-run")).toEqual({ tier: "must_do", note: "quick" });
+  });
+
+  it("does not let quick claims use up the day of the bigger quests", () => {
+    const items = [
+      quest("check-in-a", "if_free", 50, "instant"),
+      quest("check-in-b", "if_free", 50, "instant"),
+      quest("check-in-c", "if_free", 50, "instant"),
+      // 30 minutes on three days a week: about 13 minutes a day.
+      quest("best-reward", "must_do", 99, "medium", { daysPerWeek: 3 }),
+    ];
+    const plans = planDay(items, "casual", ["progression"], 15, NOW);
+    expect(plans.get("best-reward")).toEqual({ tier: "must_do", note: null });
+    expect(plans.get("check-in-a")?.tier).toBe("must_do");
+  });
+
+  it("never rates a quest below the quest it unlocks", () => {
+    const items = [
+      quest("rank-track", "if_free", 60, "short"),
+      quest("prize-draw", "must_do", 92, "instant", { requires: "rank-track" }),
+      quest("unrelated", "if_free", 55, "short"),
+    ];
+    const plans = planDay(items, "casual", ["progression"], 30, NOW);
+    expect(plans.get("rank-track")).toEqual({ tier: "must_do", note: null });
+    expect(plans.get("unrelated")?.tier).toBe("if_free");
+    // A link to a quest that is not on the list changes nothing.
+    const alone = planDay([quest("prize", "must_do", 92, "instant", { requires: "gone" })], "casual", [], 30, NOW);
+    expect(alone.get("prize")?.tier).toBe("must_do");
   });
 
   it("gives the day to the best quest first, not the cheapest", () => {
