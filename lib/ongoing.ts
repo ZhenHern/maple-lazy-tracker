@@ -1,6 +1,7 @@
 import { calibrate } from "@/lib/classifier/calibrate";
 import { ratingOf } from "@/lib/classifier/models";
 import { relatedTitle, sameTitle } from "@/lib/images";
+import { isTask } from "@/lib/tiering";
 import type { ItemSource, PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
 
 // Turns stored posts into the list of quests that are running now. Pure code:
@@ -83,13 +84,6 @@ function sameRewards(a: string[], b: string[]): boolean {
 
 function stripImages(item: StoredItem): StoredItem {
   return { ...item, images: [], rewardImages: [] };
-}
-
-// A quest is something to do before a deadline. A system change or a piece
-// of permanent content is not: there is nothing to "skip" or to do "if free",
-// so giving it a tier makes no sense. Those are listed separately as news.
-function isQuest(item: StoredItem): boolean {
-  return item.endsAt !== null && item.category !== "system";
 }
 
 /**
@@ -181,8 +175,9 @@ export function selectOngoing(
     items.some((item) => item.source.sourceId === post.sourceId),
   );
   return {
-    items: items.filter(isQuest),
-    news: items.filter((item) => !isQuest(item)),
+    // Only a task gets a tier; everything else is listed separately as news.
+    items: items.filter(isTask),
+    news: items.filter((item) => !isTask(item)),
     contributing,
   };
 }

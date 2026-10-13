@@ -137,9 +137,14 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       timeEstimate = { ...timeEstimate, basis: "uncertain", minutesPerWeek: null, effort: null };
     }
 
+    // A system change, or anything with no deadline, is news: a quality-of-life
+    // change takes no play time, and an estimate on it would only mislead.
+    const news = item.category === "system" || endsAt === null;
+    if (news) timeEstimate = null;
+
     // Taking part in an event always costs some time. A model that leaves the
     // estimate out has skipped the question, not answered "none".
-    if (!timeEstimate && item.category === "event") {
+    if (!timeEstimate && item.category === "event" && !news) {
       warnings.push(`"${item.title}": no time estimate given, marked uncertain`);
       timeEstimate = {
         label: "Not stated in the post",

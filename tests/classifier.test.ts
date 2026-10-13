@@ -90,6 +90,18 @@ describe("groundItems", () => {
     expect(warnings).toHaveLength(1);
   });
 
+  it("gives a system change, or anything without a deadline, no time estimate", () => {
+    const estimate = { label: "10 min a day", minutesPerWeek: 70, effort: "low" as const, basis: "stated" as const };
+    const { items } = groundItems(
+      [
+        item({ id: "qol", title: "Inventory Sort Button", category: "system", timeEstimate: estimate }),
+        item({ id: "boss", title: "New Boss", category: "content", endsAt: null, timeEstimate: estimate }),
+      ],
+      post(),
+    );
+    expect(items.map((each) => each.timeEstimate)).toEqual([null, null]);
+  });
+
   it("removes a reward the post never mentions", () => {
     const { items } = groundItems(
       [item({ rewards: ["Magnificent Growth Potion", "Frozen Dragon Mount"] })],

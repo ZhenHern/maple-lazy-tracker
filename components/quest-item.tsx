@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { isAnimated } from "@/lib/images";
 import { rewardKind } from "@/lib/reward-kind";
+import { isTask } from "@/lib/tiering";
 import type { Profile, Tier, TrackerItem } from "@/lib/types";
 import { Countdown, ENDING_SOON, formatDate, formatRemaining } from "./countdown";
 import { PixelSprite } from "./pixel-sprite";
@@ -118,7 +119,10 @@ export function QuestItem({
   const urgent =
     now !== null && item.endsAt !== null && Date.parse(item.endsAt) - now < ENDING_SOON;
   const ratingNote = item.source.rating === "ai" ? null : RATING_NOTE[item.source.rating];
-  const estimate = item.timeEstimate;
+  // A system change or permanent content is news, not a task: it has no time,
+  // no effort and no tier, whatever the stored data says.
+  const task = isTask(item);
+  const estimate = task ? item.timeEstimate : null;
   const moreLoot = item.rewards.length - LOOT_NAMES;
 
   return (
@@ -240,20 +244,22 @@ export function QuestItem({
                 </dd>
               </div>
             )}
-            <div className="fact">
-              <dt>Effort</dt>
-              <dd>
-                {TIME_COST_LABEL[item.timeCost].replace(
-                  " a day",
-                  item.daysPerWeek >= 7
-                    ? " a day"
-                    : item.daysPerWeek === 1
-                      ? ", once a week"
-                      : `, ${item.daysPerWeek} days a week`,
-                )}
-                {planNote && <span className="fact-note"> {PLAN_NOTE[planNote].text}</span>}
-              </dd>
-            </div>
+            {task && (
+              <div className="fact">
+                <dt>Effort</dt>
+                <dd>
+                  {TIME_COST_LABEL[item.timeCost].replace(
+                    " a day",
+                    item.daysPerWeek >= 7
+                      ? " a day"
+                      : item.daysPerWeek === 1
+                        ? ", once a week"
+                        : `, ${item.daysPerWeek} days a week`,
+                  )}
+                  {planNote && <span className="fact-note"> {PLAN_NOTE[planNote].text}</span>}
+                </dd>
+              </div>
+            )}
             <div className="fact">
               <dt>Type</dt>
               <dd>
@@ -344,23 +350,25 @@ export function QuestItem({
             </div>
           )}
 
-          <div>
-            <h4 className="label">Worth it for a {PROFILE_INFO[profile].name}?</h4>
-            {/* The model's one-sentence reason. Older data has none. */}
-            {item.why && <p className="quest-why">{item.why}</p>}
-            <ul className="quest-ratings">
-              {ratings.map(([axis, tier]) => (
-                <li key={axis} className={`rating tier-${tier}`}>
-                  <span className="rating-axis">{axis}</span>
-                  <span className="stars" aria-hidden="true">
-                    {"★".repeat(TIER_STARS[tier])}
-                    <span className="stars-off">{"★".repeat(3 - TIER_STARS[tier])}</span>
-                  </span>
-                  <span className="rating-word">{TIER_WORD[tier]}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {task && (
+            <div>
+              <h4 className="label">Worth it for a {PROFILE_INFO[profile].name}?</h4>
+              {/* The model's one-sentence reason. Older data has none. */}
+              {item.why && <p className="quest-why">{item.why}</p>}
+              <ul className="quest-ratings">
+                {ratings.map(([axis, tier]) => (
+                  <li key={axis} className={`rating tier-${tier}`}>
+                    <span className="rating-axis">{axis}</span>
+                    <span className="stars" aria-hidden="true">
+                      {"★".repeat(TIER_STARS[tier])}
+                      <span className="stars-off">{"★".repeat(3 - TIER_STARS[tier])}</span>
+                    </span>
+                    <span className="rating-word">{TIER_WORD[tier]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {ratingNote && <p className="text-xs font-bold text-ink-soft">{ratingNote.text}</p>}
 

@@ -68,6 +68,16 @@ export interface Plan {
   note: "quick" | "over" | "soon" | "claim" | null;
 }
 
+/**
+ * True for something to do before a deadline. A system change or a piece of
+ * permanent content is not a task: there is nothing to "skip" or to do "if
+ * free", and no time to spend, so it gets no tier, no time and no effort.
+ * It is shown as news instead.
+ */
+export function isTask(item: { endsAt: string | null; category: TrackerItem["category"] }): boolean {
+  return item.endsAt !== null && item.category !== "system";
+}
+
 /** The last moment a quest still matters: its claim deadline if it has one, else its end. */
 export function closesAt(item: Pick<TrackerItem, "endsAt" | "claimUntil">): string | null {
   return item.claimUntil ?? item.endsAt;

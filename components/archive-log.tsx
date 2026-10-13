@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { TrackerItem } from "@/lib/types";
 import { useLocalStorage } from "@/lib/use-local-storage";
-import { closesAt } from "@/lib/tiering";
+import { closesAt, isTask } from "@/lib/tiering";
 import { useNow } from "@/lib/use-now";
 import { PixelSprite } from "./pixel-sprite";
 import { PROFILE_INFO } from "./profile-picker";
@@ -29,8 +29,11 @@ export function ArchiveLog({ items }: { items: TrackerItem[] }) {
     const closes = closesAt(item);
     return now !== null && closes !== null && Date.parse(closes) <= now;
   };
-  const running = sorted.filter((item) => !isOver(item));
-  const ended = sorted.filter(isOver);
+  // Changes with no deadline are news: listed apart, without tier or time.
+  const tasks = sorted.filter(isTask);
+  const news = sorted.filter((item) => !isTask(item));
+  const running = tasks.filter((item) => !isOver(item));
+  const ended = tasks.filter(isOver);
   const rough = mostlyRough(items);
 
   if (items.length === 0) {
@@ -74,6 +77,17 @@ export function ArchiveLog({ items }: { items: TrackerItem[] }) {
           <h3 className="label">Ended ({ended.length})</h3>
           <ul className="grid gap-2">
             {ended.map((item, index) => (
+              <QuestItem key={item.id} item={item} profile={profile} now={now} index={index} />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {news.length > 0 && (
+        <section className="tab-panel tier-ended">
+          <h3 className="label">What changed, nothing to do ({news.length})</h3>
+          <ul className="grid gap-2">
+            {news.map((item, index) => (
               <QuestItem key={item.id} item={item} profile={profile} now={now} index={index} />
             ))}
           </ul>

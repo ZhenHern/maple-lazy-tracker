@@ -52,12 +52,13 @@ You do not know everything, and the game changes every patch. **When the officia
 
 You need this to tell *where* a mistake comes from. Read `SPEC.md` for the full design.
 
-1. **The AI model rates.** For each quest it gives a 0 to 100 score for the value of the rewards to each job (Casual, Endgame, Returning), a score for limited items and one for cosmetics, a coarse **time class** (instant, short, medium, long), a one-sentence reason, the dates and the rewards. The prompt is `lib/classifier/prompt.ts`.
+1. **The AI model rates.** For each quest it gives a 0 to 100 score for the value of the rewards to each job (Casual, Endgame, Returning), a score for limited items and one for cosmetics, a coarse **time class** (instant, short, medium, long, or idle for something that only runs while the character is AFK), how many days a week it is played, a one-sentence reason, the dates (start, end, and a later claim deadline when the post gives one), the rewards, and the **steps**: the separate activities inside one quest, each with what it gives by itself. The prompt is `lib/classifier/prompt.ts`.
 2. **Code turns scores into tiers.** `lib/classifier/calibrate.ts`: Must Do needs a score of 70+ and a place in the top quarter of the list; 35+ is If Free; the rest is Skip.
 3. **Code fits the day.** `lib/tiering.ts`, function `planDay`. A quest's cost is its time class in minutes (instant 1, short 10, medium 30, long 75) times the days a week it is played, divided by 7. Then: a quest that has not opened is set aside under "Soon" and takes no time; a quest that has ended but whose rewards can still be claimed (`claimUntil`) is a one-click Must Do until that deadline; an idle (AFK) quest takes no time and keeps the tier its rewards earn; a quest costing two minutes a day or less is Must Do unless it was a Skip; a quest longer than the whole playtime drops one tier; the remaining Must Do quests are taken highest score first until the playtime is full, and with no priority picked, quests that are Must Do for progression go before quests that are Must Do only for cosmetics or limited items.
-4. **Code decides what is a quest.** `lib/ongoing.ts`: only an activity with an end date is a quest and gets a tier. System changes and permanent content have no deadline, so they are listed without a tier in a separate "What changed this patch" panel; a tier for them would make no sense. Ended quests go, and the same quest described in two posts is shown once.
+4. **Code decides what is a quest.** `lib/ongoing.ts` and `isTask` in `lib/tiering.ts`: only an activity with an end date that is not a system change is a quest. Everything else (a system or quality-of-life change, a balance change, permanent content) is **news**: it is listed in "What changed this patch" on the home page and under "What changed, nothing to do" on an archive page, and it must show **no tier, no time and no effort**, because there is nothing to do. Ended quests go, and the same quest described in two posts is shown once.
+5. **Code picks the pictures.** A reward's icon comes from the official post when Nexon illustrated it, otherwise from maplestory.io by item name. A reward that is not an item (a buff, "Character EXP") correctly shows a generic icon for its kind.
 
-So a wrong placement has one of four causes, and your report must name which you suspect:
+So a wrong placement has one of five causes, and your report must name which you suspect:
 
 | Cause | Looks like | Who fixes it |
 |---|---|---|
@@ -65,10 +66,13 @@ So a wrong placement has one of four causes, and your report must name which you
 | Wrong value | Facts are right but the score is not what a player would give (Fragments rated high for Returning) | A general rule in the prompt |
 | Wrong time class | A one-click claim marked "short", an hour-long grind marked "short" | The time class guidance in the prompt |
 | Wrong rule | Scores and time class are right, but the tier still feels wrong for that playtime | The code in `lib/tiering.ts` or `lib/classifier/calibrate.ts` |
+| Stale rating | The post was rated by an older prompt, so a mistake the current prompt already forbids is still stored | Nobody: the daily job re-rates it. Report it once, briefly, under "stale" |
+
+**Check for stale ratings first.** Open `http://localhost:3000/api/status`: `promptVersion` is the current prompt and `outdatedPrompt` is how many posts were rated by an older one. A mistake in a post on an old prompt may already be fixed in the prompt; read `lib/classifier/prompt.ts` before calling it a rule to change, and say in your report which findings come from stale posts.
 
 ## How to review
 
-The development server runs at `http://localhost:3000`. If it does not answer, say so and stop; do not start servers on other people's ports.
+The development server runs at `http://localhost:3000`. If it does not answer, say so and stop; do not start servers on other people's ports. The public site is `https://maple-lazy-tracker.vercel.app`; it reads the same database, so use it for a last look at what real visitors see (it has no `/dev/review`, and its list can be up to an hour behind).
 
 1. **Read the review page first.** Open `http://localhost:3000/dev/review`. It has two parts:
    - **Day plans**: one table of every quest against each job at 15, 30 and 60 minutes, showing the tier the home page gives (M = Must Do, F = If Free, S = Skip; a plus means promoted for taking a minute, a minus means moved down for not fitting the playtime, "soon" means it has not opened and sits in the Soon tab), with the Must Do count and minutes a day per column. There is one table for the page's default (no priority picked, so progression, limited and cosmetic all count) and one for progression only. **This table is the home page's sorting; judge it column by column.**
@@ -76,7 +80,12 @@ The development server runs at `http://localhost:3000`. If it does not answer, s
 2. **Check the facts on a sample.** For any quest that looks off, and for at least three others, open the official post linked on the quest card (or `/archive/<post id>`) and compare dates, rewards, level requirements and how long it takes.
 3. **Play it as each player.** Take the nine combinations that matter most: each of the three jobs at 15 minutes, 30 minutes and 1 hour. For each one, read its Must Do list top to bottom and ask: *would I tell a friend in this situation to do exactly these, in this time?* Then look at If Free and Skip for anything that should have been higher. Use the Day plans table for this, and open `http://localhost:3000/` to see the cards as a player does (wording, chips, the "What changed this patch" panel). The job and playtime buttons on the home page may not respond in a hidden browser; the table shows the same result.
 4. **Check the wording.** The summary and the reason sentence should sound like a player talking, name real amounts, and say plainly when something costs money, is random, or needs a level or rank.
-5. **Note what is missing.** If the official post has an activity a player would care about and the site does not list it, that is a finding too.
+5. **Open a few cards.** On the home page and on an archive page (`/archive/<post id>`), open at least five cards and check what a player reads there:
+   - **Steps ("How to progress").** A quest made of several activities lists them. Each step should be a real activity from the post, in the order it opens, with the reward that activity gives by itself. A minigame folded into a bigger event must still show its own rewards here.
+   - **Time and effort.** A quest shows them; they should match what the activity really takes. **A system change, a quality-of-life change or permanent content must show neither**, and no "Worth it?" ratings. If one does, or if one sits in a tier, that is a finding.
+   - **Dates.** The end is the last moment to make progress. When rewards can be claimed later, the card says until when.
+   - **Reward icons.** An icon must be the item named beside it. A wrong icon is a finding; a generic icon is not.
+6. **Note what is missing.** If the official post has an activity a player would care about and the site does not list it, that is a finding too.
 
 If the browser cannot show the page (for example it is hidden and the list does not update when you click), use `/dev/review` and the code in `lib/tiering.ts` to work out the tiers, and say in your report that you could not verify the page by eye.
 
@@ -99,8 +108,8 @@ Your final message goes to the developer agent, who follows `SPEC.md` and will a
    | Quest | Player and playtime | Shown | Should be | Why a player would say so | Cause | Sure? |
    |---|---|---|---|---|---|---|
 
-   "Cause" is one of: wrong fact, wrong value, wrong time class, wrong rule.
-3. **Wrong or missing facts.** Dates, rewards, requirements or durations that contradict the official post, with the post's wording quoted briefly, and activities the site left out.
+   "Cause" is one of: wrong fact, wrong value, wrong time class, wrong rule, stale rating.
+3. **Wrong or missing facts.** Dates, rewards, requirements, durations, steps or icons that contradict the official post, with the post's wording quoted briefly, and activities the site left out. Include any news item (system change, permanent content) that shows a tier, a time or an effort.
 4. **Rules to change.** Each as one general rule, saying whether it belongs in the prompt or in the code, and which findings it would fix.
 5. **What is right.** The placements you checked that a player would agree with, briefly, so the developer knows what not to break.
 6. **What you could not check**, and why.
