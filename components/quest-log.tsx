@@ -16,6 +16,7 @@ import { useLocalStorage } from "@/lib/use-local-storage";
 import { useNow } from "@/lib/use-now";
 import { ENDING_SOON, formatRemaining } from "./countdown";
 import { NpcDialog } from "./npc-dialog";
+import { QuestTools } from "./quest-tools";
 import { PixelSprite, type SpriteName } from "./pixel-sprite";
 import { PROFILE_INFO, ProfilePicker } from "./profile-picker";
 import { QuestItem } from "./quest-item";
@@ -233,12 +234,16 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
         );
       }
     }
+    // Past midnight on the visitor's own clock, the Shroom has an opinion.
+    if (clock !== null && new Date(clock).getHours() < 5) {
+      lines.push("It is past midnight where you are. Claim your check-ins and go to bed. I already did.");
+    }
     lines.push(
       `I marked ${plural(groups.skip.length, "thing")} as Skip. That is time back for napping.`,
       "Change your job or what you care about below, and I'll re-sort every quest on the spot.",
     );
     return lines;
-  }, [allItems.length, groups, job.name, now, running, plans, playtime]);
+  }, [allItems.length, groups, job.name, now, clock, running, plans, playtime]);
 
   function showTab(next: SectionKey) {
     setTab(next);
@@ -328,6 +333,8 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
           </div>
 
           {rough && <RoughNotice items={allItems} />}
+
+          <QuestTools mustDo={groups.must_do} jobName={job.name} playtime={playtime} now={clock} />
 
           <p className="text-xs text-ink-soft">
             {/* A plain link: the server builds the file for the chosen job and priorities. */}

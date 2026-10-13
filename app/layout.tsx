@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next";
+import { EasterEggs } from "@/components/easter-eggs";
 import type { Metadata } from "next";
 import { Nunito, Pixelify_Sans } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl, THEME_KEY } from "@/lib/site";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         {children}
+        <EasterEggs />
         {/* Vercel Web Analytics: counts page views without cookies. It only
             reports from a Vercel deployment, never from local runs. */}
         <Analytics />

@@ -1,9 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocalStorage } from "@/lib/use-local-storage";
 import { PixelSprite } from "./pixel-sprite";
 
 const OUCH = "Ow, ow! Stop that. I'm the one saving you from dailies, remember?";
+
+// Poke the Shroom often enough and the visitor earns a title, like the
+// monster-hunting titles in the game. The count is kept in localStorage.
+const TITLES = [
+  { pokes: 100, title: "Shroom's Nemesis", line: "One hundred pokes. You have a title now, and I have a headache." },
+  { pokes: 25, title: "Mushroom Menace", line: "That is 25 pokes. Fine, have a title. Now please do your dailies." },
+];
+
+function sanitizePokes(stored: unknown): number {
+  return typeof stored === "number" && Number.isFinite(stored) && stored > 0 ? Math.floor(stored) : 0;
+}
 
 interface Hit {
   id: number;
@@ -54,9 +66,13 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
   const [hits, setHits] = useState<Hit[]>([]);
   const nextHitId = useRef(0);
 
-  // Every fifth poke the Shroom complains, until the visitor moves on.
-  const [ouch, setOuch] = useState(false);
-  const line = ouch ? OUCH : lines[index % lines.length];
+  const [totalPokes, setTotalPokes] = useLocalStorage("lazy-tracker:pokes", sanitizePokes);
+  const earned = TITLES.find((each) => totalPokes >= each.pokes);
+
+  // Every fifth poke the Shroom complains, until the visitor moves on. The
+  // poke that earns a title gets its own line instead.
+  const [ouch, setOuch] = useState<string | null>(null);
+  const line = ouch ?? lines[index % lines.length];
 
   function poke() {
     const critical = Math.random() < 0.2;
@@ -69,7 +85,9 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
     };
     setHits((current) => [...current, hit]);
     setPokes((count) => count + 1);
-    setOuch((pokes + 1) % 5 === 0);
+    setTotalPokes(totalPokes + 1);
+    const reached = TITLES.find((each) => each.pokes === totalPokes + 1);
+    setOuch(reached ? reached.line : (pokes + 1) % 5 === 0 ? OUCH : null);
     // The number normally removes itself when its animation ends. With reduced
     // motion there is no animation, so a timer clears it as well.
     window.setTimeout(
@@ -106,6 +124,7 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
             </span>
           ))}
           <span className="npc-name">Lazy Shroom</span>
+          {earned && <span className="npc-title">Your title: {earned.title}</span>}
         </button>
 
         <div className="npc-bubble">
@@ -118,7 +137,7 @@ export function NpcDialog({ lines, onShowMustDo }: NpcDialogProps) {
             </span>
             {lines.length > 1 && (
               <button type="button" className="btn" onClick={() => {
-                  setOuch(false);
+                  setOuch(null);
                   setIndex((i) => i + 1);
                 }}>
                 Next ▸

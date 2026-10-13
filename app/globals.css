@@ -1951,3 +1951,115 @@ body {
 :root[data-theme="dark"] .stars-off {
   color: #46548a;
 }
+
+/* ---------- Quest log helpers ---------- */
+
+.quest-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.npc-title {
+  margin-top: 0.2rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 6px;
+  background: #fff3c9;
+  color: #7a5600;
+  font-size: 0.62rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ---------- Easter egg: the level-up banner ---------- */
+
+.level-up {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.4rem;
+  pointer-events: none;
+  animation: level-up-fade 3.2s ease-out forwards;
+}
+
+.level-up-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22rem;
+  height: 22rem;
+  margin: -11rem 0 0 -11rem;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgb(255 216 102 / 0.55) 0 12deg, transparent 12deg 24deg);
+  mask-image: radial-gradient(circle, #000 20%, transparent 68%);
+  animation: level-up-spin 6s linear infinite;
+}
+
+.level-up-shroom {
+  position: relative;
+  animation: level-up-jump 0.6s ease-out 3;
+}
+
+.level-up-text {
+  position: relative;
+  color: #ffd866;
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(2.2rem, 9vw, 4.5rem);
+  letter-spacing: 0.06em;
+  text-shadow:
+    3px 0 #7a3a10,
+    -3px 0 #7a3a10,
+    0 3px #7a3a10,
+    0 -3px #7a3a10,
+    0 7px 0 rgb(22 34 74 / 0.45);
+}
+
+.level-up-note {
+  position: relative;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(22 34 74 / 0.85);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+@keyframes level-up-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  10%,
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes level-up-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes level-up-jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-1.4rem);
+  }
+}
+
+/* With animations off the banner would sit there forever at full strength;
+   the component removes it after three seconds, so it simply shows and goes. */
