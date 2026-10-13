@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { isAnimated } from "@/lib/images";
 import { rewardKind } from "@/lib/reward-kind";
@@ -377,6 +378,14 @@ export function QuestItem({
             <a href={item.source.url} target="_blank" rel="noreferrer" className="underline">
               {item.source.title}
             </a>
+            .{" "}
+            <Link
+              href={`/feedback?about=${encodeURIComponent(item.title)}`}
+              className="underline"
+              prefetch={false}
+            >
+              Something wrong? Report it
+            </Link>
           </p>
         </div>
       </details>

@@ -1768,3 +1768,186 @@ body {
     left: var(--rest);
   }
 }
+
+/* ---------- Feedback form ---------- */
+
+.feedback-text {
+  width: 100%;
+  min-height: 8rem;
+  padding: 0.6rem 0.8rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* The bot trap: present in the form, invisible and unreachable for people. */
+.feedback-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  opacity: 0.6;
+}
+
+.theme-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+}
+
+/* ---------- Night mode ----------
+   <html data-theme="dark"> is set by the script in app/layout.tsx and by the
+   switch in the header. Most of the page follows from the tokens below; the
+   rules after them repaint the surfaces that were written as plain white.
+   Coloured chips, gold buttons and reward slots keep their own light
+   background and dark text on purpose: they read as badges on a dark card. */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-cream: #1a2342;
+  --color-panel: #222c50;
+  --color-line: #3b4a78;
+  --color-ink: #e8edff;
+  --color-ink-soft: #a9b5d9;
+  --color-frame: #3f66c9;
+  --color-frame-dark: #0b1230;
+  --color-must: #f0647a;
+  --color-free: #5aa8f0;
+  --color-skip: #98a2bb;
+  --color-ended: #8b94ab;
+  /* Card and control surfaces, a step lighter than the window behind them. */
+  --night-surface: #28335c;
+  --night-raised: #33406e;
+  --night-gold: #4a3f14;
+}
+
+:root[data-theme="dark"] body {
+  background: #0d1533;
+}
+
+/* A night sky with a few stars; the hills stay, in moonlight. */
+:root[data-theme="dark"] .scenery {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #ffffff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 31% 9%, #dfe8ff 50%, transparent 51%),
+    radial-gradient(2px 2px at 47% 24%, #ffffff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 63% 12%, #fff3c9 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 28%, #ffffff 50%, transparent 51%),
+    radial-gradient(2px 2px at 90% 8%, #dfe8ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 22% 38%, #ffffff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 70% 42%, #dfe8ff 50%, transparent 51%),
+    linear-gradient(#070c24, #16224f 55%, #2a3a78);
+}
+
+:root[data-theme="dark"] .cloud {
+  opacity: 0.12;
+}
+
+:root[data-theme="dark"] .hills {
+  filter: brightness(0.42) saturate(0.8);
+}
+
+:root[data-theme="dark"] :focus-visible {
+  outline-color: #ffd866;
+  box-shadow: 0 0 0 3px #0b1230;
+}
+
+:root[data-theme="dark"] .page-intro,
+:root[data-theme="dark"] .tagline,
+:root[data-theme="dark"] .footnote {
+  background: rgb(13 21 51 / 0.82);
+}
+
+:root[data-theme="dark"] .window {
+  box-shadow:
+    inset 0 0 0 2px #46599a,
+    0 6px 0 rgb(0 0 0 / 0.45);
+}
+
+:root[data-theme="dark"] .pick,
+:root[data-theme="dark"] .search,
+:root[data-theme="dark"] .filter,
+:root[data-theme="dark"] .tab,
+:root[data-theme="dark"] .empty,
+:root[data-theme="dark"] .quest,
+:root[data-theme="dark"] .rating,
+:root[data-theme="dark"] .notice-row {
+  background: var(--night-surface);
+}
+
+:root[data-theme="dark"] .search {
+  color: var(--color-ink);
+}
+
+:root[data-theme="dark"] .search::placeholder {
+  color: #8f9bc0;
+}
+
+:root[data-theme="dark"] .filter[aria-pressed="true"],
+:root[data-theme="dark"] .filter[aria-current="page"] {
+  border-color: #9db6ee;
+  background: var(--color-frame);
+}
+
+:root[data-theme="dark"] .btn:not(.btn-go),
+:root[data-theme="dark"] .quest-toggle {
+  background: linear-gradient(var(--night-raised), var(--night-surface));
+}
+
+/* The gold hover state of the Details button keeps dark text. */
+:root[data-theme="dark"] .quest-head:hover .quest-toggle {
+  background: linear-gradient(#ffe07a, #ffb21f);
+  color: #3d2200;
+}
+
+:root[data-theme="dark"] .pick[aria-pressed="true"],
+:root[data-theme="dark"] .notice:hover,
+:root[data-theme="dark"] .review-moved {
+  background: var(--night-gold);
+}
+
+:root[data-theme="dark"] .statusbar-job:hover {
+  color: #3d2200;
+}
+
+:root[data-theme="dark"] .tab:hover {
+  background: color-mix(in srgb, var(--tier-color) 22%, var(--night-surface));
+}
+
+:root[data-theme="dark"] .tab[aria-selected="true"] {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .tab-count {
+  background: color-mix(in srgb, var(--tier-color) 30%, var(--night-surface));
+}
+
+:root[data-theme="dark"] .gauge.quest-gauge,
+:root[data-theme="dark"] .slot-kind {
+  background: var(--night-raised);
+}
+
+:root[data-theme="dark"] .quest-why {
+  background: #2e2a1c;
+  color: #f3e7c4;
+}
+
+:root[data-theme="dark"] .tier-soon {
+  --tier-color: #a58bf0;
+}
+
+:root[data-theme="dark"] .quest-loot {
+  color: #f0c659;
+}
+
+:root[data-theme="dark"] .stars-off {
+  color: #46548a;
+}

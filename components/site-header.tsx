@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { PixelSprite } from "./pixel-sprite";
+import { ThemeToggle } from "./theme-toggle";
 
 const LINKS = [
   { href: "/", label: "Quest Log" },
   { href: "/archive", label: "Archive" },
+  { href: "/feedback", label: "Feedback" },
 ] as const;
 
-/** The logo and the two-page navigation, shared by every page. */
+/** The logo, the page links and the day / night switch, shared by every page. */
 export function SiteHeader({ current }: { current?: (typeof LINKS)[number]["href"] }) {
   return (
     <header className="site-header">
@@ -30,6 +32,7 @@ export function SiteHeader({ current }: { current?: (typeof LINKS)[number]["href
             {label}
           </Link>
         ))}
+        <ThemeToggle />
       </nav>
     </header>
   );
@@ -55,6 +58,13 @@ export function SiteFooter() {
           Tell us
         </a>{" "}
         and it will be taken down.
+      </p>
+      <p className="mt-1.5">
+        Spotted a wrong rating or a bug?{" "}
+        <Link href="/feedback" className="underline">
+          Send feedback
+        </Link>
+        .
       </p>
     </footer>
   );

@@ -28,7 +28,24 @@ create table if not exists meta (
   updated_at  timestamptz not null default now()
 );
 
+-- Messages from the feedback form (/feedback). Read them here in the Table
+-- Editor; tick "handled" when one is dealt with. The size checks are the
+-- backstop against someone filling the table with junk.
+create table if not exists feedback (
+  id          bigint generated always as identity primary key,
+  created_at  timestamptz not null default now(),
+  kind        text not null check (kind in ('rating','bug','idea','other')),
+  message     text not null check (char_length(message) between 1 and 2000),
+  about       text check (char_length(about) <= 200),    -- the quest it is about, if any
+  contact     text check (char_length(contact) <= 120),  -- optional, only to reply
+  page        text check (char_length(page) <= 300),     -- where the form was sent from
+  user_agent  text check (char_length(user_agent) <= 300),
+  handled     boolean not null default false
+);
+create index if not exists feedback_created_at_idx on feedback (created_at desc);
+
 -- Row Level Security with no policies: the public (anon) key can read and
 -- write nothing. Only the server, using the service-role key, gets through.
 alter table posts enable row level security;
 alter table meta  enable row level security;
+alter table feedback enable row level security;
