@@ -106,12 +106,36 @@ export function pickImages(candidates: string[], sizes: Map<string, number>): st
 
 // Words that appear in Nexon's icon filenames or reward text but say nothing
 // about which item it is.
-const NOISE = new Set(["icon", "item", "ui", "reward", "img", "image", "x", "the", "of", "a"]);
+const NOISE = new Set(["icon", "item", "ui", "reward", "img", "image", "x", "the", "of", "a", "lv", "level"]);
+
+// Words that say what form an item comes in. A file may add one of these to
+// the reward's name, or leave one out, and still be the same thing:
+// "sol-erda-fragment-coupon" is the Sol Erda Fragment, "virtual-master" is the
+// Virtual Master Chair. Any other difference is a different item: "Sol Erda",
+// "Sol Erda Fragment" and "Sol Erda Energy" are three things in the game.
+const FORM = new Set([
+  "coupon",
+  "voucher",
+  "box",
+  "ticket",
+  "scroll",
+  "chair",
+  "mount",
+  "pet",
+  "title",
+  "medal",
+  "outfit",
+  "skin",
+  "set",
+]);
 
 function nameTokens(value: string): Set<string> {
   return new Set(
     value
       .toLowerCase()
+      // The star count of an enhancement scroll is part of its name:
+      // "15-star" and "22-star" must not look alike once numbers are dropped.
+      .replace(/(\d+)[-\s]?star\b/g, "$1star")
       .replace(/\.[a-z0-9]+$/, "")
       .split(/[^a-z0-9]+/)
       .filter((token) => token && !/^\d+$/.test(token) && !NOISE.has(token))
@@ -133,19 +157,28 @@ export function matchRewardImage(reward: string, urls: string[]): string | null 
   let best: string | null = null;
   let fewestExtras = Infinity;
   for (const url of urls) {
-    const have = nameTokens(url.split("/").pop() ?? "");
+    const file = (url.split("/").pop() ?? "").toLowerCase();
+    // "ui_reward_sol_erda.png" is a screenshot of an event window, not an icon.
+    if (/^ui[_-]/.test(file)) continue;
+    const have = nameTokens(file);
     if (have.size === 0) continue;
     let extras: number;
     if ([...wanted].every((token) => have.has(token))) {
-      extras = have.size - wanted.size;
+      const added = [...have].filter((token) => !wanted.has(token));
+      extras = added.length;
       // A one-word reward ("Mesos") must match exactly, or it would match anything.
       if (extras > (wanted.size === 1 ? 0 : 3)) continue;
+      // What the file adds must only say the form: "-energy" or "special-"
+      // makes it another item, and "-roid" makes it a picture of two things.
+      if (!added.every((token) => FORM.has(token))) continue;
     } else if (
       // The file may drop one word of the reward: "virtual-master.gif" is the
       // "Virtual Master Chair". Counted as slightly worse than an exact match.
       have.size >= 2 &&
       wanted.size - have.size === 1 &&
-      [...have].every((token) => wanted.has(token))
+      [...have].every((token) => wanted.has(token)) &&
+      // ...but only a form word: without "fragment" it is a different item.
+      [...wanted].filter((token) => !have.has(token)).every((token) => FORM.has(token))
     ) {
       extras = 0.5;
     } else {

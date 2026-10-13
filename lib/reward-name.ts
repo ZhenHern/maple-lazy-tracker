@@ -30,6 +30,8 @@ export function rewardName(reward: string): RewardName {
       .replace(/\(?\bx\s?\d[\d,]*(-\d[\d,]*)?(\s*\/\s*(?!x\d)[a-z]+|\s+total)?\)?/gi, " ")
       .replace(/(^|\s)\/+(?=\s|$)/g, " ")
       .replace(/\btotal\b/gi, " ")
+      // "Grindstone of Faith x20 compensation": why it is given, not what.
+      .replace(/\s+compensation\s*$/i, " ")
       // A leading count: "3 Karma Bright Cubes", "500 Sol Erda Fragments".
       .replace(/^\s*\d[\d,]*\s+/, ""),
   );
