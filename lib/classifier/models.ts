@@ -4,7 +4,12 @@
 // models are smaller and noticeably less accurate, so their results are marked
 // provisional and replaced as soon as a primary model has quota again.
 
-const DEFAULT_PRIMARY = "gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash";
+// The free quota is counted per model, so every extra trusted model is extra
+// daily capacity. gemini-3-flash-preview is an older Flash generation that
+// still rates far better than the Lite fallback, and it answered on days when
+// the three newer ones were out of quota.
+const DEFAULT_PRIMARY =
+  "gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3-flash-preview";
 const DEFAULT_FALLBACK = "gemini-3.5-flash-lite";
 
 /** Recorded as the "model" of an item that was built by code, with no AI rating. */

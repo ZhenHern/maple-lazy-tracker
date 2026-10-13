@@ -12,6 +12,8 @@ import { POSTS_TAG } from "@/lib/tracker";
 //   GET /api/dev/try?ids=45330,45393  ...on these posts only
 //   GET /api/dev/try?tier=fallback    use the backup model (its own daily quota,
 //                                     good for cheap first passes)
+//   GET /api/dev/try?model=gemini-3-flash-preview
+//                                     try one named model, to compare models
 //   GET /api/dev/try?limit=2          spend up to 2 requests (default 1)
 //   GET /api/dev/try?promote          save the last trial as the live data
 //
@@ -49,7 +51,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "ids must be numeric post ids" }, { status: 400 });
     }
 
-    const trial = await runTrial({ ids, tier, maxRequests: limit });
+    const model = params.get("model")?.trim() || undefined;
+    if (model && !/^[a-z0-9.-]+$/i.test(model)) {
+      return NextResponse.json({ error: "model must be a model id" }, { status: 400 });
+    }
+    const trial = await runTrial({ ids, tier, maxRequests: limit, model });
     return NextResponse.json({
       trial: trial.id,
       promptVersion: trial.promptVersion,

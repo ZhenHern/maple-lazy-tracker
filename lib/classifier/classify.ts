@@ -77,6 +77,8 @@ interface ClassifyOptions {
   quota: QuotaTracker;
   /** Give up waiting (for rate limits) past this time, in ms. */
   deadline: number;
+  /** Try exactly these models instead of the tier's list. For the prompt lab. */
+  models?: string[];
 }
 
 /**
@@ -88,7 +90,7 @@ interface ClassifyOptions {
  */
 export async function classifyBatch(
   posts: ScrapedPost[],
-  { tier, quota, deadline }: ClassifyOptions,
+  { tier, quota, deadline, models: only }: ClassifyOptions,
 ): Promise<BatchOutcome> {
   const outcome: BatchOutcome = {
     model: null,
@@ -97,7 +99,7 @@ export async function classifyBatch(
     requests: 0,
     failures: [],
   };
-  const models = tier === "primary" ? primaryModels() : fallbackModels();
+  const models = only ?? (tier === "primary" ? primaryModels() : fallbackModels());
 
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt += 1) {

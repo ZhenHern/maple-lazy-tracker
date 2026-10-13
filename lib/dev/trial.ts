@@ -42,9 +42,11 @@ interface TrialOptions {
   tier: "primary" | "fallback";
   /** Most Gemini requests to spend. Posts beyond that are reported, not run. */
   maxRequests: number;
+  /** Try exactly this model, whatever the configured lists say. */
+  model?: string;
 }
 
-export async function runTrial({ ids, tier, maxRequests }: TrialOptions): Promise<Trial> {
+export async function runTrial({ ids, tier, maxRequests, model }: TrialOptions): Promise<Trial> {
   const problems: Record<string, string> = {};
   const scraped: ScrapedPost[] = [];
   for (const id of ids) {
@@ -66,7 +68,12 @@ export async function runTrial({ ids, tier, maxRequests }: TrialOptions): Promis
       for (const post of batch) problems[post.sourceId] = "Not run: request limit for this trial reached";
       continue;
     }
-    const outcome = await classifyBatch(batch, { tier, quota, deadline });
+    const outcome = await classifyBatch(batch, {
+      tier,
+      quota,
+      deadline,
+      ...(model ? { models: [model] } : {}),
+    });
     requests += outcome.requests;
     if (!outcome.model) {
       for (const post of batch) problems[post.sourceId] = outcome.failures.join("; ");
