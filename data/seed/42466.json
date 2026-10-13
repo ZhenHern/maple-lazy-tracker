@@ -43,10 +43,11 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 2,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
         null,
-        "https://maplestory.io/api/GMS/270/item/2832607/icon",
+        "https://g.nexonstatic.com/media/bsmjwl52/frontier-ticket-coupon.png",
         null
       ],
       "timeEstimate": {
@@ -93,6 +94,7 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 5,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/x4ypyuj2/familiar-card-pack.png",
         "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",

@@ -38,6 +38,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 1,
+      "killsPerDay": null,
       "rewardImages": [],
       "timeEstimate": null,
       "weeklyTarget": null

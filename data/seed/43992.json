@@ -23,6 +23,7 @@
       },
       "endsAt": "2026-09-08T23:59:00Z",
       "images": [
+        "https://g.nexonstatic.com/media/0u3fhtok/alongside-ellanos-mount.png",
         "https://g.nexonstatic.com/media/vmjgkwhq/1100x225-fantasia-finale-event-maplestory.png",
         "https://g.nexonstatic.com/media/mprmwryp/ellanos-coupon-furnishing.gif"
       ],
@@ -40,10 +41,11 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         "https://g.nexonstatic.com/media/hcoe0uw5/illusion-ring-ellanos.gif",
-        "https://g.nexonstatic.com/media/0u3fhtok/alongside-ellanos-mount.png",
+        "https://maplestory.io/api/GMS/270/item/2831512/icon",
         "https://maplestory.io/api/GMS/270/item/2638457/icon"
       ],
       "timeEstimate": {

@@ -44,11 +44,12 @@
       "timeCost": "short",
       "claimUntil": "2026-09-09T02:00:00Z",
       "daysPerWeek": 1,
+      "killsPerDay": null,
       "rewardImages": [
         null,
-        "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
-        "https://maplestory.io/api/GMS/270/item/4009546/icon",
-        "https://maplestory.io/api/GMS/270/item/2638500/icon",
+        null,
+        "https://g.nexonstatic.com/media/rdhnuxrz/icon_sol_erda.png",
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
         "https://g.nexonstatic.com/media/2cfhiwyt/inspector-outfit-set.png"
       ],
       "timeEstimate": {

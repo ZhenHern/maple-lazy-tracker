@@ -59,12 +59,13 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
         "https://maplestory.io/api/GMS/270/item/4310493/icon",
         "https://maplestory.io/api/GMS/270/item/2832780/icon",
         "https://maplestory.io/api/GMS/270/item/5004030/icon",
-        null
+        "https://maplestory.io/api/GMS/270/item/5157451/icon"
       ],
       "timeEstimate": {
         "basis": "uncertain",
@@ -110,8 +111,9 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 1,
+      "killsPerDay": null,
       "rewardImages": [
-        null,
+        "https://g.nexonstatic.com/media/q5dbvygd/icon_nodestone.png",
         "https://maplestory.io/api/GMS/270/item/4031160/icon",
         "https://maplestory.io/api/GMS/270/item/2012018/icon",
         null
@@ -154,9 +156,10 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 3,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/4310493/icon",
-        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
         "https://maplestory.io/api/GMS/270/item/2049393/icon"
       ],
       "timeEstimate": {

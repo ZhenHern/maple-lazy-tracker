@@ -43,6 +43,7 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/1012911/icon",
         "https://g.nexonstatic.com/media/cnkp1r1k/eternal-twisted-armor-box.png",
@@ -79,6 +80,7 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null
       ],
@@ -116,6 +118,7 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/uysnzgmo/destiny-2nd-transcendence-weapon-box.png",
         null,
@@ -152,6 +155,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2831068/icon",
         "https://maplestory.io/api/GMS/270/item/2831312/icon"
@@ -175,11 +179,11 @@
       },
       "endsAt": "2026-09-15T23:59:00Z",
       "images": [
+        "https://g.nexonstatic.com/media/5y4fshpp/kinetic-damage-skin-unit.png",
         "https://g.nexonstatic.com/media/rs0b2epq/kineticlabelchat-ring.png",
         "https://g.nexonstatic.com/media/wribshlc/lil-jay-and-lil-jays-cat-mask.png",
         "https://g.nexonstatic.com/media/tdeo2wdz/kinesisfacehairfemale.png",
-        "https://g.nexonstatic.com/media/srjiqsw0/kinesishaireyesm.png",
-        "https://g.nexonstatic.com/media/4h4l1kvy/knight-statue.gif"
+        "https://g.nexonstatic.com/media/srjiqsw0/kinesishaireyesm.png"
       ],
       "rewards": [
         "Hyper Burninator Coupon",
@@ -196,12 +200,13 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2534007/icon",
-        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
         "https://g.nexonstatic.com/media/fcuoybnx/yunaroid.png",
         "https://maplestory.io/api/GMS/270/item/5002867/icon",
-        "https://g.nexonstatic.com/media/5y4fshpp/kinetic-damage-skin-unit.png"
+        "https://maplestory.io/api/GMS/270/item/2740124/icon"
       ],
       "timeEstimate": {
         "basis": "calculated",
@@ -248,9 +253,10 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
-        "https://g.nexonstatic.com/media/py0b0pjb/sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/rdhnuxrz/icon_sol_erda.png",
         "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
         "https://maplestory.io/api/GMS/270/item/2049394/icon",
         "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png"
@@ -300,6 +306,7 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
         "https://g.nexonstatic.com/media/tmni2rch/althearoid.png",
@@ -349,9 +356,10 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2831541/icon",
-        "https://maplestory.io/api/GMS/270/item/4009546/icon",
+        null,
         "https://maplestory.io/api/GMS/270/item/3019760/icon"
       ],
       "timeEstimate": {
@@ -387,6 +395,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [],
       "timeEstimate": null,
       "weeklyTarget": null
@@ -428,10 +437,11 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2638098/icon",
         "https://maplestory.io/api/GMS/270/item/2049393/icon",
-        "https://maplestory.io/api/GMS/270/item/4037202/icon",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
         "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
         "https://g.nexonstatic.com/media/rzdl0olv/icon_experience-nodestone.png"
       ],
@@ -461,9 +471,9 @@
       "images": [
         "https://g.nexonstatic.com/media/cufknzs5/cozy-winter-set.png",
         "https://g.nexonstatic.com/media/e4mdteut/season-3-diamond.png",
-        "https://g.nexonstatic.com/media/yodnivc4/season-3-master.png",
         "https://g.nexonstatic.com/media/0pffxr0i/season-3-emerald.png",
-        "https://g.nexonstatic.com/media/v3ebtyzs/season-3-platinum.png"
+        "https://g.nexonstatic.com/media/v3ebtyzs/season-3-platinum.png",
+        "https://g.nexonstatic.com/media/o20l5u1t/season-3-gold.png"
       ],
       "rewards": [
         "Sol Erda Fragment x600",
@@ -479,11 +489,12 @@
       "timeCost": "long",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
-        "https://maplestory.io/api/GMS/270/item/2049780/icon",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/2644105/icon",
         null,
-        "https://g.nexonstatic.com/media/edhgshgx/challenger-medal-roid.png"
+        null
       ],
       "timeEstimate": {
         "basis": "uncertain",
@@ -522,6 +533,7 @@
       "timeCost": "long",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png"
       ],
@@ -564,6 +576,7 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/1672073/icon",
         "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
@@ -609,6 +622,7 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null
@@ -641,6 +655,87 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
+      "rewardImages": [],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "sunny-sunday",
+      "why": "",
+      "steps": [
+        {
+          "name": "Sunday, July 26",
+          "what": "+250% Monster Park Clear EXP (Excludes Monster Park Extreme)\nSpiegelette's Golden Strawberry Farm One-Time Entry Pass (x2): Tradable within world, expires July 29, 2026 11:59 PM UTC.",
+          "endsAt": "2026-07-27T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-07-26T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, August 2",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, Mesos used to safeguard are not eligible for the 30% discount)",
+          "endsAt": "2026-08-03T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, August 9",
+          "what": "Combo Kill EXP + 300%\nElite monster appearance increase\n2x Sol Erda when hunting",
+          "endsAt": "2026-08-10T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-08-09T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, August 16",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, Mesos used to safeguard are not eligible for the 30% discount)\n1+1 Star Force upon a successful enhancement at 10-Star or below.",
+          "endsAt": "2026-08-17T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-08-16T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, August 23",
+          "what": "50% off Ability Resets\n50% off Spell Trace Enhancements\n250% Monster Park Clear EXP (Excludes Monster Park Extreme)\nMysterious Monsterbloom (x3): Untradable, Permanent. Claim once per account.\nCannot be claimed in Challenger World.\n+100% chance to register a new monster in Monster Collection\n[HEXA Matrix] When Main Stat is Lv. 5+, the enhancement chance is increased 20%.",
+          "endsAt": "2026-08-24T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, August 30",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, Mesos used to safeguard are not eligible for the 30% discount)",
+          "endsAt": "2026-08-31T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-08-30T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, September 6",
+          "what": "Haste Fever Time Booster (x3): Tradable within world, expires September 9, 2026 11:59 PM UTC.\nElite monster appearance increase\n2x Sol Erda when hunting\n5x Magnificent Soul chance from soul shards",
+          "endsAt": "2026-09-07T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-09-06T00:00:00.000Z"
+        }
+      ],
+      "title": "Sunny Sunday",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 0,
+          "endgame": 0,
+          "returning": 0
+        }
+      },
+      "endsAt": "2026-09-07T00:00:00.000Z",
+      "images": [],
+      "rewards": [],
+      "summary": "Log in each Sunday to enjoy various perks!",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-26T00:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 1,
+      "killsPerDay": null,
       "rewardImages": [],
       "timeEstimate": null,
       "weeklyTarget": null
@@ -649,6 +744,8 @@
   "model": "gemini-3-flash-preview",
   "promptVersion": 9,
   "classifiedAt": "2026-10-13T01:14:44.450Z",
-  "warnings": [],
+  "warnings": [
+    "\"Sunny Sunday\": 7 schedule days read from the post's table"
+  ],
   "error": null
 }

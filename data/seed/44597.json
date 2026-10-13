@@ -37,10 +37,11 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null,
-        null,
+        "https://maplestory.io/api/GMS/270/item/2539003/icon",
         null
       ],
       "timeEstimate": null,
@@ -75,6 +76,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null,
@@ -112,6 +114,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         "https://g.nexonstatic.com/media/juwbsnp3/burning-rebirth-flame.png",
@@ -151,10 +154,11 @@
       "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 3,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/4009547/icon",
-        "https://maplestory.io/api/GMS/270/item/2638500/icon",
-        "https://maplestory.io/api/GMS/270/item/4037073/icon"
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://g.nexonstatic.com/media/nu0ex5pu/icon_exp_voucher.png"
       ],
       "timeEstimate": {
         "basis": "uncertain",
@@ -215,6 +219,7 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null,
@@ -282,9 +287,10 @@
       "timeCost": "short",
       "claimUntil": "2026-10-08T02:00:00.000Z",
       "daysPerWeek": 5,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
-        null,
+        "https://g.nexonstatic.com/media/uxtlov4i/icon_ultimate-nodestone.png",
         null,
         null,
         null
@@ -331,10 +337,11 @@
       "timeCost": "instant",
       "claimUntil": "2026-11-24T23:59:00.000Z",
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
-        "https://maplestory.io/api/GMS/270/item/4009547/icon",
-        null,
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://maplestory.io/api/GMS/270/item/2636708/icon",
         "https://g.nexonstatic.com/media/rzdl0olv/icon_experience-nodestone.png",
         "https://maplestory.io/api/GMS/270/item/5681263/icon"
       ],
@@ -382,10 +389,11 @@
       "timeCost": "medium",
       "claimUntil": "2026-10-08T02:00:00.000Z",
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/4009547/icon",
-        null,
-        "https://g.nexonstatic.com/media/4k0hl3js/icon_adventure_coin_x1_coupon.png",
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://maplestory.io/api/GMS/270/item/4310266/icon",
         null
       ],
       "timeEstimate": {
@@ -398,9 +406,73 @@
     },
     {
       "id": "sunny-sunday-schedule",
-      "why": "Mandatory for gear progression. The November 1st 2x Sol Erda and Oct 11th 1+1 Star Force are the high points.",
-      "steps": [],
-      "title": "Sunny Sunday Schedule",
+      "why": "",
+      "steps": [
+        {
+          "name": "Sunday, September 13",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, mesos used to safeguard are not eligible for the 30% discount)\nRune Appearance Cooldown reduction\n+100% Rune EXP buff effect\nCombo Kill EXP +300%",
+          "endsAt": "2026-09-14T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-09-13T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, September 20",
+          "what": "50% off Ability Resets\n250% Monster Park Clear EXP (Excludes Monster Park Extreme)",
+          "endsAt": "2026-09-21T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-09-20T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, September 27",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, mesos used to safeguard are not eligible for the 30% discount)\nRune Appearance Cooldown reduction\n+100% Rune EXP buff effect\nElite monster appearance increase",
+          "endsAt": "2026-09-28T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-09-27T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, October 4",
+          "what": "Treasure Hunter EXP x3\nCombo Kill EXP +300%\n+250% Monster Park Clear EXP (Excludes Monster Park Extreme)",
+          "endsAt": "2026-10-05T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-10-04T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, October 11",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, mesos used to safeguard are not eligible for the 30% discount)\n50% off Spell Trace Enhancements\n1+1 Star Force upon a successful enhancement at 10-Star or below.",
+          "endsAt": "2026-10-12T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-10-11T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, October 18",
+          "what": "+250% Monster Park Clear EXP (Excludes Monster Park Extreme)\n[HEXA Matrix] When Main Stat is Lv. 5+, the enhancement chance is increased 20%.",
+          "endsAt": "2026-10-19T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-10-18T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, October 25",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, mesos used to safeguard are not eligible for the 30% discount)\n50% off Ability Resets",
+          "endsAt": "2026-10-26T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-10-25T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, November 1",
+          "what": "5x chance to get Magnificent Soul from Soul Shards\n2x Sol Erda when hunting\nTreasure Hunter EXP x3",
+          "endsAt": "2026-11-02T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-11-01T00:00:00.000Z"
+        },
+        {
+          "name": "Sunday, November 8",
+          "what": "30% reduced chance of item destruction when enhancing items below 21 Stars\n30% off Star Force enhancements (Excludes Superior Equipment, mesos used to safeguard are not eligible for the 30% discount)\nCombo Kill EXP +300%",
+          "endsAt": "2026-11-09T00:00:00.000Z",
+          "reward": "",
+          "startsAt": "2026-11-08T00:00:00.000Z"
+        }
+      ],
+      "title": "Sunny Sunday",
       "value": {
         "limited": 0,
         "cosmetic": 0,
@@ -410,15 +482,10 @@
           "returning": 90
         }
       },
-      "endsAt": "2026-11-08T23:59:00.000Z",
+      "endsAt": "2026-11-09T00:00:00.000Z",
       "images": [],
-      "rewards": [
-        "30% Star Force Discount",
-        "1+1 Star Force (Up to 10*)",
-        "2x Sol Erda while hunting (Nov 1)",
-        "50% off Ability Resets"
-      ],
-      "summary": "A series of 9 specialized perk days. Key dates: Sept 13/27 & Oct 11/25 (30% off Star Force), Oct 11 (1+1 SF), and Nov 1 (2x Sol Erda hunting & 5x Magnificent Soul).",
+      "rewards": [],
+      "summary": "Log in each Sunday to enjoy various perks!",
       "category": "event",
       "dailyCap": null,
       "requires": null,
@@ -426,18 +493,9 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 1,
-      "rewardImages": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "timeEstimate": {
-        "basis": "uncertain",
-        "label": "Sundays only",
-        "effort": null,
-        "minutesPerWeek": null
-      },
+      "killsPerDay": null,
+      "rewardImages": [],
+      "timeEstimate": null,
       "weeklyTarget": null
     },
     {
@@ -477,9 +535,10 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        null,
-        null,
+        "https://maplestory.io/api/GMS/270/item/2644039/icon",
+        "https://maplestory.io/api/GMS/270/item/2644300/icon",
         "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
         "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
         null
@@ -527,8 +586,9 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        null,
+        "https://maplestory.io/api/GMS/270/item/1662290/icon",
         "https://g.nexonstatic.com/media/iinpbxnb/giant-monster-yeti-mount.gif",
         null,
         "https://g.nexonstatic.com/media/ddxjzb0d/night-cat-damage-skin.png"
@@ -570,6 +630,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null,
@@ -605,6 +666,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null
       ],
@@ -646,6 +708,7 @@
       "timeCost": "idle",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         null,
         null,
@@ -684,6 +747,7 @@
       "timeCost": "long",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [],
       "timeEstimate": null,
       "weeklyTarget": null
@@ -696,7 +760,8 @@
     "\"Special Skill Ring Overhaul\": claim deadline 2027-09-08T23:59:00.000Z is not usable, cleared",
     "\"Night Troupe: Mesotron-S Project\": step \"Rank Progression\" is not in the post, removed",
     "\"Sunny Sunday Schedule\": time estimate \"Sundays only\" has no duration, marked uncertain",
-    "\"Familiar Update: Crucible Badge\": reward \"Crucible Badge: +1% Crit DMG, +3% IED\" is not in the post, removed"
+    "\"Familiar Update: Crucible Badge\": reward \"Crucible Badge: +1% Crit DMG, +3% IED\" is not in the post, removed",
+    "\"Sunny Sunday\": 9 schedule days read from the post's table"
   ],
   "error": null
 }

@@ -66,9 +66,10 @@
       "timeCost": "long",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
-        "https://g.nexonstatic.com/media/4k0hl3js/icon_adventure_coin_x1_coupon.png",
+        "https://maplestory.io/api/GMS/270/item/4310266/icon",
         "https://g.nexonstatic.com/media/pxseawhv/icon_random_mimic_box.png",
         "https://g.nexonstatic.com/media/ypyhgff1/icon_symbol_selector_coupon.png",
         "https://g.nexonstatic.com/media/zsshidmt/icon_special_medal_of_honor.png"

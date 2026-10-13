@@ -9,45 +9,45 @@
   "items": [
     {
       "id": "mesotron-s-project",
-      "why": "Rare chance to transfer AbsoLab/Fafnir gear, Emblems, and legacy Hair/Faces to other characters in the same world.",
+      "why": "Unlocks equipment, mount, hair, and face transfers alongside Transcendent Growth Potions and weekly boss reset tickets.",
       "steps": [
         {
           "name": "Real Gains in Virtual Training",
-          "what": "Shoot targets for 90 seconds to earn up to 100 Designer EXP daily.",
+          "what": "Shoot target symbols matching the display within 90 seconds.",
           "endsAt": "2026-11-10T23:59:00Z",
-          "reward": "Virtual Master Chair at 10,000 cumulative points",
+          "reward": "Virtual Master Chair at 10,000 points",
           "startsAt": "2026-09-30T00:00:00Z"
         },
         {
           "name": "Surveillance Agent Gunny",
-          "what": "Find wanted enemies for 2 minutes to earn up to 200 Designer EXP daily.",
+          "what": "Spot matching wanted Gray targets within 2 minutes.",
           "endsAt": "2026-11-10T23:59:00Z",
-          "reward": "Target Acquired Chair at 20,000 cumulative points",
+          "reward": "Target Acquired Chair at 20,000 points",
           "startsAt": "2026-10-14T00:00:00Z"
         },
         {
           "name": "Victory Pose Practice",
-          "what": "Recreate ranger poses for 2.5 minutes to earn up to 300 Designer EXP daily.",
+          "what": "Memorize and recreate the direction M-Force Rangers are facing within 2.5 minutes.",
           "endsAt": "2026-11-10T23:59:00Z",
-          "reward": "Quirky M-Force Chair at 30,000 cumulative points",
+          "reward": "Quirky M-Force Chair at 30,000 points",
           "startsAt": "2026-10-28T00:00:00Z"
         },
         {
           "name": "Jenny's Meet and Greet",
-          "what": "An AFK map where you can earn Designer EXP or character EXP (VIP Seating only). Exclusive merch is sold here for mesos.",
+          "what": "Sit in General or VIP Seating at the venue map to passively accumulate Designer EXP or character EXP while AFK. Exclusive cosmetic photo cards and titles can be purchased with mesos.",
           "endsAt": null,
-          "reward": "One, Two, Woo! Chair (3b Mesos), Three, Four, Woo! Chair (5b Mesos), Space Star Jenny Photo Cards (1.5b Mesos)",
+          "reward": "Passive Character EXP (VIP Seating), Space Star Jenny Photo Cards, One, Two, Woo! / Three, Four, Woo! Titles",
           "startsAt": null
         }
       ],
       "title": "Mesotron-S Project",
       "value": {
-        "limited": 85,
-        "cosmetic": 90,
+        "limited": 30,
+        "cosmetic": 40,
         "progression": {
-          "casual": 92,
-          "endgame": 75,
-          "returning": 95
+          "casual": 90,
+          "endgame": 85,
+          "returning": 90
         }
       },
       "endsAt": "2026-11-10T23:59:00Z",
@@ -58,88 +58,48 @@
         "https://g.nexonstatic.com/media/uwql4ipm/mesotron-s-heaven-breaker.gif"
       ],
       "rewards": [
-        "Equipment Transfer (AbsoLab, Fafnir, Emblems, Lv. 100 Secondaries)",
-        "Special Hair Transfer Coupon",
-        "Special Face Transfer Coupon",
-        "Mount Skill Transfer Certificate",
-        "Transcendent Growth Potion"
+        "Equipment Transfer (AbsoLab, Fafnir, Lv. 100 secondaries, Mitra's Rage)",
+        "Transcendent Growth Potion",
+        "Weekly Boss Clear Count Reset Ticket",
+        "Mount Transfer Certificate",
+        "Special Hair/Face Transfer Coupons"
       ],
-      "summary": "The main festival track. Play minigames to earn Designer EXP and rank up weekly. Higher ranks unlock the ability to transfer hair, faces, and equipment across your account.",
+      "summary": "Earn Designer EXP from minigames to level up through 5 ranks, unlocking perks including character transfers, Transcendent Growth Potions, and Troupe Coins for combat buffs and symbol/Sol Erda daily bonuses.",
       "category": "event",
-      "dailyCap": null,
+      "dailyCap": 500,
       "requires": null,
       "startsAt": "2026-09-30T00:00:00Z",
       "timeCost": "short",
       "claimUntil": null,
-      "daysPerWeek": 7,
+      "daysPerWeek": 5,
+      "killsPerDay": null,
       "rewardImages": [
         null,
-        "https://maplestory.io/api/GMS/270/item/2635029/icon",
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://maplestory.io/api/GMS/270/item/2636033/icon",
         null,
-        "https://maplestory.io/api/GMS/270/item/2631073/icon",
-        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png"
+        "https://maplestory.io/api/GMS/270/item/2635029/icon"
       ],
       "timeEstimate": {
         "basis": "calculated",
-        "label": "2-5 min/day",
+        "label": "5 min/day",
         "effort": "low",
         "minutesPerWeek": 35
       },
-      "weeklyTarget": null
-    },
-    {
-      "id": "festival-decorations",
-      "why": "Massive progression boosts: up to +5 daily symbols, Sol Erda in dailies, and 2x Monster Park EXP.",
-      "steps": [],
-      "title": "Festival Decorations & Perks",
-      "value": {
-        "limited": 0,
-        "cosmetic": 20,
-        "progression": {
-          "casual": 90,
-          "endgame": 85,
-          "returning": 90
-        }
-      },
-      "endsAt": "2026-11-10T23:59:00Z",
-      "images": [],
-      "rewards": [
-        "Daily Quest Reward +5 Symbols",
-        "Grandis Daily Quest: +100 Sol Erda & +1 Fragment",
-        "2x Monster Park Clear EXP",
-        "Weekly Boss Clear Count Reset Ticket",
-        "Chance at Luxury Furnishing Coupons"
-      ],
-      "summary": "Spend Troupe Coins from ranking up to unlock powerful event-long buffs. You must choose which decorations to prioritize in the event UI.",
-      "category": "system",
-      "dailyCap": null,
-      "requires": "mesotron-s-project",
-      "startsAt": "2026-09-30T00:00:00Z",
-      "timeCost": "instant",
-      "claimUntil": null,
-      "daysPerWeek": 7,
-      "rewardImages": [
-        null,
-        null,
-        null,
-        "https://maplestory.io/api/GMS/270/item/2636033/icon",
-        null
-      ],
-      "timeEstimate": null,
-      "weeklyTarget": null
+      "weeklyTarget": 2500
     },
     {
       "id": "go-go-sidekick",
-      "why": "One of the best fragment sources: up to 500 Sol Erda Fragments per week for low effort.",
+      "why": "Up to 500 Sol Erda Fragments or 4,000 Advanced EXP Vouchers per claim (3 claims/week) from wave deployment battles.",
       "steps": [],
       "title": "Go Go Sidekick!",
       "value": {
         "limited": 0,
         "cosmetic": 0,
         "progression": {
-          "casual": 95,
-          "endgame": 92,
-          "returning": 85
+          "casual": 90,
+          "endgame": 95,
+          "returning": 45
         }
       },
       "endsAt": "2026-11-03T23:59:00Z",
@@ -147,43 +107,87 @@
         "https://g.nexonstatic.com/media/kbxdi5cd/go-go.png"
       ],
       "rewards": [
-        "Sol Erda Fragment Coupon (up to 500)",
-        "Advanced EXP Voucher (up to 4,000)",
-        "EXP Voucher (up to 15,000)"
+        "Up to 500 Sol Erda Fragments per claim",
+        "Up to 4,000 Advanced EXP Vouchers per claim",
+        "Up to 15,000 EXP Vouchers per claim"
       ],
-      "summary": "Choose a reward type weekly (EXP, Vouchers, or Sol Erda Fragments) and deploy sidekicks while hunting. Claim rewards up to 3 times per week based on waves cleared.",
+      "summary": "Defeat monsters near your level to fill the deployment gauge, then send sidekick squads into wave battles. Earn rewards 3 times a week choosing between EXP Vouchers, Advanced EXP Vouchers, or Sol Erda Fragments.",
       "category": "event",
       "dailyCap": null,
       "requires": null,
       "startsAt": "2026-09-30T00:00:00Z",
-      "timeCost": "short",
+      "timeCost": "medium",
       "claimUntil": null,
       "daysPerWeek": 3,
+      "killsPerDay": 3000,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/2637690/icon",
-        "https://maplestory.io/api/GMS/270/item/2638500/icon",
-        "https://maplestory.io/api/GMS/270/item/4037073/icon"
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://g.nexonstatic.com/media/nu0ex5pu/icon_exp_voucher.png"
       ],
       "timeEstimate": {
-        "basis": "calculated",
-        "label": "10-15 min, 3 days/week",
+        "basis": "uncertain",
+        "label": "Up to 10 deployments/day, 3 claims/week; run length not stated",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "festival-guardian",
+      "why": "Weekly 2-minute DPS test offering large EXP payouts and a permanent M-Force chair at 1,000 points.",
+      "steps": [],
+      "title": "Festival Guardian",
+      "value": {
+        "limited": 15,
+        "cosmetic": 50,
+        "progression": {
+          "casual": 60,
+          "endgame": 40,
+          "returning": 75
+        }
+      },
+      "endsAt": "2026-11-10T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/ebaljeqm/rombot.gif"
+      ],
+      "rewards": [
+        "Weekly EXP based on stage cleared",
+        "We Are M-Force Chair"
+      ],
+      "summary": "Requires Veteran Designer Rank. Challenge Rombot OMNI-CLN in a 2-minute weekly DPS punch-king test to earn EXP based on stage reached, plus a permanent chair at 1,000+ points.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": "mesotron-s-project",
+      "startsAt": "2026-10-14T00:00:00Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 1,
+      "killsPerDay": null,
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/larb345u/we-are-m-force.gif"
+      ],
+      "timeEstimate": {
+        "basis": "stated",
+        "label": "2 min once/week",
         "effort": "low",
-        "minutesPerWeek": 45
+        "minutesPerWeek": 2
       },
       "weeklyTarget": null
     },
     {
       "id": "hello-world-hello-robot",
-      "why": "Rare lottery for 22-star and 18-star scrolls, max-level symbols, and permanent outfits.",
+      "why": "Daily random reward draw at Master rank with chances at 18/22-star scrolls, Sacred Symbols, and Sol Erda.",
       "steps": [],
       "title": "Hello World, Hello Robot",
       "value": {
-        "limited": 60,
-        "cosmetic": 75,
+        "limited": 20,
+        "cosmetic": 40,
         "progression": {
           "casual": 80,
           "endgame": 80,
-          "returning": 60
+          "returning": 80
         }
       },
       "endsAt": "2026-11-10T23:59:00Z",
@@ -195,13 +199,13 @@
         "https://g.nexonstatic.com/media/z2clwjn0/omega-sector-festival-intruder-eye-accessory.gif"
       ],
       "rewards": [
-        "Chance at Karma Star Force 22-Star Enhancement (Lv. 200)",
-        "Chance at Special Arcane/Sacred Symbol Box (Max Level)",
-        "Chance at Karma Star Force 18-Star Enhancement (Lv. 250)",
-        "Sol Erda/Sol Erda Fragment Selector Coupon (x10)",
-        "Night Troupe Festival Outfit Set Coupon"
+        "Chance at Karma Star Force 18-Star / 22-Star Enhancement",
+        "Chance at Special Sacred Symbol Box (Lv. 11)",
+        "Chance at Special Arcane Symbol Box (Lv. 20)",
+        "Chance at Sol Erda / Sol Erda Fragment Selector Coupon",
+        "Chance at Magnificent Growth Potion"
       ],
-      "summary": "Available only at Master Designer rank. Talk to Strange Mateon daily to receive a random gift. Stock is limited per world.",
+      "summary": "Requires Master Designer Rank. Visit Strange Mateon once a day at the festival venue to receive a daily random reward from a pool of enhancement scrolls, symbol boxes, and cosmetics.",
       "category": "event",
       "dailyCap": null,
       "requires": "mesotron-s-project",
@@ -209,12 +213,13 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/2644040/icon",
-        null,
         "https://maplestory.io/api/GMS/270/item/2644300/icon",
+        null,
+        null,
         "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png",
-        null
+        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png"
       ],
       "timeEstimate": {
         "basis": "calculated",
@@ -223,58 +228,14 @@
         "minutesPerWeek": 7
       },
       "weeklyTarget": null
-    },
-    {
-      "id": "festival-guardian",
-      "why": "Solid weekly EXP boost for very little effort, plus a permanent chair.",
-      "steps": [],
-      "title": "Festival Guardian",
-      "value": {
-        "limited": 10,
-        "cosmetic": 25,
-        "progression": {
-          "casual": 60,
-          "endgame": 55,
-          "returning": 45
-        }
-      },
-      "endsAt": "2026-11-10T23:59:00Z",
-      "images": [
-        "https://g.nexonstatic.com/media/ebaljeqm/rombot.gif",
-        "https://g.nexonstatic.com/media/larb345u/we-are-m-force.gif"
-      ],
-      "rewards": [
-        "Character EXP",
-        "We Are M-Force Chair Coupon"
-      ],
-      "summary": "A weekly boss punching bag challenge. Defeat Rombot OMNI-CLN through 10 stages to earn points and EXP. Requires Veteran Designer rank.",
-      "category": "event",
-      "dailyCap": null,
-      "requires": "mesotron-s-project",
-      "startsAt": "2026-10-14T00:00:00Z",
-      "timeCost": "short",
-      "claimUntil": null,
-      "daysPerWeek": 1,
-      "rewardImages": [
-        null,
-        null
-      ],
-      "timeEstimate": {
-        "basis": "stated",
-        "label": "2 min once/week",
-        "effort": "low",
-        "minutesPerWeek": 2
-      },
-      "weeklyTarget": null
     }
   ],
-  "model": "gemini-3-flash-preview",
-  "promptVersion": 14,
-  "classifiedAt": "2026-10-13T11:08:16.160Z",
+  "model": "gemini-3.6-flash",
+  "promptVersion": 16,
+  "classifiedAt": "2026-10-13T11:33:03.725Z",
   "warnings": [
-    "\"Go Go Sidekick!\": amount in \"Sol Erda Fragment Coupon (up to 500/week)\" is not in the post, removed",
-    "\"Go Go Sidekick!\": amount in \"Advanced EXP Voucher (up to 4,000/week)\" is not in the post, removed",
-    "\"Go Go Sidekick!\": amount in \"EXP Voucher (up to 15,000/week)\" is not in the post, removed",
+    "\"Mesotron-S Project\": 2500 a week at 500 a day is 5 days a week, not 7",
+    "\"Jenny's Meet and Greet\": time estimate \"AFK time\" has no duration, marked uncertain",
     "\"Hello World, Hello Robot\": every reward is a draw, scores capped at 80",
     "\"Jenny's Meet and Greet\": only feeds \"Mesotron-S Project\", folded into it as steps"
   ],

@@ -35,6 +35,7 @@
       "timeCost": "instant",
       "claimUntil": null,
       "daysPerWeek": 1,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2831068/icon",
         "https://maplestory.io/api/GMS/270/item/2831312/icon"
@@ -79,6 +80,7 @@
       "timeCost": "short",
       "claimUntil": null,
       "daysPerWeek": 7,
+      "killsPerDay": null,
       "rewardImages": [
         "https://maplestory.io/api/GMS/270/item/2534007/icon",
         "https://maplestory.io/api/GMS/270/item/2831197/icon",
