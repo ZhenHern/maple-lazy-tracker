@@ -113,8 +113,22 @@ export async function runTrial({ ids, tier, maxRequests, model }: TrialOptions):
     posts,
     problems,
   };
-  await mkdir(path.dirname(TRIAL_FILE), { recursive: true });
-  await writeFile(TRIAL_FILE, `${JSON.stringify(trial, null, 2)}\n`);
+  // A trial that classified nothing (every model refused) must not wipe out
+  // the last good one: those requests were paid for and can still be promoted.
+  if (posts.length > 0) {
+    // Posts the previous trial covered and this one did not are carried over,
+    // as long as both ran the same prompt. A patch post that succeeded is not
+    // lost when the event notices are retried on their own.
+    const previous = await readLatestTrial();
+    const fresh = new Set(posts.map((post) => post.sourceId));
+    const carried =
+      previous && previous.promptVersion === PROMPT_VERSION
+        ? previous.posts.filter((post) => !fresh.has(post.sourceId))
+        : [];
+    const saved: Trial = { ...trial, posts: [...carried, ...posts] };
+    await mkdir(path.dirname(TRIAL_FILE), { recursive: true });
+    await writeFile(TRIAL_FILE, `${JSON.stringify(saved, null, 2)}\n`);
+  }
   return trial;
 }
 

@@ -19,6 +19,8 @@ export const TIME_COST_MINUTES: Record<TimeCost, number> = {
   short: 10,
   medium: 30,
   long: 75,
+  // Runs while the player is away, so it uses none of their playtime.
+  idle: 0,
 };
 
 // At or under this many minutes a day, a quest is as good as free.
@@ -89,6 +91,8 @@ function demote(tier: Tier): Tier {
  *
  * 1. A quest that has not opened is set aside ("soon"). It cannot be done
  *    today, so it neither takes time nor counts as a Must Do yet.
+ *    An idle (AFK) quest takes no playtime either, and keeps the tier its
+ *    rewards earn: it is not a one-click claim, so it is not promoted.
  * 2. A quest that costs a minute or two a day is a Must Do for everyone,
  *    unless its rewards are worthless to this player (it was a Skip). A daily
  *    check-in costs nothing, so there is no reason to pass on it.
@@ -119,6 +123,9 @@ export function planDay(
 
     if (notOpenYet(item, now)) {
       plans.set(item.id, { tier: base, note: "soon" });
+    } else if (item.timeCost === "idle") {
+      // Not a task that competes for the day: it keeps the tier its rewards earn.
+      plans.set(item.id, { tier: base, note: null });
     } else if (minutes <= QUICK_MINUTES && base !== "skip") {
       plans.set(item.id, { tier: "must_do", note: base === "must_do" ? null : "quick" });
       used += minutes;

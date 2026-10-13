@@ -4,7 +4,9 @@ export const TIERS = ["must_do", "if_free", "skip"] as const;
 export const PROFILES = ["casual", "endgame", "returning"] as const;
 // How long a quest takes a day, as a coarse class. The model must always pick
 // one, even when the exact duration is unknown (see timeEstimate for that).
-export const TIME_COSTS = ["instant", "short", "medium", "long"] as const;
+// "idle" is for AFK activities: they take none of the player's playtime, but
+// they are not a one-click claim either, so they are neither promoted nor cut.
+export const TIME_COSTS = ["instant", "short", "medium", "long", "idle"] as const;
 export const PRIORITIES = ["progression", "limited", "cosmetic"] as const;
 export const MAX_ITEMS = 40;
 export const MAX_REWARDS = 5;

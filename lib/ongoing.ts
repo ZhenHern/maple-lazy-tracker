@@ -49,9 +49,36 @@ function byPreference(a: StoredPost, b: StoredPost): number {
   return b.publishedAt.localeCompare(a.publishedAt);
 }
 
-function sameDeadline(a: string | null, b: string | null): boolean {
+// Two posts can date the same event differently (one gives the last day to
+// take part, the other the last day to claim). A recurring event's next run is
+// months away, so anything inside this gap is the same run.
+const RERUN_GAP = 21 * DAY;
+
+function sameDeadline(a: string | null, b: string | null, tolerance: number): boolean {
   if (a === null || b === null) return true;
-  return Math.abs(Date.parse(a) - Date.parse(b)) <= 2 * DAY;
+  return Math.abs(Date.parse(a) - Date.parse(b)) <= tolerance;
+}
+
+// Words in reward names that say nothing about which reward it is.
+const REWARD_FILLER = new Set(["x", "the", "of", "a", "and", "or", "per", "chance", "at", "up", "to"]);
+
+function rewardWords(rewards: string[]): Set<string> {
+  return new Set(
+    rewards
+      .join(" ")
+      .toLowerCase()
+      .split(/[^a-z]+/)
+      .filter((word) => word.length > 2 && !REWARD_FILLER.has(word))
+      .map((word) => (word.endsWith("s") ? word.slice(0, -1) : word)),
+  );
+}
+
+/** True when two reward lists mostly name the same things. */
+function sameRewards(a: string[], b: string[]): boolean {
+  const [fewer, more] = [rewardWords(a), rewardWords(b)].sort((p, q) => p.size - q.size);
+  if (fewer.size < 4) return false;
+  const shared = [...fewer].filter((word) => more.has(word)).length;
+  return shared / fewer.size >= 0.5;
 }
 
 function stripImages(item: StoredItem): StoredItem {
@@ -110,11 +137,19 @@ export function selectOngoing(
       // "Operation: Dive Dungeon" are two activities and both stay.
       // Matching titles are not enough when both give an end date and the
       // dates are far apart: those are two runs of a recurring event.
+      // Two posts also name the same thing differently ("Mesotron-S Project"
+      // in the notice, "Night Troupe: Omega Sector" in the patch notes). When
+      // the end date is the same day and the rewards largely overlap, it is
+      // the same quest whatever it is called.
       const repeat = items.some(
         (existing) =>
           existing.source.sourceId !== post.sourceId &&
-          sameTitle(existing.title, item.title) &&
-          sameDeadline(existing.endsAt, item.endsAt),
+          ((sameTitle(existing.title, item.title) &&
+            sameDeadline(existing.endsAt, item.endsAt, RERUN_GAP)) ||
+            (existing.endsAt !== null &&
+              item.endsAt !== null &&
+              sameDeadline(existing.endsAt, item.endsAt, DAY) &&
+              sameRewards(existing.rewards, item.rewards))),
       );
       if (repeat) continue;
       items.push({

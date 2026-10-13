@@ -59,6 +59,7 @@ const TIME_COST_LABEL = {
   short: "About 5 to 15 minutes a day",
   medium: "About 15 to 45 minutes a day",
   long: "More than 45 minutes a day",
+  idle: "Runs while you are away",
 };
 
 // Images load straight from Nexon's CDN in the visitor's browser. next/image is
