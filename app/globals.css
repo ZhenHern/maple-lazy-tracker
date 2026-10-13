@@ -2063,3 +2063,67 @@ body {
 
 /* With animations off the banner would sit there forever at full strength;
    the component removes it after three seconds, so it simply shows and goes. */
+
+/* ---------- Perk-day schedule (Sunny Sunday) ---------- */
+
+.schedule-now {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.schedule-day {
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--color-line);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.schedule-next {
+  border-color: var(--color-frame);
+  box-shadow: 0 3px 0 var(--color-line);
+}
+
+.schedule-live {
+  border-color: #58b530;
+  background: #f1fbe9;
+  box-shadow: 0 3px 0 #58b530;
+}
+
+.schedule-past {
+  opacity: 0.65;
+}
+
+.schedule-date {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-weight: 800;
+}
+
+.schedule-perks {
+  display: grid;
+  gap: 0.2rem;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  list-style: disc;
+}
+
+.schedule-more > summary {
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+:root[data-theme="dark"] .schedule-day {
+  background: var(--night-surface);
+}
+
+:root[data-theme="dark"] .schedule-live {
+  border-color: #7cc65a;
+  background: #22381f;
+  box-shadow: 0 3px 0 #3f7a26;
+}

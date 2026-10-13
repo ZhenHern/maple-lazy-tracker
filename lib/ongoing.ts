@@ -1,7 +1,7 @@
 import { calibrate } from "@/lib/classifier/calibrate";
 import { ratingOf } from "@/lib/classifier/models";
 import { relatedTitle, sameTitle } from "@/lib/images";
-import { isTask } from "@/lib/tiering";
+import { isSchedule, isTask } from "@/lib/tiering";
 import type { ItemSource, PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
 
 // Turns stored posts into the list of quests that are running now. Pure code:
@@ -22,11 +22,22 @@ export interface NewsItem {
   source: ItemSource;
 }
 
+/** A rotating schedule of perk days, shown in a panel of its own. */
+export interface ScheduleInfo {
+  id: string;
+  title: string;
+  summary: string;
+  days: { startsAt: string; endsAt: string; perks: string[] }[];
+  source: ItemSource;
+}
+
 export interface OngoingTracker {
   /** Quests: activities with an end date. Only these get tiers. */
   items: TrackerItem[];
   /** System changes and permanent content of the current patch, untiered. */
   news: NewsItem[];
+  /** Rotating perk-day schedules (Sunny Sunday), untiered. */
+  schedules: ScheduleInfo[];
   /** Official posts that contributed at least one ongoing item. */
   sources: PostSummary[];
   /** When the newest contributing post was classified, or null if there is no data. */
@@ -102,7 +113,12 @@ export function selectOngoing(
   allPosts: StoredPost[],
   now: number,
   showImages: boolean,
-): { items: SourcedItem[]; news: SourcedItem[]; contributing: StoredPost[] } {
+): {
+  items: SourcedItem[];
+  news: SourcedItem[];
+  schedules: SourcedItem[];
+  contributing: StoredPost[];
+} {
   const posts = [...allPosts].sort(byPreference);
   // Posts older than this no longer contribute permanent items. A dated item
   // stays until it ends, however old its post is: a long event must not drop
@@ -196,8 +212,9 @@ export function selectOngoing(
   );
   return {
     // Only a task gets a tier; everything else is listed separately as news.
-    items: items.filter(isTask),
-    news: items.filter((item) => !isTask(item)),
+    items: items.filter((item) => isTask(item) && !isSchedule(item)),
+    news: items.filter((item) => !isTask(item) && !isSchedule(item)),
+    schedules: items.filter(isSchedule),
     contributing,
   };
 }
@@ -208,7 +225,7 @@ export function buildOngoing(
   now: number,
   showImages: boolean,
 ): OngoingTracker {
-  const { items, news, contributing } = selectOngoing(allPosts, now, showImages);
+  const { items, news, schedules, contributing } = selectOngoing(allPosts, now, showImages);
   return {
     // Tiers are ranked among quests only, so news never takes a Must Do slot.
     items: calibrate(items),
@@ -217,6 +234,17 @@ export function buildOngoing(
       title,
       category,
       summary,
+      source,
+    })),
+    schedules: schedules.map(({ id, title, summary, steps, source }) => ({
+      id,
+      title,
+      summary,
+      days: steps.map((step) => ({
+        startsAt: step.startsAt!,
+        endsAt: step.endsAt!,
+        perks: step.what.split("\n").filter(Boolean),
+      })),
       source,
     })),
     sources: contributing

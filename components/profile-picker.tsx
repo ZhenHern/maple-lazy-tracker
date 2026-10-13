@@ -123,7 +123,7 @@ export function ProfilePicker({
         </div>
         <p className="pick-caption">
           {priorities.length === 0
-            ? "Nothing picked, so all three count."
+            ? "Nothing picked: a Must Do needs progression value. Pick the others to count them in full."
             : "Pick any mix. A quest ranks by its best match."}
         </p>
       </fieldset>

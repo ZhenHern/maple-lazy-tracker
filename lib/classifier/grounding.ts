@@ -1,7 +1,8 @@
-import { normalizeTitle } from "@/lib/images";
+import { normalizeTitle, sameTitle } from "@/lib/images";
 import type { ScoredItem } from "@/lib/types";
 import { findDates, isGroundedDate, type TextDate } from "./dates";
 import { eventPeriod } from "./rules";
+import { findSchedules } from "./schedule";
 
 // Checks a model's answer against the post it was given, in plain code.
 //
@@ -461,6 +462,54 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
   const folded = foldFeeders(kept, warnings);
   kept.length = 0;
   kept.push(...folded);
+  // A table of dated perk days is read by code, not taken from the model:
+  // every day, exactly as the post lists it. The model's item for it (if it
+  // returned one) only lends its title; an item is made when it returned none.
+  for (const schedule of findSchedules(post.text, post.publishedAt)) {
+    const steps = schedule.days.map((day) => ({
+      name: new Date(day.startsAt).toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }),
+      // One perk per line; the schedule panel shows them as a list.
+      what: day.perks.join("\n"),
+      reward: "",
+      startsAt: day.startsAt,
+      endsAt: day.endsAt,
+    }));
+    const at = kept.findIndex((item) => sameTitle(item.title, schedule.title));
+    const base = at >= 0 ? kept[at] : null;
+    const item: ScoredItem = {
+      id: base?.id ?? schedule.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      title: schedule.title,
+      category: "event",
+      summary: schedule.intro || base?.summary || "Perks that change from day to day.",
+      why: "",
+      timeCost: "instant",
+      daysPerWeek: 1,
+      weeklyTarget: null,
+      dailyCap: null,
+      killsPerDay: null,
+      value: base?.value ?? {
+        progression: { casual: 0, endgame: 0, returning: 0 },
+        limited: 0,
+        cosmetic: 0,
+      },
+      rewards: [],
+      requires: null,
+      steps,
+      startsAt: schedule.days[0].startsAt,
+      endsAt: schedule.days[schedule.days.length - 1].endsAt,
+      claimUntil: null,
+      timeEstimate: null,
+    };
+    if (at >= 0) kept[at] = item;
+    else kept.push(item);
+    warnings.push(`"${schedule.title}": ${steps.length} schedule days read from the post's table`);
+  }
+
   // A notice about a single event states its period outright, and code reads
   // that more reliably than a model does (models sometimes copy the Pacific
   // time as if it were UTC). When the two ends are within a day of each other

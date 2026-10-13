@@ -175,7 +175,7 @@ export interface PlanRow {
 
 /**
  * The tier of every quest for each job at each playtime, with the given
- * priorities (an empty list is the page's default: all three count). This is
+ * priorities (an empty list is the page's default: progression decides Must Do). This is
  * the home page's sorting, laid out so every combination can be read at once.
  */
 export function buildDayPlans(

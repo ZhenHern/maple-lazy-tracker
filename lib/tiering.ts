@@ -87,6 +87,27 @@ export function isTask(item: { endsAt: string | null; category: TrackerItem["cat
   return item.endsAt !== null && item.category !== "system";
 }
 
+const SCHEDULE_DAY_MS = 36 * 3_600_000;
+
+/**
+ * True for a rotating schedule of perk days (Sunny Sunday): every step is one
+ * short dated day. It is not a quest: there is nothing to do and nothing to
+ * rank against other quests, so it gets a panel of its own, with no tier.
+ */
+export function isSchedule(item: {
+  steps: { startsAt: string | null; endsAt: string | null }[];
+}): boolean {
+  return (
+    item.steps.length >= 2 &&
+    item.steps.every(
+      (step) =>
+        step.startsAt !== null &&
+        step.endsAt !== null &&
+        Date.parse(step.endsAt) - Date.parse(step.startsAt) <= SCHEDULE_DAY_MS,
+    )
+  );
+}
+
 /** The last moment a quest still matters: its claim deadline if it has one, else its end. */
 export function closesAt(item: Pick<TrackerItem, "endsAt" | "claimUntil">): string | null {
   return item.claimUntil ?? item.endsAt;

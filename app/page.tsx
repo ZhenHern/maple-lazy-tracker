@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { PixelSprite } from "@/components/pixel-sprite";
 import { QuestLog } from "@/components/quest-log";
+import { SchedulePanel } from "@/components/schedule-panel";
 import { Scenery } from "@/components/scenery";
 import { SiteFooter, SiteHeader } from "@/components/site-header";
 import { getOngoing } from "@/lib/tracker";
@@ -67,7 +68,7 @@ function formatDay(iso: string): string {
 // Reads the cached list (see getOngoing). No AI call ever happens here: the
 // daily cron does the classifying, visitors only ever read its results.
 async function Tracker() {
-  const { items, news, sources, updatedAt, builtAt } = await getOngoing();
+  const { items, news, schedules, sources, updatedAt, builtAt } = await getOngoing();
 
   if (items.length === 0) {
     return (
@@ -99,6 +100,11 @@ async function Tracker() {
         updated={updatedAt ? formatDay(updatedAt) : null}
         builtAt={builtAt}
       />
+
+      {/* Rotating perk days are not quests: they get a panel of their own. */}
+      {schedules.map((schedule) => (
+        <SchedulePanel key={schedule.id} schedule={schedule} builtAt={builtAt} />
+      ))}
 
       {/* Changes with no deadline are news, not tasks, so they get no tier. */}
       {news.length > 0 && (
