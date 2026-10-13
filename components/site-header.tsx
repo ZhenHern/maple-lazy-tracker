@@ -35,11 +35,27 @@ export function SiteHeader({ current }: { current?: (typeof LINKS)[number]["href
   );
 }
 
+// Where a rights holder can ask for content to be removed. A GitHub issue is
+// public and dated, and needs no email address on the page.
+const REMOVAL_URL = "https://github.com/ZhenHern/maple-lazy-tracker/issues/new";
+
 export function SiteFooter() {
   return (
     <footer className="footnote">
-      Fan project, not affiliated with Nexon. Tiers and time estimates are AI-generated from the
-      official patch notes and can be wrong. MapleStory and all related images belong to Nexon.
+      <p>
+        Lazy Tracker is a free, non-commercial fan project. It is not affiliated with, endorsed
+        by or sponsored by Nexon. Tiers and time estimates are AI-generated from the official
+        patch notes and can be wrong.
+      </p>
+      <p className="mt-1.5">
+        MapleStory and all game names, images and icons are trademarks or copyrights of Nexon,
+        shown only to identify the events they belong to. Nothing here is sold, and every quest
+        links to its official post. Rights holder and want something removed?{" "}
+        <a href={REMOVAL_URL} className="underline" rel="noopener noreferrer" target="_blank">
+          Tell us
+        </a>{" "}
+        and it will be taken down.
+      </p>
     </footer>
   );
 }
