@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { TrackerItem } from "@/lib/types";
 import { useLocalStorage } from "@/lib/use-local-storage";
+import { closesAt } from "@/lib/tiering";
 import { useNow } from "@/lib/use-now";
 import { PixelSprite } from "./pixel-sprite";
 import { PROFILE_INFO } from "./profile-picker";
@@ -24,8 +25,10 @@ export function ArchiveLog({ items }: { items: TrackerItem[] }) {
   const job = PROFILE_INFO[profile];
 
   const sorted = [...items].sort(byDeadline);
-  const isOver = (item: TrackerItem) =>
-    now !== null && item.endsAt !== null && Date.parse(item.endsAt) <= now;
+  const isOver = (item: TrackerItem) => {
+    const closes = closesAt(item);
+    return now !== null && closes !== null && Date.parse(closes) <= now;
+  };
   const running = sorted.filter((item) => !isOver(item));
   const ended = sorted.filter(isOver);
   const rough = mostlyRough(items);

@@ -154,7 +154,7 @@ This API is undocumented and could change without notice, so every response is v
 ```ts
 type Tier = 'must_do' | 'if_free' | 'skip';
 type Profile = 'casual' | 'endgame' | 'returning';
-type TimeCost = 'instant' | 'short' | 'medium' | 'long';
+type TimeCost = 'instant' | 'short' | 'medium' | 'long' | 'idle';
 type Priority = 'progression' | 'limited' | 'cosmetic';
 
 interface TrackerItem {
@@ -164,6 +164,7 @@ interface TrackerItem {
   summary: string;               // one or two sentences
   timeCost: TimeCost;            // coarse time on a day it is played, always set
   daysPerWeek: number;           // 1 to 7: how many days a week it is played
+  claimUntil: string | null;     // last moment to claim rewards, when later than endsAt
   why: string;                   // one sentence justifying the scores
   value: {
     progression: Record<Profile, Tier>;
@@ -250,6 +251,8 @@ The home page shows everything running now in one list, so players do not open p
 
 - **Sources.** Every stored post. A quest with an end date stays until it ends, however old its post is. Permanent items count only from posts published in the last 100 days (and only from the latest patch, see below).
 - **Quests and news.** Only an activity with an end date is a quest and gets a tier. System changes and permanent content are not tasks, so a tier ("skip", "if free") makes no sense for them: they are listed untiered in a "What changed this patch" panel under the quest log, and they take no part in the ranking.
+- **Claim window.** `endsAt` is the last moment a player can make progress. When rewards can be claimed later, `claimUntil` holds that deadline: after `endsAt` the quest stays listed as a one-click "Claim rewards" Must Do until `claimUntil`, so nobody forgets rewards they earned.
+- **Idle quests.** An AFK activity has the time class `idle`: it uses no playtime, is not promoted as a quick claim and is not cut for time.
 - **Not started yet.** A quest whose start date is in the future shows "Starts <date>" instead of a countdown.
 - **Rough ratings.** When most of the list was rated by a backup model, one notice above the tabs replaces the per-quest "Rough rating" chips.
 - **New since last visit.** The browser remembers the previous visit (`lazy-tracker:visits` in localStorage) and marks quests from posts published after it.
@@ -260,7 +263,7 @@ The home page shows everything running now in one list, so players do not open p
 
 ### What the prompt knows about progression
 
-The same reward is worth different amounts to different players, so the prompt (version 10) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
+The same reward is worth different amounts to different players, so the prompt (version 11) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
 
 ### Picking pictures
 

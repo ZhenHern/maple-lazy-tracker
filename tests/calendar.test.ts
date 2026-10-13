@@ -11,6 +11,7 @@ function quest(overrides: Partial<TrackerItem>): TrackerItem {
     why: "",
     timeCost: "instant",
     daysPerWeek: 7,
+    claimUntil: null,
     scores: { progression: { casual: 90, endgame: 50, returning: 90 }, limited: 0, cosmetic: 0 },
     value: {
       progression: { casual: "must_do", endgame: "if_free", returning: "must_do" },

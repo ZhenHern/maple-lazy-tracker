@@ -63,8 +63,25 @@ export interface Plan {
    * Why the plan differs from the reward-value tier, or null when it does not.
    * quick: promoted, it takes a minute or two. over: it does not fit the day.
    * soon: it has not opened yet, so it is not part of today at all.
+   * claim: it has ended; only its rewards are left to collect.
    */
-  note: "quick" | "over" | "soon" | null;
+  note: "quick" | "over" | "soon" | "claim" | null;
+}
+
+/** The last moment a quest still matters: its claim deadline if it has one, else its end. */
+export function closesAt(item: Pick<TrackerItem, "endsAt" | "claimUntil">): string | null {
+  return item.claimUntil ?? item.endsAt;
+}
+
+/** True when a quest can no longer be played but its rewards can still be claimed. */
+export function claimOnly(item: TrackerItem, now: number | null): boolean {
+  return (
+    now !== null &&
+    item.endsAt !== null &&
+    item.claimUntil !== null &&
+    Date.parse(item.endsAt) <= now &&
+    Date.parse(item.claimUntil) > now
+  );
 }
 
 /** True when a quest has a start date that is still ahead of `now`. */
@@ -93,6 +110,8 @@ function demote(tier: Tier): Tier {
  *    today, so it neither takes time nor counts as a Must Do yet.
  *    An idle (AFK) quest takes no playtime either, and keeps the tier its
  *    rewards earn: it is not a one-click claim, so it is not promoted.
+ *    A quest that has ended but whose rewards can still be claimed is a
+ *    one-click Must Do until its claim deadline.
  * 2. A quest that costs a minute or two a day is a Must Do for everyone,
  *    unless its rewards are worthless to this player (it was a Skip). A daily
  *    check-in costs nothing, so there is no reason to pass on it.
@@ -123,6 +142,12 @@ export function planDay(
 
     if (notOpenYet(item, now)) {
       plans.set(item.id, { tier: base, note: "soon" });
+    } else if (claimOnly(item, now)) {
+      // Collecting earned rewards is a one-click job nobody should miss.
+      plans.set(
+        item.id,
+        base === "skip" ? { tier: "skip", note: null } : { tier: "must_do", note: "claim" },
+      );
     } else if (item.timeCost === "idle") {
       // Not a task that competes for the day: it keeps the tier its rewards earn.
       plans.set(item.id, { tier: base, note: null });
@@ -161,7 +186,7 @@ export function plannedMinutes(items: TrackerItem[], plans: Map<string, Plan>): 
   const total = items
     .filter((item) => {
       const plan = plans.get(item.id);
-      return plan?.tier === "must_do" && plan.note !== "soon";
+      return plan?.tier === "must_do" && plan.note !== "soon" && plan.note !== "claim";
     })
     .reduce((sum, item) => sum + dailyMinutes(item), 0);
   return Math.round(total);

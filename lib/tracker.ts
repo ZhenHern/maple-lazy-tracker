@@ -52,7 +52,7 @@ function latestPatchDate(posts: StoredPost[]): string | undefined {
 function countRunning(post: StoredPost, now: number, latestPatch: string | undefined): number {
   const current = post.kind !== "patch" || post.publishedAt === latestPatch;
   return post.items.filter((item) =>
-    item.endsAt === null ? current : Date.parse(item.endsAt) > now,
+    item.endsAt === null ? current : Date.parse(item.claimUntil ?? item.endsAt) > now,
   ).length;
 }
 

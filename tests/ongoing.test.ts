@@ -14,6 +14,7 @@ function item(title: string, overrides: Partial<StoredItem> = {}): StoredItem {
     why: "",
     timeCost: "short",
     daysPerWeek: 7,
+    claimUntil: null,
     value: { progression: { casual: 80, endgame: 80, returning: 80 }, limited: 0, cosmetic: 0 },
     rewards: [],
     startsAt: null,
@@ -136,5 +137,17 @@ describe("idle quests", () => {
       tier: "if_free",
       note: null,
     });
+  });
+});
+
+describe("claim window", () => {
+  it("keeps a quest listed after it ends, until its rewards can no longer be claimed", () => {
+    const claimable = item("Winter Countdown", {
+      endsAt: "2026-10-10T23:59:00Z",
+      claimUntil: "2026-10-24T23:59:00Z",
+    });
+    const gone = item("Old Event", { endsAt: "2026-10-10T23:59:00Z" });
+    const { items } = buildOngoing([post("10", "event", [claimable, gone])], NOW, false);
+    expect(titles(items)).toEqual(["Winter Countdown"]);
   });
 });

@@ -202,7 +202,11 @@ export function buildDayPlans(
         profile,
         playtime,
         minutes: plannedMinutes(items, plans),
-        mustDo: items.filter((item) => plans.get(item.id)?.tier === "must_do").length,
+        // What the home page's Must Do tab holds: quests under "Soon" are not in it.
+        mustDo: items.filter((item) => {
+          const plan = plans.get(item.id);
+          return plan?.tier === "must_do" && plan.note !== "soon";
+        }).length,
       });
     }
   }

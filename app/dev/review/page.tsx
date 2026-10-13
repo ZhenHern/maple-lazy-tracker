@@ -199,7 +199,9 @@ async function Lab() {
                                 ? "-"
                                 : cell.note === "soon"
                                   ? " soon"
-                                  : ""}
+                                  : cell.note === "claim"
+                                    ? " claim"
+                                    : ""}
                           </span>
                         </td>
                       );

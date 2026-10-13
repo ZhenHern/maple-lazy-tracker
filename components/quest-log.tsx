@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
 import {
   DEFAULT_PLAYTIME,
+  closesAt,
   planDay,
   plannedMinutes,
   PLAYTIMES,
@@ -179,7 +180,10 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
   // Ended quests take no part in the day's plan.
   const running = useMemo(
     () =>
-      allItems.filter((item) => !(item.endsAt !== null && Date.parse(item.endsAt) <= now)),
+      allItems.filter((item) => {
+        const closes = closesAt(item);
+        return closes === null || Date.parse(closes) > now;
+      }),
     [allItems, now],
   );
   // The tier of every running quest for this player and this much playtime.

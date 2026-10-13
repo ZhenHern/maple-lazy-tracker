@@ -49,6 +49,9 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     rewards: z.array(z.string()),
     startsAt: isoDate.nullable(),
     endsAt: isoDate.nullable(),
+    // When rewards can still be claimed after endsAt, the last moment to claim
+    // them. The quest stays listed as "claim your rewards" until then.
+    claimUntil: isoDate.nullable(),
     timeEstimate: z
       .object({
         label: z.string().min(1),
@@ -74,6 +77,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   why: z.string().default(""),
   timeCost: z.enum(TIME_COSTS).default("short"),
   daysPerWeek: z.number().default(7),
+  claimUntil: isoDate.nullable().default(null),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

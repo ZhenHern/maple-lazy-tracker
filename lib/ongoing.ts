@@ -133,7 +133,9 @@ export function selectOngoing(
       rating: ratingOf(post.model),
     };
     for (const item of post.items) {
-      if (item.endsAt !== null && Date.parse(item.endsAt) <= now) continue;
+      // A quest stays until its rewards can no longer be claimed.
+      const closes = item.claimUntil ?? item.endsAt;
+      if (closes !== null && Date.parse(closes) <= now) continue;
       if (item.endsAt === null && stale) continue;
       // A repeat is the same title in ANOTHER post (the patch notes and the
       // event's own notice). Inside one post, "Operation: Dive" and

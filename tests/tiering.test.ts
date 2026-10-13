@@ -20,6 +20,7 @@ function quest(
     why: "",
     timeCost,
     daysPerWeek: 7,
+    claimUntil: null,
     value: {
       progression: { casual: tier, endgame: tier, returning: tier },
       limited: "skip",
@@ -167,5 +168,26 @@ describe("planDay", () => {
     const outfit = cosmeticQuest("outfit", 95, "short");
     expect(planDay([outfit], "casual", ["progression"], 30, NOW).get("outfit")?.tier).toBe("skip");
     expect(planDay([outfit], "casual", ["cosmetic"], 30, NOW).get("outfit")?.tier).toBe("must_do");
+  });
+});
+
+describe("claim-only quests", () => {
+  it("become a one-click Must Do once the event is over but rewards remain", () => {
+    const ended = quest("check-in", "if_free", 50, "short", {
+      endsAt: "2026-10-10T23:59:00Z",
+      claimUntil: "2026-10-24T23:59:00Z",
+    });
+    const plans = planDay([ended], "casual", ["progression"], 15, NOW);
+    expect(plans.get("check-in")).toEqual({ tier: "must_do", note: "claim" });
+    // Claiming takes no playtime.
+    expect(plannedMinutes([ended], plans)).toBe(0);
+  });
+
+  it("stay a Skip when the rewards were worthless to this player", () => {
+    const ended = quest("junk", "skip", 5, "short", {
+      endsAt: "2026-10-10T23:59:00Z",
+      claimUntil: "2026-10-24T23:59:00Z",
+    });
+    expect(planDay([ended], "casual", ["progression"], 15, NOW).get("junk")?.tier).toBe("skip");
   });
 });

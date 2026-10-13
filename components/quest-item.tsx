@@ -45,13 +45,14 @@ interface QuestItemProps {
   /** True when the quest appeared since the visitor's previous visit. */
   isNew?: boolean;
   /** Set when the daily playtime moved this quest to another tier. */
-  planNote?: "quick" | "over" | "soon" | null;
+  planNote?: "quick" | "over" | "soon" | "claim" | null;
 }
 
 const PLAN_NOTE = {
   quick: { chip: "Takes a minute", text: "Promoted to Must Do because it costs almost no time." },
   over: { chip: "Over your time", text: "Moved down because it does not fit your daily playtime." },
   soon: { chip: "Not open yet", text: "It has not started, so it is not part of today's plan." },
+  claim: { chip: "Claim rewards", text: "The event is over. Only the rewards are left to collect." },
 };
 
 const TIME_COST_LABEL = {
@@ -151,7 +152,12 @@ export function QuestItem({
                   {PLAN_NOTE[planNote].chip}
                 </span>
               )}
-              <Countdown startsAt={item.startsAt} endsAt={item.endsAt} now={now} />
+              <Countdown
+                startsAt={item.startsAt}
+                endsAt={item.endsAt}
+                claimUntil={item.claimUntil}
+                now={now}
+              />
               {ratingNote && (
                 // A list that is mostly rough hides this chip and shows one
                 // notice instead (see .ratings-rough in globals.css).
@@ -221,6 +227,12 @@ export function QuestItem({
               <dt>When</dt>
               <dd>
                 {whenText(item, now)}
+                {item.claimUntil && (
+                  <span className="fact-note">
+                    {" "}
+                    Rewards can be claimed until {formatDate(item.claimUntil)}.
+                  </span>
+                )}
                 {elapsed !== null && elapsed < 100 && (
                   <span className="fact-note"> {Math.round(elapsed)}% of the run has passed.</span>
                 )}

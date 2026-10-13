@@ -22,11 +22,13 @@ interface CountdownProps {
   /** When set and still in the future, the chip says when the quest opens. */
   startsAt?: string | null;
   endsAt: string | null;
+  /** When rewards can still be claimed after the end, the last moment to do so. */
+  claimUntil?: string | null;
   /** Current time in ms, or null before hydration. */
   now: number | null;
 }
 
-export function Countdown({ startsAt = null, endsAt, now }: CountdownProps) {
+export function Countdown({ startsAt = null, endsAt, claimUntil = null, now }: CountdownProps) {
   // Not open yet: saying "29 days left" would send players to an event that
   // does not exist in the game today.
   if (now !== null && startsAt !== null && Date.parse(startsAt) > now) {
@@ -45,6 +47,14 @@ export function Countdown({ startsAt = null, endsAt, now }: CountdownProps) {
     return <span className="chip chip-quiet">Ends {date}</span>;
   }
   const remaining = Date.parse(endsAt) - now;
+  if (remaining <= 0 && claimUntil !== null && Date.parse(claimUntil) > now) {
+    // Over, but the rewards are still waiting.
+    return (
+      <span className="chip chip-urgent" title={`Claim by ${formatDate(claimUntil)} (UTC)`}>
+        Claim by {formatDate(claimUntil)}
+      </span>
+    );
+  }
   if (remaining <= 0) {
     return <span className="chip chip-quiet">Ended {date}</span>;
   }

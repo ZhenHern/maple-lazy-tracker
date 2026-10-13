@@ -90,7 +90,7 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       continue;
     }
 
-    let { startsAt, endsAt, timeEstimate } = item;
+    let { startsAt, endsAt, claimUntil, timeEstimate } = item;
     if (startsAt && !isGroundedDate(startsAt, dates, post.publishedAt)) {
       warnings.push(`"${item.title}": start date ${startsAt} is not in the post, cleared`);
       startsAt = null;
@@ -98,6 +98,16 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
     if (endsAt && !isGroundedDate(endsAt, dates, post.publishedAt)) {
       warnings.push(`"${item.title}": end date ${endsAt} is not in the post, cleared`);
       endsAt = null;
+    }
+    // A claim deadline only means something after an end date the post states.
+    if (
+      claimUntil &&
+      (!endsAt ||
+        Date.parse(claimUntil) <= Date.parse(endsAt) ||
+        !isGroundedDate(claimUntil, dates, post.publishedAt))
+    ) {
+      warnings.push(`"${item.title}": claim deadline ${claimUntil} is not usable, cleared`);
+      claimUntil = null;
     }
     if (startsAt && endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) {
       warnings.push(`"${item.title}": ends before it starts, start date cleared`);
@@ -139,7 +149,7 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       };
     }
 
-    kept.push({ ...item, startsAt, endsAt, rewards, timeEstimate });
+    kept.push({ ...item, startsAt, endsAt, claimUntil, rewards, timeEstimate });
   }
   // A notice about a single event states its period outright, and code reads
   // that more reliably than a model does (models sometimes copy the Pacific
