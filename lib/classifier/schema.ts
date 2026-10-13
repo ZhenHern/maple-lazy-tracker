@@ -57,6 +57,11 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     // itself, because models get this division wrong. null when not stated.
     weeklyTarget: z.number().nullable(),
     dailyCap: z.number().nullable(),
+    // Monsters to defeat on a day the item is played, for the full reward.
+    // Code turns this into minutes (see HUNT_RATE in grounding.ts), because
+    // a kill count is a fact and "how long is that" is arithmetic. null when
+    // the item is not about hunting or the post gives no count.
+    killsPerDay: z.number().nullable(),
     // One sentence on who should bother and why. Shown on the card so a
     // player can judge the rating instead of taking it on trust.
     why: z.string(),
@@ -110,6 +115,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   daysPerWeek: z.number().default(7),
   weeklyTarget: z.number().nullable().default(null),
   dailyCap: z.number().nullable().default(null),
+  killsPerDay: z.number().nullable().default(null),
   claimUntil: isoDate.nullable().default(null),
   steps: z.array(storedStepSchema).default([]),
   requires: z.string().nullable().default(null),

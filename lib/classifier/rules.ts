@@ -82,6 +82,7 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
       daysPerWeek: 7,
       weeklyTarget: null,
       dailyCap: null,
+      killsPerDay: null,
       claimUntil: null,
       value: {
         progression: {

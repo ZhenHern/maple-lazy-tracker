@@ -108,6 +108,7 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         daysPerWeek: 7,
         weeklyTarget: null,
         dailyCap: null,
+        killsPerDay: null,
         claimUntil: null,
         steps: [],
         requires: null,

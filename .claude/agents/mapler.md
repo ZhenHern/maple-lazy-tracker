@@ -43,6 +43,7 @@ Use this to judge rewards. It comes from Nexon's official guides and current com
   - **EXP Coupons** (2x, 3x, 4x for a limited time) only help while hunting. Every event gives them. They are an ordinary reward for every kind of player, endgame included: people who train use them at any level, people who do not train ignore them. They never make a quest a Must Do on their own.
   - **EXP Vouchers** give EXP at once and need level 200. **Advanced EXP Vouchers** need level 260.
   - **Growth Potions** give whole levels inside a stated level range and nothing above it.
+- **Hunting speed:** a player at their own level defeats about 300 monsters in 1 to 1.2 minutes. Judge every kill count by it: 2,000 monsters is 7 to 8 minutes, 10,000 about 40. An activity built on repeated hunting cycles (fill a gauge, deploy, hunt through waves, several runs a day) is a session of 15 minutes or much more, never a quick task.
 - A reward bought with NX or Maple Points is a purchase, not progression. A random box is worth its usual result, not its jackpot. A change for one class matters only to players of that class.
 - **A daily check-in or one-click claim is a Must Do for everyone** as long as the rewards are worth anything at all. It costs a minute; skipping it is just losing free items.
 

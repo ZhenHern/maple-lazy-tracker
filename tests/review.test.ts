@@ -15,6 +15,7 @@ function item(title: string, casual: number, overrides: Partial<StoredItem> = {}
     daysPerWeek: 7,
     weeklyTarget: null,
     dailyCap: null,
+    killsPerDay: null,
     claimUntil: null,
     steps: [],
     requires: null,

@@ -233,6 +233,22 @@ function foldFeeders(items: ScoredItem[], warnings: string[]): ScoredItem[] {
   return result.filter((item) => !removed.has(item.id));
 }
 
+// How fast a player clears monsters at their own level: 300 take about 1 to
+// 1.2 minutes (the site owner's figure, as a long-time player). Every kill
+// count in a post becomes time through this one number.
+const HUNT_RATE = 270;
+
+/** The time class of hunting `kills` monsters, by the same bands the prompt describes. */
+function huntingClass(kills: number): "instant" | "short" | "medium" | "long" {
+  const minutes = kills / HUNT_RATE;
+  if (minutes <= 2) return "instant";
+  if (minutes <= 15) return "short";
+  if (minutes <= 45) return "medium";
+  return "long";
+}
+
+const CLASS_ORDER = ["instant", "short", "medium", "long"];
+
 const DAY = 86_400_000;
 const TIME_UNIT = /\b(sec|second|min|minute|hr|hour)s?\b/i;
 
@@ -400,9 +416,39 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       }
     }
 
+    // A kill count the model reported is turned into time here. It can only
+    // make the item longer than the model said: models underrate hunting far
+    // more often than they overrate it.
+    let timeCost = item.timeCost;
+    const kills = item.killsPerDay;
+    if (kills && kills > 0 && kills <= 500_000 && timeCost !== "idle") {
+      const hunted = huntingClass(kills);
+      const minutes = Math.round(kills / HUNT_RATE);
+      if (CLASS_ORDER.indexOf(hunted) > CLASS_ORDER.indexOf(timeCost)) {
+        warnings.push(
+          `"${item.title}": ${kills} monsters is about ${minutes} min of hunting, time class raised from ${timeCost} to ${hunted}`,
+        );
+        timeCost = hunted;
+      }
+      // The estimate is only written when the count explains the whole time
+      // class. A count that comes out shorter than the model's class is a part
+      // of the activity (one run of several), and "11 minutes" beside
+      // "15 to 45 minutes" would contradict itself.
+      const explains = hunted === timeCost;
+      if (explains && !news && (!timeEstimate || timeEstimate.basis !== "stated")) {
+        timeEstimate = {
+          label: `About ${minutes} min of hunting a day (${kills.toLocaleString("en-US")} monsters)`,
+          minutesPerWeek: minutes * daysPerWeek,
+          effort: hunted === "long" ? "high" : hunted === "medium" ? "medium" : "low",
+          basis: "calculated",
+        };
+      }
+    }
+
     kept.push({
       ...item,
       value,
+      timeCost,
       daysPerWeek,
       startsAt,
       endsAt,

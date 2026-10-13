@@ -35,6 +35,7 @@ function item(id: string, overrides: Partial<ScoredItem> = {}): ScoredItem {
     daysPerWeek: 7,
     weeklyTarget: null,
     dailyCap: null,
+    killsPerDay: null,
     claimUntil: null,
     steps: [],
     requires: null,
@@ -186,5 +187,30 @@ describe("rates, draws and days per week", () => {
     const { items } = groundItems([track, seat, guardian], post);
     expect(items.map((each) => each.id)).toEqual([track.id, guardian.id]);
     expect(items[0].steps.map((step) => step.name)).toEqual(["Real Gains in Virtual Training"]);
+  });
+});
+
+describe("hunting time", () => {
+  it("turns a kill count into a time class and an estimate", () => {
+    const mission = item("Special Mission", { timeCost: "instant", killsPerDay: 2000, timeEstimate: null });
+    const { items, warnings } = groundItems([mission], post);
+    // 2,000 monsters at about 270 a minute is 7 to 8 minutes.
+    expect(items[0].timeCost).toBe("short");
+    expect(items[0].timeEstimate).toMatchObject({ basis: "calculated", minutesPerWeek: 7 * 7 });
+    expect(items[0].timeEstimate?.label).toContain("2,000 monsters");
+    expect(warnings.some((warning) => warning.includes("raised from instant to short"))).toBe(true);
+  });
+
+  it("makes a long hunting session long, and never shortens what the model said", () => {
+    const session = item("Go Go Sidekick", { timeCost: "short", killsPerDay: 15000 });
+    expect(groundItems([session], post).items[0].timeCost).toBe("long");
+    const quick = item("Go Go Sidekick", { timeCost: "medium", killsPerDay: 300 });
+    const kept = groundItems([quick], post).items[0];
+    expect(kept.timeCost).toBe("medium");
+    // A count that only covers part of the activity does not rewrite the estimate.
+    expect(kept.timeEstimate?.label).toBe("10 min a day");
+    // An AFK activity stays idle whatever count comes with it.
+    const idle = item("Sauna", { timeCost: "idle", killsPerDay: 5000 });
+    expect(groundItems([idle], post).items[0].timeCost).toBe("idle");
   });
 });

@@ -22,6 +22,7 @@ function quest(
     daysPerWeek: 7,
     weeklyTarget: null,
     dailyCap: null,
+    killsPerDay: null,
     claimUntil: null,
     steps: [],
     requires: null,
