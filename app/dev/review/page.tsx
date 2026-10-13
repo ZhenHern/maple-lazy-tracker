@@ -4,7 +4,14 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { PROMPT_VERSION } from "@/lib/classifier/prompt";
 import { readAllPosts } from "@/lib/db/store";
-import { AXES, buildReview, type Axis, type Rated, type ReviewRow } from "@/lib/dev/review";
+import {
+  AXES,
+  buildDayPlans,
+  buildReview,
+  type Axis,
+  type Rated,
+  type ReviewRow,
+} from "@/lib/dev/review";
 import { readLatestTrial } from "@/lib/dev/trial";
 
 // The prompt lab's review page, at /dev/review. Development only.
@@ -83,14 +90,24 @@ async function loadReview() {
   // Rows arrive sorted by post, so grouping is one pass.
   const groups = new Map<string, ReviewRow[]>();
   for (const row of rows) groups.set(row.sourceId, [...(groups.get(row.sourceId) ?? []), row]);
-  return { trial, differences, groups };
+  const now = Date.now();
+  return {
+    trial,
+    differences,
+    groups,
+    // The page's default (nothing picked, all three count) and progression only.
+    plans: [
+      { label: "Default: no priority picked, so progression, limited and cosmetic all count", ...buildDayPlans(posts, [], now) },
+      { label: "Progression only", ...buildDayPlans(posts, ["progression"], now) },
+    ],
+  };
 }
 
 async function Lab() {
   // This page must show the files as they are right now, so it opts out of
   // being built ahead of time.
   await connection();
-  const { trial, differences, groups } = await loadReview();
+  const { trial, differences, groups, plans } = await loadReview();
 
   return (
     <>
@@ -136,6 +153,69 @@ async function Lab() {
           </ul>
         </div>
       </section>
+
+      {plans.map((plan) => (
+        <section key={plan.label} className="window">
+          <h2 className="window-title">
+            Day plans
+            <span className="window-note">{plan.label}</span>
+          </h2>
+          <div className="window-body review-scroll">
+            <p className="review-note">
+              What the home page shows each kind of player. M = Must Do, F = If Free, S = Skip. A
+              plus means promoted for taking a minute; a minus means moved down for not fitting the
+              playtime. The last rows give the Must Do count and its minutes a day.
+            </p>
+            <table className="review-table">
+              <thead>
+                <tr>
+                  <th scope="col">Quest (time class)</th>
+                  {plan.columns.map((column) => (
+                    <th key={column.key} scope="col">
+                      {column.profile} {column.playtime}m
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {plan.rows.map((row) => (
+                  <tr key={row.id}>
+                    <th scope="row">
+                      <span className="review-title">{row.title}</span>
+                      <span className="review-note">
+                        {row.timeCost} · starts {day(row.startsAt)} · ends {day(row.endsAt)}
+                      </span>
+                    </th>
+                    {plan.columns.map((column) => {
+                      const cell = row.cells[column.key];
+                      return (
+                        <td key={column.key}>
+                          <span className={`review-tier tier-${cell.tier}`}>
+                            {TIER_LABEL[cell.tier][0]}
+                            {cell.note === "quick" ? "+" : cell.note === "over" ? "-" : ""}
+                          </span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+                <tr>
+                  <th scope="row">Must Do quests</th>
+                  {plan.columns.map((column) => (
+                    <td key={column.key}>{column.mustDo}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <th scope="row">Minutes a day</th>
+                  {plan.columns.map((column) => (
+                    <td key={column.key}>{column.minutes}</td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
 
       {[...groups].map(([sourceId, group]) => (
         <section key={sourceId} className="window">

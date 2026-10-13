@@ -1,7 +1,9 @@
 import { calibrate } from "@/lib/classifier/calibrate";
 import { normalizeTitle } from "@/lib/images";
-import { selectOngoing, type SourcedItem } from "@/lib/ongoing";
-import type { Profile, StoredPost, Tier, TrackerItem } from "@/lib/types";
+import { PROFILES } from "@/lib/classifier/schema";
+import { buildOngoing, selectOngoing, type SourcedItem } from "@/lib/ongoing";
+import { planDay, plannedMinutes, type Plan, type Playtime } from "@/lib/tiering";
+import type { Priority, Profile, StoredPost, Tier, TrackerItem } from "@/lib/types";
 
 // Builds the comparison the review page shows: every running quest with its
 // live rating, and next to it the rating the latest trial would give. Pure
@@ -141,4 +143,68 @@ export function buildReview(livePosts: StoredPost[], trialPosts: StoredPost[], n
       a.title.localeCompare(b.title),
   );
   return { rows, differences: rows.filter((row) => row.status !== "same").length };
+}
+
+// ---------- Day plans: what each kind of player actually sees ----------
+
+/** The playtimes shown in the plan table (no limit is left out to keep it readable). */
+export const PLAN_PLAYTIMES: Playtime[] = [15, 30, 60];
+
+export interface PlanColumn {
+  key: string;
+  profile: Profile;
+  playtime: Playtime;
+  /** Minutes a day the Must Do quests of this column add up to. */
+  minutes: number;
+  mustDo: number;
+}
+
+export interface PlanRow {
+  id: string;
+  title: string;
+  timeCost: string;
+  startsAt: string | null;
+  endsAt: string | null;
+  /** The planned tier per column key. */
+  cells: Record<string, Plan>;
+}
+
+/**
+ * The tier of every quest for each job at each playtime, with the given
+ * priorities (an empty list is the page's default: all three count). This is
+ * the home page's sorting, laid out so every combination can be read at once.
+ */
+export function buildDayPlans(
+  posts: StoredPost[],
+  priorities: Priority[],
+  now: number,
+): { columns: PlanColumn[]; rows: PlanRow[] } {
+  const { items } = buildOngoing(posts, now, false);
+  const columns: PlanColumn[] = [];
+  const rows: PlanRow[] = items.map((item) => ({
+    id: item.id,
+    title: item.title,
+    timeCost: item.timeCost,
+    startsAt: item.startsAt,
+    endsAt: item.endsAt,
+    cells: {},
+  }));
+
+  for (const profile of PROFILES) {
+    for (const playtime of PLAN_PLAYTIMES) {
+      const key = `${profile}-${playtime}`;
+      const plans = planDay(items, profile, priorities, playtime, now);
+      items.forEach((item, index) => {
+        rows[index].cells[key] = plans.get(item.id) ?? { tier: "skip", note: null };
+      });
+      columns.push({
+        key,
+        profile,
+        playtime,
+        minutes: plannedMinutes(items, plans, now),
+        mustDo: items.filter((item) => plans.get(item.id)?.tier === "must_do").length,
+      });
+    }
+  }
+  return { columns, rows };
 }

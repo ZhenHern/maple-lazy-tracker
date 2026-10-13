@@ -78,7 +78,6 @@ const CATEGORIES: { key: CategoryFilter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "event", label: "Events" },
   { key: "content", label: "New content" },
-  { key: "system", label: "System" },
 ];
 
 // Stable sanitizers for useLocalStorage: stored data is untrusted input too.

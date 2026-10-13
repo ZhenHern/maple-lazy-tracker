@@ -1347,6 +1347,29 @@ body {
   animation: nudge 1.6s ease-in-out infinite;
 }
 
+/* ---------- Patch news: changes that are not tasks ---------- */
+
+.news-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.news-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.news-text {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+}
+
 /* ---------- Prompt lab (/dev/review, development only) ---------- */
 
 .review-page {

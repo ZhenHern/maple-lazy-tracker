@@ -12,8 +12,20 @@ import type { ItemSource, PostSummary, StoredItem, StoredPost, TrackerItem } fro
 const WINDOW_DAYS = 100;
 const DAY = 86_400_000;
 
+/** A change that is not a task: shown as news, never given a tier. */
+export interface NewsItem {
+  id: string;
+  title: string;
+  category: StoredItem["category"];
+  summary: string;
+  source: ItemSource;
+}
+
 export interface OngoingTracker {
+  /** Quests: activities with an end date. Only these get tiers. */
   items: TrackerItem[];
+  /** System changes and permanent content of the current patch, untiered. */
+  news: NewsItem[];
   /** Official posts that contributed at least one ongoing item. */
   sources: PostSummary[];
   /** When the newest contributing post was classified, or null if there is no data. */
@@ -40,15 +52,23 @@ function stripImages(item: StoredItem): StoredItem {
   return { ...item, images: [], rewardImages: [] };
 }
 
+// A quest is something to do before a deadline. A system change or a piece
+// of permanent content is not: there is nothing to "skip" or to do "if free",
+// so giving it a tier makes no sense. Those are listed separately as news.
+function isQuest(item: StoredItem): boolean {
+  return item.endsAt !== null && item.category !== "system";
+}
+
 /**
- * The quests running at `now`, still carrying their raw scores: ended items
- * dropped, stale permanent items hidden, cross-post repeats merged.
+ * What is current at `now`, still carrying raw scores: ended items dropped,
+ * stale permanent items hidden, cross-post repeats merged. `items` are the
+ * quests (dated activities); `news` is everything else.
  */
 export function selectOngoing(
   allPosts: StoredPost[],
   now: number,
   showImages: boolean,
-): { items: SourcedItem[]; contributing: StoredPost[] } {
+): { items: SourcedItem[]; news: SourcedItem[]; contributing: StoredPost[] } {
   const posts = [...allPosts].sort(byPreference);
   // Posts older than this no longer contribute permanent items. A dated item
   // stays until it ends, however old its post is: a long event must not drop
@@ -103,7 +123,11 @@ export function selectOngoing(
   const contributing = posts.filter((post) =>
     items.some((item) => item.source.sourceId === post.sourceId),
   );
-  return { items, contributing };
+  return {
+    items: items.filter(isQuest),
+    news: items.filter((item) => !isQuest(item)),
+    contributing,
+  };
 }
 
 /** `selectOngoing`, then tiers ranked over the combined list. */
@@ -112,9 +136,17 @@ export function buildOngoing(
   now: number,
   showImages: boolean,
 ): OngoingTracker {
-  const { items, contributing } = selectOngoing(allPosts, now, showImages);
+  const { items, news, contributing } = selectOngoing(allPosts, now, showImages);
   return {
+    // Tiers are ranked among quests only, so news never takes a Must Do slot.
     items: calibrate(items),
+    news: news.map(({ id, title, category, summary, source }) => ({
+      id,
+      title,
+      category,
+      summary,
+      source,
+    })),
     sources: contributing
       .map(({ sourceId, kind, title, url, publishedAt, thumbnailUrl }) => ({
         sourceId,

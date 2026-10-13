@@ -248,6 +248,7 @@ Not yet verified: the Supabase store has only run against a local stand-in for S
 The home page shows everything running now in one list, so players do not open posts one by one.
 
 - **Sources.** Every stored post. A quest with an end date stays until it ends, however old its post is. Permanent items count only from posts published in the last 100 days (and only from the latest patch, see below).
+- **Quests and news.** Only an activity with an end date is a quest and gets a tier. System changes and permanent content are not tasks, so a tier ("skip", "if free") makes no sense for them: they are listed untiered in a "What changed this patch" panel under the quest log, and they take no part in the ranking.
 - **Not started yet.** A quest whose start date is in the future shows "Starts <date>" instead of a countdown.
 - **Rough ratings.** When most of the list was rated by a backup model, one notice above the tabs replaces the per-quest "Rough rating" chips.
 - **New since last visit.** The browser remembers the previous visit (`lazy-tracker:visits` in localStorage) and marks quests from posts published after it.

@@ -67,7 +67,7 @@ function formatDay(iso: string): string {
 // Reads the cached list (see getOngoing). No AI call ever happens here: the
 // daily cron does the classifying, visitors only ever read its results.
 async function Tracker() {
-  const { items, sources, updatedAt } = await getOngoing();
+  const { items, news, sources, updatedAt } = await getOngoing();
 
   if (items.length === 0) {
     return (
@@ -95,6 +95,29 @@ async function Tracker() {
   return (
     <div className="grid gap-4 sm:gap-5">
       <QuestLog items={items} updated={updatedAt ? formatDay(updatedAt) : null} />
+
+      {/* Changes with no deadline are news, not tasks, so they get no tier. */}
+      {news.length > 0 && (
+        <section className="window">
+          <h2 className="window-title">
+            What changed this patch
+            <span className="window-note">Nothing to do, just good to know</span>
+          </h2>
+          <ul className="window-body news-list">
+            {news.map((entry) => (
+              <li key={entry.id}>
+                <span className="news-title">
+                  {entry.title}
+                  <span className="chip chip-quiet">
+                    {entry.category === "system" ? "System change" : "Permanent content"}
+                  </span>
+                </span>
+                <span className="news-text">{entry.summary}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="window">
         <h2 className="window-title">
