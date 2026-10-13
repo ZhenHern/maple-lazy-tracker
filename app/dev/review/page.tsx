@@ -164,7 +164,8 @@ async function Lab() {
             <p className="review-note">
               What the home page shows each kind of player. M = Must Do, F = If Free, S = Skip. A
               plus means promoted for taking a minute; a minus means moved down for not fitting the
-              playtime. The last rows give the Must Do count and its minutes a day.
+              playtime; the word soon means it has not opened, so it is shown under Coming Soon and takes
+              no time today. The last rows give the Must Do count and its minutes a day.
             </p>
             <table className="review-table">
               <thead>
@@ -192,7 +193,13 @@ async function Lab() {
                         <td key={column.key}>
                           <span className={`review-tier tier-${cell.tier}`}>
                             {TIER_LABEL[cell.tier][0]}
-                            {cell.note === "quick" ? "+" : cell.note === "over" ? "-" : ""}
+                            {cell.note === "quick"
+                              ? "+"
+                              : cell.note === "over"
+                                ? "-"
+                                : cell.note === "soon"
+                                  ? " soon"
+                                  : ""}
                           </span>
                         </td>
                       );

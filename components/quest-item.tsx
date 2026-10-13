@@ -45,12 +45,13 @@ interface QuestItemProps {
   /** True when the quest appeared since the visitor's previous visit. */
   isNew?: boolean;
   /** Set when the daily playtime moved this quest to another tier. */
-  planNote?: "quick" | "over" | null;
+  planNote?: "quick" | "over" | "soon" | null;
 }
 
 const PLAN_NOTE = {
-  quick: { chip: "1-min claim", text: "Promoted to Must Do because it takes about a minute." },
+  quick: { chip: "Takes a minute", text: "Promoted to Must Do because it costs almost no time." },
   over: { chip: "Over your time", text: "Moved down because it does not fit your daily playtime." },
+  soon: { chip: "Not open yet", text: "It has not started, so it is not part of today's plan." },
 };
 
 const TIME_COST_LABEL = {
@@ -246,7 +247,14 @@ export function QuestItem({
             <div className="fact">
               <dt>Effort</dt>
               <dd>
-                {TIME_COST_LABEL[item.timeCost]}
+                {TIME_COST_LABEL[item.timeCost].replace(
+                  " a day",
+                  item.daysPerWeek >= 7
+                    ? " a day"
+                    : item.daysPerWeek === 1
+                      ? ", once a week"
+                      : `, ${item.daysPerWeek} days a week`,
+                )}
                 {planNote && <span className="fact-note"> {PLAN_NOTE[planNote].text}</span>}
               </dd>
             </div>

@@ -46,6 +46,24 @@ function isGroundedReward(reward: string, textWords: Set<string>): boolean {
   return found / wanted.length >= REWARD_MATCH;
 }
 
+// Every number written in a text, without thousands separators.
+function numbersIn(text: string): Set<string> {
+  return new Set((text.match(/\d[\d,]*/g) ?? []).map((value) => value.replace(/,/g, "")));
+}
+
+// Models like to add quantities up ("x30" three times becomes "x90"). A sum is
+// not a fact from the post, and a player cannot check it. An amount that the
+// post never writes is taken out; the reward's name stays.
+function withoutInventedAmounts(reward: string, textNumbers: Set<string>): string {
+  return reward
+    .replace(/\(?\bx\s?(\d[\d,]*)\)?|\b(\d[\d,]*)\s?x\b/gi, (match, a, b) =>
+      textNumbers.has(String(a ?? b).replace(/,/g, "")) ? match : "",
+    )
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,;)])/g, "$1")
+    .trim();
+}
+
 const DAY = 86_400_000;
 const TIME_UNIT = /\b(sec|second|min|minute|hr|hour)s?\b/i;
 
@@ -57,6 +75,7 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
   const warnings: string[] = [];
   const dates = findDates(post.text, post.publishedAt);
   const textWords = new Set(words(post.text));
+  const textNumbers = numbersIn(post.text);
 
   const kept: ScoredItem[] = [];
   for (const item of items) {
@@ -85,11 +104,21 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       startsAt = null;
     }
 
-    const rewards = item.rewards.filter((reward) => {
-      const grounded = isGroundedReward(reward, textWords);
-      if (!grounded) warnings.push(`"${item.title}": reward "${reward}" is not in the post, removed`);
-      return grounded;
-    });
+    const rewards = item.rewards
+      .filter((reward) => {
+        const grounded = isGroundedReward(reward, textWords);
+        if (!grounded) {
+          warnings.push(`"${item.title}": reward "${reward}" is not in the post, removed`);
+        }
+        return grounded;
+      })
+      .map((reward) => {
+        const cleaned = withoutInventedAmounts(reward, textNumbers);
+        if (cleaned !== reward) {
+          warnings.push(`"${item.title}": amount in "${reward}" is not in the post, removed`);
+        }
+        return cleaned;
+      });
 
     // "1,000 monsters/day" is a quantity, not a duration. Without a unit of
     // time the estimate is not one a player can plan with.

@@ -201,7 +201,7 @@ export function buildDayPlans(
         key,
         profile,
         playtime,
-        minutes: plannedMinutes(items, plans, now),
+        minutes: plannedMinutes(items, plans),
         mustDo: items.filter((item) => plans.get(item.id)?.tier === "must_do").length,
       });
     }

@@ -27,6 +27,9 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     summary: z.string().min(1),
     // The coarse time class used to fit quests into a player's daily playtime.
     timeCost: z.enum(TIME_COSTS),
+    // On how many days a week the quest is played for full rewards (1 to 7).
+    // A weekly claim is 1; a daily check-in is 7.
+    daysPerWeek: z.number(),
     // One sentence on who should bother and why. Shown on the card so a
     // player can judge the rating instead of taking it on trust.
     why: z.string(),
@@ -68,6 +71,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   // Posts classified before these fields existed have none.
   why: z.string().default(""),
   timeCost: z.enum(TIME_COSTS).default("short"),
+  daysPerWeek: z.number().default(7),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

@@ -20,7 +20,7 @@ import { PROFILE_INFO, ProfilePicker } from "./profile-picker";
 import { QuestItem } from "./quest-item";
 import { StatusBar } from "./status-bar";
 
-type SectionKey = Tier | "ended";
+type SectionKey = Tier | "soon" | "ended";
 type CategoryFilter = TrackerItem["category"] | "all";
 
 interface Section {
@@ -60,6 +60,16 @@ const SECTIONS: Section[] = [
       title: "Nothing to skip. Wow.",
       text: "Everything running right now is worth at least a look.",
       sprite: "chest",
+    },
+  },
+  {
+    key: "soon",
+    title: "Soon",
+    blurb: "Not open yet. Nothing to do today.",
+    empty: {
+      title: "Nothing on the way",
+      text: "Every announced quest has already opened.",
+      sprite: "hourglass",
     },
   },
   {
@@ -143,16 +153,22 @@ interface QuestLogProps {
   items: TrackerItem[];
   /** Human-readable date the data was last refreshed, or null. */
   updated: string | null;
+  /** When the server built the list, in ms. Stands in for the clock until it is known. */
+  builtAt: number;
 }
 
-export function QuestLog({ items: allItems, updated }: QuestLogProps) {
+export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
   const [profile, setProfile] = useLocalStorage("lazy-tracker:profile", sanitizeProfile);
   const [priorities, setPriorities] = useLocalStorage(
     "lazy-tracker:priorities",
     sanitizePriorities,
   );
   const [playtime, setPlaytime] = useLocalStorage("lazy-tracker:playtime", sanitizePlaytime);
-  const now = useNow();
+  const clock = useNow();
+  // The browser's clock is unknown during server rendering and hydration. The
+  // time the list was built is close enough to decide what has opened or
+  // ended, and it is the same on both sides, so the first render matches.
+  const now = clock ?? builtAt;
   const previousVisit = usePreviousVisit();
   const [tab, setTab] = useState<SectionKey>("must_do");
   const [search, setSearch] = useState("");
@@ -163,9 +179,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
   // Ended quests take no part in the day's plan.
   const running = useMemo(
     () =>
-      allItems.filter(
-        (item) => !(now !== null && item.endsAt !== null && Date.parse(item.endsAt) <= now),
-      ),
+      allItems.filter((item) => !(item.endsAt !== null && Date.parse(item.endsAt) <= now)),
     [allItems, now],
   );
   // The tier of every running quest for this player and this much playtime.
@@ -179,10 +193,12 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
       must_do: [],
       if_free: [],
       skip: [],
+      soon: [],
       ended: [],
     };
     for (const item of [...allItems].sort(byDeadline)) {
-      grouped[plans.get(item.id)?.tier ?? "ended"].push(item);
+      const plan = plans.get(item.id);
+      grouped[!plan ? "ended" : plan.note === "soon" ? "soon" : plan.tier].push(item);
     }
     return grouped;
   }, [allItems, plans]);
@@ -192,7 +208,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
 
   const npcLines = useMemo(() => {
     const must = groups.must_do.length;
-    const minutes = plannedMinutes(running, plans, now);
+    const minutes = plannedMinutes(running, plans);
     const lines = [
       `Hey there, ${job.name}! ${plural(allItems.length, "thing")} are running in Maple World, ` +
         `but only ${must} ${must === 1 ? "is a Must Do" : "are Must Do"} for you. I sorted the rest so you can slack off.`,
@@ -323,7 +339,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
           <div className="min-w-0">
             <div className="tabs" role="tablist" aria-label="Tiers" onKeyDown={onTabKeyDown}>
               {SECTIONS.map(({ key, title }) => {
-                if (key === "ended" && groups.ended.length === 0) return null;
+                if ((key === "ended" || key === "soon") && groups[key].length === 0) return null;
                 return (
                   <button
                     key={key}

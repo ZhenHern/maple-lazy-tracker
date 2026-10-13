@@ -11,7 +11,7 @@ const GAUGES: { tier: Tier; label: string }[] = [
 interface StatusBarProps {
   job: { name: string; sprite: SpriteName };
   counts: Record<Tier, number>;
-  active: Tier | "ended";
+  active: Tier | "soon" | "ended";
   onSelect: (tier: Tier) => void;
   /** Takes the visitor back up to the job picker. */
   onChangeJob: () => void;

@@ -599,6 +599,9 @@ body {
 .tier-ended {
   --tier-color: var(--color-ended);
 }
+.tier-soon {
+  --tier-color: #6b4fc4;
+}
 
 .tabs {
   display: flex;

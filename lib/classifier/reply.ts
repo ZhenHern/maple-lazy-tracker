@@ -29,6 +29,8 @@ function normalizeItems(items: ScoredItem[]): ScoredItem[] {
       id: count === 1 ? base : `${base}-${count}`,
       rewards: item.rewards.slice(0, MAX_REWARDS),
       why: item.why.trim().slice(0, 220),
+      // Whatever the model sent, the planner needs a whole number from 1 to 7.
+      daysPerWeek: Math.min(7, Math.max(1, Math.round(item.daysPerWeek) || 7)),
       // An uncertain estimate must never carry a number, whatever the model sent.
       timeEstimate:
         item.timeEstimate?.basis === "uncertain"

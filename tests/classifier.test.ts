@@ -39,6 +39,7 @@ function item(overrides: Partial<ScoredItem> = {}): ScoredItem {
     summary: "Log in daily.",
     why: "A potion a day for one minute.",
     timeCost: "instant",
+    daysPerWeek: 7,
     value: {
       progression: { casual: 70, endgame: 40, returning: 85 },
       limited: 10,
@@ -96,8 +97,19 @@ describe("groundItems", () => {
   });
 
   it("keeps a reward the model reworded slightly", () => {
-    const { items } = groundItems([item({ rewards: ["Sol Erda Fragment x50"] })], post());
-    expect(items[0].rewards).toEqual(["Sol Erda Fragment x50"]);
+    const { items } = groundItems([item({ rewards: ["Sol Erda Fragments (selector)"] })], post());
+    expect(items[0].rewards).toEqual(["Sol Erda Fragments (selector)"]);
+  });
+
+  it("removes an amount the post never states, and keeps one it does", () => {
+    const text = TEXT + "\nDay 9: Sol Erda Fragment x30. Day 14: Sol Erda Fragment x30.";
+    const { items, warnings } = groundItems(
+      // The model added two x30 up to x60: a sum is not a fact from the post.
+      [item({ rewards: ["Sol Erda Fragment x60", "Sol Erda Fragment x30", "Magnificent Growth Potion"] })],
+      post({ text }),
+    );
+    expect(items[0].rewards).toEqual(["Sol Erda Fragment", "Sol Erda Fragment x30", "Magnificent Growth Potion"]);
+    expect(warnings).toHaveLength(1);
   });
 
   it("drops a coin shop listed as an event, and exact duplicates", () => {

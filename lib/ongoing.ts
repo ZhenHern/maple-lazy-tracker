@@ -30,6 +30,12 @@ export interface OngoingTracker {
   sources: PostSummary[];
   /** When the newest contributing post was classified, or null if there is no data. */
   updatedAt: string | null;
+  /**
+   * When this list was built, in ms. The page plans the day with it until the
+   * browser's own clock is available, so server and browser agree on which
+   * quests have opened and the first render matches.
+   */
+  builtAt: number;
 }
 
 /** A stored item (raw 0-100 scores) plus where it came from. */
@@ -158,5 +164,6 @@ export function buildOngoing(
       }))
       .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
     updatedAt: contributing.map((post) => post.classifiedAt).sort().at(-1) ?? null,
+    builtAt: now,
   };
 }

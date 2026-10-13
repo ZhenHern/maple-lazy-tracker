@@ -79,6 +79,7 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
       summary: SUMMARY,
       why: "",
       timeCost: "short",
+      daysPerWeek: 7,
       value: {
         progression: {
           casual: NEUTRAL_SCORE,

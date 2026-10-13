@@ -58,6 +58,7 @@ function scored(title: string): ScoredItem {
     summary: "Do the thing.",
     why: "",
     timeCost: "short",
+    daysPerWeek: 7,
     value: {
       progression: { casual: 60, endgame: 60, returning: 60 },
       limited: 0,

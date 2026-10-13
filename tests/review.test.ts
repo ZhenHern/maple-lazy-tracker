@@ -12,6 +12,7 @@ function item(title: string, casual: number, overrides: Partial<StoredItem> = {}
     summary: "Do it.",
     why: "",
     timeCost: "short",
+    daysPerWeek: 7,
     value: {
       progression: { casual, endgame: 10, returning: 10 },
       limited: 0,

@@ -4,22 +4,25 @@ import type { Priority, Profile, Tier, TimeCost, TrackerItem } from "@/lib/types
 // Turns the model's ratings into the list one particular player sees.
 //
 // The model answers two questions per quest: how valuable are the rewards to
-// each kind of player, and roughly how long does it take a day. It never sees
-// the player's free time. Fitting quests into that time is done here, in code,
-// so changing the playtime re-sorts the page at once and costs no AI call.
+// each kind of player, and roughly how long does it take. It never sees the
+// player's free time. Fitting quests into that time is done here, in code, so
+// changing the playtime re-sorts the page at once and costs no AI call.
 
 /** Daily playtime choices in minutes. 0 means no limit. */
 export const PLAYTIMES = [15, 30, 60, 0] as const;
 export type Playtime = (typeof PLAYTIMES)[number];
 export const DEFAULT_PLAYTIME: Playtime = 30;
 
-/** Minutes a day each time class is counted as when filling a player's time. */
+/** Minutes each time class is counted as on a day the quest is played. */
 export const TIME_COST_MINUTES: Record<TimeCost, number> = {
   instant: 1,
   short: 10,
   medium: 30,
   long: 75,
 };
+
+// At or under this many minutes a day, a quest is as good as free.
+const QUICK_MINUTES = 2;
 
 /**
  * The tier from reward value alone: the best rating among the priorities the
@@ -55,18 +58,25 @@ export function bestScore(
 export interface Plan {
   tier: Tier;
   /**
-   * Why playtime changed the tier, or null when it did not.
-   * quick: promoted, it takes a minute. over: it does not fit the day.
+   * Why the plan differs from the reward-value tier, or null when it does not.
+   * quick: promoted, it takes a minute or two. over: it does not fit the day.
+   * soon: it has not opened yet, so it is not part of today at all.
    */
-  note: "quick" | "over" | null;
+  note: "quick" | "over" | "soon" | null;
 }
 
-/** Minutes a day a quest costs, or 0 when it needs no play time right now. */
-export function dailyMinutes(item: TrackerItem, now: number | null): number {
-  // A passive system change, or a quest that has not opened, uses no time today.
-  if (item.timeEstimate === null && item.category === "system") return 0;
-  if (now !== null && item.startsAt !== null && Date.parse(item.startsAt) > now) return 0;
-  return TIME_COST_MINUTES[item.timeCost];
+/** True when a quest has a start date that is still ahead of `now`. */
+export function notOpenYet(item: TrackerItem, now: number | null): boolean {
+  return now !== null && item.startsAt !== null && Date.parse(item.startsAt) > now;
+}
+
+/**
+ * Minutes a day a quest costs, averaged over the week. A 30-minute activity
+ * that can only be done three days a week costs about 13 minutes a day, and a
+ * few minutes once a week is next to nothing.
+ */
+export function dailyMinutes(item: TrackerItem): number {
+  return (TIME_COST_MINUTES[item.timeCost] * item.daysPerWeek) / 7;
 }
 
 function demote(tier: Tier): Tier {
@@ -75,14 +85,22 @@ function demote(tier: Tier): Tier {
 
 /**
  * The tier of every quest for one player, given their job, priorities and
- * daily playtime. Three rules, in order:
+ * daily playtime. The rules, in order:
  *
- * 1. A quest that takes about a minute is a Must Do for everyone, unless its
- *    rewards are worthless to this player (it was a Skip). A daily check-in
- *    costs nothing, so there is no reason to pass on it.
- * 2. A quest that alone takes longer than the whole playtime drops one tier.
- * 3. The remaining Must Do quests are taken best-value-per-minute first until
- *    the playtime is full. The ones that do not fit become If Free.
+ * 1. A quest that has not opened is set aside ("soon"). It cannot be done
+ *    today, so it neither takes time nor counts as a Must Do yet.
+ * 2. A quest that costs a minute or two a day is a Must Do for everyone,
+ *    unless its rewards are worthless to this player (it was a Skip). A daily
+ *    check-in costs nothing, so there is no reason to pass on it.
+ * 3. A quest that alone takes longer than the whole playtime drops one tier.
+ * 4. The remaining Must Do quests are taken best first until the playtime is
+ *    full: the highest score that still fits goes in next, and the ones that
+ *    do not fit become If Free. Best first, not cheapest first: the top
+ *    reward of a patch must not lose its place to several small ones.
+ * 5. When the player picked no priority, quests that are Must Do for
+ *    progression fill the day before quests that are Must Do only for looks
+ *    or collecting. Someone who has not said they care about cosmetics should
+ *    not see an outfit event ahead of the patch's best progression reward.
  */
 export function planDay(
   items: TrackerItem[],
@@ -92,28 +110,34 @@ export function planDay(
   now: number | null,
 ): Map<string, Plan> {
   const plans = new Map<string, Plan>();
-  const competing: { item: TrackerItem; minutes: number; score: number }[] = [];
+  const competing: { item: TrackerItem; minutes: number; score: number; core: boolean }[] = [];
   let used = 0;
 
   for (const item of items) {
     const base = resolveTier(item, profile, priorities);
-    const minutes = dailyMinutes(item, now);
-    const instant = minutes > 0 && minutes <= TIME_COST_MINUTES.instant;
+    const minutes = dailyMinutes(item);
 
-    if (instant && base !== "skip") {
+    if (notOpenYet(item, now)) {
+      plans.set(item.id, { tier: base, note: "soon" });
+    } else if (minutes <= QUICK_MINUTES && base !== "skip") {
       plans.set(item.id, { tier: "must_do", note: base === "must_do" ? null : "quick" });
       used += minutes;
     } else if (playtime !== 0 && minutes > playtime && base !== "skip") {
       plans.set(item.id, { tier: demote(base), note: "over" });
-    } else if (base === "must_do" && minutes > 0) {
-      competing.push({ item, minutes, score: bestScore(item, profile, priorities) });
+    } else if (base === "must_do") {
+      competing.push({
+        item,
+        minutes,
+        score: bestScore(item, profile, priorities),
+        // "Core" = what the player asked for. With nothing picked, that is progression.
+        core: priorities.length > 0 || item.value.progression[profile] === "must_do",
+      });
     } else {
       plans.set(item.id, { tier: base, note: null });
     }
   }
 
-  // Best value per minute first; the higher score wins a tie.
-  competing.sort((a, b) => b.score / b.minutes - a.score / a.minutes || b.score - a.score);
+  competing.sort((a, b) => Number(b.core) - Number(a.core) || b.score - a.score);
   for (const { item, minutes } of competing) {
     if (playtime === 0 || used + minutes <= playtime) {
       plans.set(item.id, { tier: "must_do", note: null });
@@ -125,13 +149,13 @@ export function planDay(
   return plans;
 }
 
-/** Minutes a day the Must Do quests of a plan add up to. */
-export function plannedMinutes(
-  items: TrackerItem[],
-  plans: Map<string, Plan>,
-  now: number | null,
-): number {
-  return items
-    .filter((item) => plans.get(item.id)?.tier === "must_do")
-    .reduce((total, item) => total + dailyMinutes(item, now), 0);
+/** Minutes a day the Must Do quests of a plan add up to, rounded. */
+export function plannedMinutes(items: TrackerItem[], plans: Map<string, Plan>): number {
+  const total = items
+    .filter((item) => {
+      const plan = plans.get(item.id);
+      return plan?.tier === "must_do" && plan.note !== "soon";
+    })
+    .reduce((sum, item) => sum + dailyMinutes(item), 0);
+  return Math.round(total);
 }
