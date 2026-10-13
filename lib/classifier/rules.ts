@@ -91,6 +91,7 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
         cosmetic: NEUTRAL_SCORE,
       },
       rewards: [],
+      steps: [],
       ...eventPeriod(post),
       timeEstimate: {
         label: "Not rated yet",

@@ -14,6 +14,7 @@ function item(title: string, casual: number, overrides: Partial<StoredItem> = {}
     timeCost: "short",
     daysPerWeek: 7,
     claimUntil: null,
+    steps: [],
     value: {
       progression: { casual, endgame: 10, returning: 10 },
       limited: 0,

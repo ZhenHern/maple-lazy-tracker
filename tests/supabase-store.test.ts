@@ -107,6 +107,7 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         timeCost: "short",
         daysPerWeek: 7,
         claimUntil: null,
+        steps: [],
         value: {
           progression: { casual: 2, endgame: 3, returning: 4 },
           limited: 5,

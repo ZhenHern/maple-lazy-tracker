@@ -149,7 +149,28 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       };
     }
 
-    kept.push({ ...item, startsAt, endsAt, claimUntil, rewards, timeEstimate });
+    // A step is held to the same standard as the quest: its name and its
+    // reward must come from the post, and so must any amount or date in it.
+    const steps = item.steps
+      .filter((step) => {
+        const grounded = isGroundedReward(step.name, textWords);
+        if (!grounded) warnings.push(`"${item.title}": step "${step.name}" is not in the post, removed`);
+        return grounded;
+      })
+      .map((step) => {
+        let reward = step.reward.trim();
+        if (reward && !isGroundedReward(reward, textWords)) {
+          warnings.push(`"${item.title}": step reward "${reward}" is not in the post, removed`);
+          reward = "";
+        }
+        const opens =
+          step.startsAt && isGroundedDate(step.startsAt, dates, post.publishedAt)
+            ? step.startsAt
+            : null;
+        return { ...step, reward: withoutInventedAmounts(reward, textNumbers), startsAt: opens };
+      });
+
+    kept.push({ ...item, startsAt, endsAt, claimUntil, rewards, steps, timeEstimate });
   }
   // A notice about a single event states its period outright, and code reads
   // that more reliably than a model does (models sometimes copy the Pacific

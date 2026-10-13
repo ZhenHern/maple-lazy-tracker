@@ -41,6 +41,7 @@ function item(overrides: Partial<ScoredItem> = {}): ScoredItem {
     timeCost: "instant",
     daysPerWeek: 7,
     claimUntil: null,
+    steps: [],
     value: {
       progression: { casual: 70, endgame: 40, returning: 85 },
       limited: 10,
@@ -267,6 +268,47 @@ describe("pickImages", () => {
       "icon.png",
       "poster.png",
       "small.gif",
+    ]);
+  });
+});
+
+describe("steps", () => {
+  const text =
+    TEXT +
+    "\nVirtual Training: shoot the targets. Reach 10,000 points for the Virtual Master Chair." +
+    "\nGunny: available October 14, 2026 12:00 AM UTC.";
+
+  it("keeps a step the post describes, with its own reward and opening date", () => {
+    const { items, warnings } = groundItems(
+      [
+        item({
+          steps: [
+            { name: "Virtual Training", what: "Shoot the targets.", reward: "Virtual Master Chair at 10,000 points", startsAt: null },
+            { name: "Gunny", what: "Find the enemies.", reward: "", startsAt: "2026-10-14T00:00:00Z" },
+          ],
+        }),
+      ],
+      post({ text }),
+    );
+    expect(warnings).toEqual([]);
+    expect(items[0].steps.map((step) => step.name)).toEqual(["Virtual Training", "Gunny"]);
+    expect(items[0].steps[1].startsAt).toBe("2026-10-14T00:00:00Z");
+  });
+
+  it("removes a step or a step reward the post never mentions", () => {
+    const { items } = groundItems(
+      [
+        item({
+          steps: [
+            { name: "Dragon Racing", what: "Race.", reward: "", startsAt: null },
+            { name: "Virtual Training", what: "Shoot.", reward: "Golden Yacht", startsAt: "2027-01-01T00:00:00Z" },
+          ],
+        }),
+      ],
+      post({ text }),
+    );
+    expect(items[0].steps).toEqual([
+      { name: "Virtual Training", what: "Shoot.", reward: "", startsAt: null },
     ]);
   });
 });

@@ -29,6 +29,7 @@ export interface ReviewRow {
   summary: string;
   why: string;
   rewards: string[];
+  steps: string[];
   time: string | null;
   timeCost: string;
   /** Which model produced the version shown (the trial's when there is one). */
@@ -125,6 +126,9 @@ export function buildReview(livePosts: StoredPost[], trialPosts: StoredPost[], n
       summary: shown.item.summary,
       why: shown.item.why,
       rewards: shown.item.rewards,
+      steps: shown.item.steps.map(
+        (step) => step.name + (step.reward ? ` (${step.reward})` : ""),
+      ),
       time: shown.item.timeEstimate?.label ?? null,
       timeCost: shown.item.timeCost,
       model: shown.model,

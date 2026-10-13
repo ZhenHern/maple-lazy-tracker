@@ -1350,6 +1350,44 @@ body {
   animation: nudge 1.6s ease-in-out infinite;
 }
 
+/* ---------- Steps inside a quest ---------- */
+
+.quest-steps {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.step {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.45rem 0.65rem;
+  border: 2px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-panel);
+}
+
+.step-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.step-what {
+  color: var(--color-ink-soft);
+  font-size: 0.8rem;
+}
+
+.step-reward {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 /* ---------- Patch news: changes that are not tasks ---------- */
 
 .news-list {

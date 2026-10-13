@@ -10,6 +10,7 @@ export const TIME_COSTS = ["instant", "short", "medium", "long", "idle"] as cons
 export const PRIORITIES = ["progression", "limited", "cosmetic"] as const;
 export const MAX_ITEMS = 40;
 export const MAX_REWARDS = 5;
+export const MAX_STEPS = 8;
 
 const tier = z.enum(TIERS);
 
@@ -18,6 +19,19 @@ const tier = z.enum(TIERS);
 const isoDate = z
   .string()
   .refine((value) => !Number.isNaN(Date.parse(value)), "not a parseable date");
+
+// One activity inside a quest. A progress track (a rank, a pass, a gauge) is
+// one quest for planning, but the player still needs to know which minigames
+// or missions feed it and what each of them gives on its own.
+const stepSchema = z.object({
+  name: z.string().min(1),
+  // One short sentence on what to do in it.
+  what: z.string(),
+  // What this activity itself gives, apart from progress. "" when nothing.
+  reward: z.string(),
+  // When it opens, if later than the quest. null = open from the start.
+  startsAt: isoDate.nullable(),
+});
 
 // The item shape is the same for Gemini's reply and for what we store; only the
 // rating type differs (a 0-100 score from Gemini, a tier once calibrated).
@@ -47,6 +61,8 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
       cosmetic: rating,
     }),
     rewards: z.array(z.string()),
+    // The activities that make up the quest. Empty for a single-activity quest.
+    steps: z.array(stepSchema),
     startsAt: isoDate.nullable(),
     endsAt: isoDate.nullable(),
     // When rewards can still be claimed after endsAt, the last moment to claim
@@ -78,6 +94,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   timeCost: z.enum(TIME_COSTS).default("short"),
   daysPerWeek: z.number().default(7),
   claimUntil: isoDate.nullable().default(null),
+  steps: z.array(stepSchema).default([]),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

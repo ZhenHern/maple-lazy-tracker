@@ -280,6 +280,34 @@ export function QuestItem({
             </div>
           </dl>
 
+          {item.steps.length > 0 && (
+            <div>
+              <h4 className="label">How to progress</h4>
+              <ol className="quest-steps">
+                {item.steps.map((step) => {
+                  const later = now !== null && step.startsAt !== null && Date.parse(step.startsAt) > now;
+                  return (
+                    <li key={step.name} className="step">
+                      <span className="step-name">
+                        {step.name}
+                        {later && (
+                          <span className="chip chip-soon">Opens {formatDate(step.startsAt!)}</span>
+                        )}
+                      </span>
+                      {step.what && <span className="step-what">{step.what}</span>}
+                      {step.reward && (
+                        <span className="step-reward">
+                          <PixelSprite name="chest" className="h-4 w-5 shrink-0" />
+                          {step.reward}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          )}
+
           {item.rewards.length > 0 && (
             <div>
               <h4 className="label">Rewards</h4>

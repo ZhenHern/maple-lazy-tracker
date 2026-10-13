@@ -74,6 +74,7 @@ function Row({ row }: { row: ReviewRow }) {
           {row.time && ` (${row.time})`}
         </span>
         {row.rewards.length > 0 && <span className="review-note">Rewards: {row.rewards.join("; ")}</span>}
+        {row.steps.length > 0 && <span className="review-note">Steps: {row.steps.join("; ")}</span>}
       </th>
       {AXES.map((axis) => (
         <Cell key={axis} live={row.live?.[axis] ?? null} trial={row.trial?.[axis] ?? null} />

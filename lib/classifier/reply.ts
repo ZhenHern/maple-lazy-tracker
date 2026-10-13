@@ -1,7 +1,13 @@
 import { z } from "zod";
 import type { ScoredItem, ScrapedPost } from "@/lib/types";
 import { groundItems } from "./grounding";
-import { MAX_ITEMS, MAX_REWARDS, replyEnvelopeSchema, replyItemsSchema } from "./schema";
+import {
+  MAX_ITEMS,
+  MAX_REWARDS,
+  MAX_STEPS,
+  replyEnvelopeSchema,
+  replyItemsSchema,
+} from "./schema";
 
 // Turns Gemini's raw reply into checked items, post by post. Pure code, so it
 // can be tested without calling the API.
@@ -28,6 +34,7 @@ function normalizeItems(items: ScoredItem[]): ScoredItem[] {
       ...item,
       id: count === 1 ? base : `${base}-${count}`,
       rewards: item.rewards.slice(0, MAX_REWARDS),
+      steps: item.steps.slice(0, MAX_STEPS),
       why: item.why.trim().slice(0, 220),
       // Whatever the model sent, the planner needs a whole number from 1 to 7.
       daysPerWeek: Math.min(7, Math.max(1, Math.round(item.daysPerWeek) || 7)),

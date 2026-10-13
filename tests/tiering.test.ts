@@ -21,6 +21,7 @@ function quest(
     timeCost,
     daysPerWeek: 7,
     claimUntil: null,
+    steps: [],
     value: {
       progression: { casual: tier, endgame: tier, returning: tier },
       limited: "skip",
