@@ -27,6 +27,9 @@ describe("rewardKind", () => {
     ["Hair/Face/Mount Transfer Coupons", "ticket"],
     ["Chance at Random Mimic Box x3", "gift"],
     ["Chance at Hidden Mission", "gift"],
+    ["1+1 Star Force (Up to 10*)", "spark"],
+    ["30% Star Force Discount", "spark"],
+    ["2x Sol Erda while hunting", "spark"],
     ["Inspector Boxes", "gift"],
   ])("%s -> %s", (name, sprite) => {
     expect(rewardKind(name).sprite).toBe(sprite);

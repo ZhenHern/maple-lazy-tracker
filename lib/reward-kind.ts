@@ -1,4 +1,5 @@
 import type { SpriteName } from "@/components/pixel-sprite";
+import { isEffect } from "@/lib/reward-name";
 
 export interface RewardKind {
   /** The pixel icon that stands in for the missing picture. */
@@ -48,12 +49,16 @@ const KINDS: [RegExp, RewardKind][] = [
 ];
 
 const OTHER: RewardKind = { sprite: "gift", label: "Reward" };
+const EFFECT: RewardKind = { sprite: "spark", label: "Buff or perk" };
 
 /**
  * Guesses what kind of thing a reward is from its name, for rewards the patch
  * notes show no picture of. A keyword guess, not a fact: it only picks an icon.
  */
 export function rewardKind(name: string): RewardKind {
+  // A discount on Star Force is a buff, not a scroll: the kind follows what
+  // the player gets, not the item the wording mentions.
+  if (isEffect(name)) return EFFECT;
   // "Chance at X" is still X: the odds say nothing about what kind of thing it is.
   const text = name.toLowerCase().replace(/^\s*(a )?chance (at|for|of) /, "");
   return KINDS.find(([pattern]) => pattern.test(text))?.[1] ?? OTHER;

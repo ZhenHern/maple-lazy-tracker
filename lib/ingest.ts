@@ -8,7 +8,7 @@ import { rulesClassify } from "@/lib/classifier/rules";
 import { getStore, writePost } from "@/lib/db/store";
 import { groundItems } from "@/lib/classifier/grounding";
 import { matchRewardImage, pickImages, sectionImages } from "@/lib/images";
-import { rewardName, singular } from "@/lib/reward-name";
+import { isEffect, rewardName, singular } from "@/lib/reward-name";
 import { findItemIcon, latestGmsVersion } from "@/lib/scraper/maplestory-io";
 import { fetchImageSizes, fetchPost, listTrackedPosts } from "@/lib/scraper/nexon";
 import type { PostSummary, ScoredItem, ScrapedPost, StoredItem, StoredPost } from "@/lib/types";
@@ -81,6 +81,8 @@ export async function withImages(
           // Nexon names its icon files after the item, so the wording around
           // the name ("Up to 500 ... per claim") is taken off before matching.
           const name = singular(rewardName(reward).plain) || reward;
+          // A discount or a buff is not an item, whatever item it mentions.
+          if (isEffect(reward)) return null;
           return (
             matchRewardImage(reward, inSection) ??
             matchRewardImage(name, inSection) ??

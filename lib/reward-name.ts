@@ -45,3 +45,24 @@ export function rewardName(reward: string): RewardName {
 export function singular(name: string): string {
   return name.replace(/([a-z]{3}[^s])s$/i, "$1");
 }
+
+// Words that make a reward a thing you receive and keep in your inventory.
+const ITEM_WORD =
+  /\b(scrolls?|coupons?|tickets?|vouchers?|box(es)?|potions?|chairs?|mounts?|pets?|outfits?|certificates?|cubes?|fragments?|nodestones?|medals?|rings?|totems?)\b/i;
+// A buff day or a perk named after the thing it discounts or boosts.
+const ALWAYS_EFFECT = /\b\d\s?\+\s?\d\b|\bdiscounts?\b|\d\s?%\s*off\b|\bsafeguard\b/i;
+const EFFECT_WORD =
+  /\bwhile\b|\bwhen\b|\bduring\b|\bevery \d|\b(buffs?|rates?|reduction|reduced|increased?|boost(ed)?|bonus|chance on|perk|resets?)\b|^\s*\d+(\.\d+)?x\s/i;
+
+/**
+ * True when a reward is an effect, not an item: a discount day ("30% Star
+ * Force Discount", "1+1 Star Force"), a multiplier ("2x Sol Erda while
+ * hunting"), a perk or a buff. An effect gets the generic buff icon. Showing
+ * the icon of the item it applies to (a Star Force scroll for a Star Force
+ * discount) would promise the player an item they will not receive.
+ */
+export function isEffect(reward: string): boolean {
+  if (ALWAYS_EFFECT.test(reward)) return true;
+  // "3x EXP Coupon" and "Bonus Potential Scroll" are items despite the words.
+  return EFFECT_WORD.test(reward) && !ITEM_WORD.test(reward);
+}

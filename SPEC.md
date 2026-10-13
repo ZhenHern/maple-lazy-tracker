@@ -288,7 +288,7 @@ Each reward can carry an icon, looked up in this order:
 3. Images in any other recent post (common rewards are often illustrated only once).
 4. maplestory.io, a community-run database built from the game's data files, by item name. The wording around the name is taken off first ("Chance at", amounts, "per claim"), and an item is accepted only when it adds nothing but a form word ("Coupon"), a bracketed qualifier or an amount. It is unofficial, has no uptime guarantee and runs about one patch behind, so every call fails soft.
 
-Matching is strict on purpose: a wrong icon is worse than none. Rewards that are not items (buffs, skills, "Passive EXP") get no icon. All icons are subject to the `NEXON_IMAGES` switch.
+A reward that is an effect and not an item (a discount day, "1+1 Star Force", "2x Sol Erda while hunting", a perk) is never given an item's icon, even when it names one: `isEffect` in `lib/reward-name.ts` decides, and the card shows the generic buff icon. Matching is strict on purpose: a wrong icon is worse than none. Rewards that are not items (buffs, skills, "Passive EXP") get no icon. All icons are subject to the `NEXON_IMAGES` switch.
 
 ### Phase 1: Pipeline to JSON
 
