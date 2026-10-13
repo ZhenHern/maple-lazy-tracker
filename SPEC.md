@@ -238,13 +238,15 @@ All server-only, documented in `.env.example`:
 
 Build order changed: the Phase 3 UI was built straight after Phase 1, ahead of Phase 2.
 
-**Status.** All the code for the three phases is written and tested locally. What is left needs accounts, so it is yours to do:
+**Status.** All three phases are built and the site is live at https://maple-lazy-tracker.vercel.app, reading from a real Supabase project. Verified on the production URL: the pages, the calendar, the sitemap and the share image answer; the local-only routes (`/dev/review`, `/api/dev/*`) return 404; the cron route refuses a request without `CRON_SECRET`.
 
-1. Create a Supabase project and run `supabase/schema.sql` in its SQL editor.
-2. Import the repository in Vercel and set the environment variables from `.env.example` (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `GEMINI_API_KEY`, the model lists, and `NEXON_IMAGES` if you decide to show images).
-3. Deploy. The cron in `vercel.json` starts on its own; trigger it once by hand from the Vercel dashboard to fill the database.
+The database was filled from the posts graded locally with `scripts/push-to-supabase.mjs`, so no Gemini quota was spent on the first deploy. A machine whose `.env.local` holds the Supabase keys reads and writes the same database as the live site.
 
-Not yet verified: the Supabase store has only run against a local stand-in for Supabase's REST API (`tests/supabase-store.test.ts`), never a real project, and the cron has only been called by hand on a local production build. The file store cannot work on Vercel, whose file system is read-only, so step 1 is required.
+Still open:
+
+1. The first scheduled cron run has to show as successful in the Vercel dashboard (the last "done when" of Phase 3).
+2. The stored posts were graded with prompt versions 9 and 10; the cron re-grades them with the current version, a few requests a day.
+3. `data/seed/` holds an old grading and is only shown when the store is empty.
 
 ### The ongoing view
 
@@ -278,7 +280,7 @@ Each reward can carry an icon, looked up in this order:
 1. Images under the item's own heading in the post. Nexon names its icon files after the item (`icon_advanced_exp_voucher.png`), so rewards are matched by filename words.
 2. Images anywhere in the same post.
 3. Images in any other recent post (common rewards are often illustrated only once).
-4. maplestory.io, a community-run database built from the game's data files, by exact item name. It is unofficial, has no uptime guarantee and runs about one patch behind, so every call fails soft.
+4. maplestory.io, a community-run database built from the game's data files, by item name. The wording around the name is taken off first ("Chance at", amounts, "per claim"), and an item is accepted only when it adds nothing but a form word ("Coupon"), a bracketed qualifier or an amount. It is unofficial, has no uptime guarantee and runs about one patch behind, so every call fails soft.
 
 Matching is strict on purpose: a wrong icon is worse than none. Rewards that are not items (buffs, skills, "Passive EXP") get no icon. All icons are subject to the `NEXON_IMAGES` switch.
 
