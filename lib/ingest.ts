@@ -8,6 +8,7 @@ import { rulesClassify } from "@/lib/classifier/rules";
 import { getStore, writePost } from "@/lib/db/store";
 import { groundItems } from "@/lib/classifier/grounding";
 import { matchRewardImage, pickImages, sectionImages } from "@/lib/images";
+import { rewardName, singular } from "@/lib/reward-name";
 import { findItemIcon, latestGmsVersion } from "@/lib/scraper/maplestory-io";
 import { fetchImageSizes, fetchPost, listTrackedPosts } from "@/lib/scraper/nexon";
 import type { PostSummary, ScoredItem, ScrapedPost, StoredItem, StoredPost } from "@/lib/types";
@@ -76,13 +77,20 @@ export async function withImages(
     items.map(async (item) => {
       const inSection = sectionImages(item.title, items.length, post.sections);
       const rewardImages = await Promise.all(
-        item.rewards.map(
-          async (reward) =>
+        item.rewards.map(async (reward) => {
+          // Nexon names its icon files after the item, so the wording around
+          // the name ("Up to 500 ... per claim") is taken off before matching.
+          const name = singular(rewardName(reward).plain) || reward;
+          return (
             matchRewardImage(reward, inSection) ??
+            matchRewardImage(name, inSection) ??
             matchRewardImage(reward, allImages) ??
+            matchRewardImage(name, allImages) ??
             matchRewardImage(reward, iconPool) ??
-            (await lookUp(reward)),
-        ),
+            matchRewardImage(name, iconPool) ??
+            (await lookUp(reward))
+          );
+        }),
       );
       // A picture already used as a reward icon is not repeated in the gallery.
       const gallery = inSection.filter((url) => !rewardImages.includes(url)).slice(0, 8);

@@ -39,6 +39,29 @@ describe("searchNames", () => {
     expect(searchNames("Sweet Spirit Pet (30 Day)")).toContain("Sweet Spirit");
   });
 
+  it("finds the name inside 'up to N ... per claim', in the singular", () => {
+    expect(searchNames("Up to 500 Sol Erda Fragments per claim")).toContain("Sol Erda Fragment");
+    expect(searchNames("Up to 15,000 EXP Vouchers per claim")).toContain("EXP Voucher");
+  });
+
+  it("writes a spaced slash the way the game does", () => {
+    expect(searchNames("Chance at Sol Erda / Sol Erda Fragment Selector Coupon (x2)")[0]).toBe(
+      "Sol Erda/Sol Erda Fragment Selector Coupon",
+    );
+  });
+
+  it("reads 'A and B' as two items, but not a bare word", () => {
+    expect(searchNames("Monster Yetiroid & Lidium Heart")).toEqual(
+      expect.arrayContaining(["Monster Yetiroid", "Lidium Heart"]),
+    );
+    expect(searchNames("Hair & Face Transfer Coupons")).toContain("Hair Transfer Coupon");
+    expect(searchNames("Frieren/Starkroids and Hearts")).not.toContain("Heart");
+  });
+
+  it("drops half a bracket left behind", () => {
+    expect(searchNames("Nodestone total)")[0]).toBe("Nodestone");
+  });
+
   it("has nothing to search for when no name is left", () => {
     expect(searchNames("x30")).toEqual([]);
   });
@@ -84,6 +107,16 @@ describe("pickItem", () => {
     );
     // A reward that states no level accepts any.
     expect(pickItem("18-Star Enhancement", scrolls)?.name).toBe("100% 18-star Enhancement (Lv. 160)");
+  });
+
+  it("allows a family prefix only when the bracket agrees", () => {
+    const scrolls = items("Star Force 22-Star Enhancement (Lv. 200)");
+    expect(pickItem("22-Star Enhancement (Lv. 200)", scrolls)?.name).toBe(
+      "Star Force 22-Star Enhancement (Lv. 200)",
+    );
+    // No level stated: the prefix makes it another item, as before.
+    expect(pickItem("22-Star Enhancement", scrolls)).toBeNull();
+    expect(pickItem("22-Star Enhancement (Lv. 250)", scrolls)).toBeNull();
   });
 
   it("lets the reward drop a kind word the game leaves out, but not add one", () => {

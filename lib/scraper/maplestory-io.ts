@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { rewardName, singular } from "@/lib/reward-name";
 
 // maplestory.io is a community-run database built from the game's own data
 // files. It is unofficial and has no uptime guarantee, so every call here
@@ -53,7 +54,7 @@ const FORM_WORDS = new Set(["coupon", "voucher", "scroll", "ticket", "item"]);
 // a Nodestone.
 const KIND_WORDS = new Set(["pet", "mount", "title", "weapon", "chair"]);
 
-const MAX_SEARCHES = 5;
+const MAX_SEARCHES = 8;
 
 function words(value: string): string[] {
   return value
@@ -81,29 +82,30 @@ const tidy =(value: string) => value.replace(/\s+/g, " ").trim();
  * x200/x40", "3 Karma Bright Cubes"), so the wording around it is taken off.
  */
 export function searchNames(reward: string): string[] {
-  const cleaned = tidy(
-    reward
-      .replace(/^\s*(a\s+)?chance\s+(at|for|of|to\s+\w+)\s+/i, "")
-      .replace(/^\s*up\s+to\s+/i, "")
-      // "(per claim)", "(up to 500 per claim)": a bracket about amounts.
-      .replace(/\([^)]*\b(per|up\s+to|total)\b[^)]*\)/gi, " ")
-      // "per claim", "per day": how often, not what.
-      .replace(/\bper\s+\w+.*$/i, " ")
-      // Amounts: "x30", "(x30)", "(x230 total)", "x200/x40", "x15-30", "(x3/week)".
-      .replace(/\(?\bx\s?\d[\d,]*(-\d[\d,]*)?(\s*\/\s*(?!x\d)[a-z]+|\s+total)?\)?/gi, " ")
-      .replace(/(^|\s)\/+(?=\s|$)/g, " ")
-      .replace(/\btotal\b/gi, " ")
-      .replace(/^\s*\d[\d,]*\s+/, ""),
-  );
-  const plain = tidy(withoutBrackets(cleaned));
+  const { full, plain } = rewardName(reward);
 
-  const names = [cleaned, plain];
+  // Most specific first. A plural is also tried in the singular, because the
+  // game names one item ("Sol Erda Fragment") and the search looks for the
+  // words as typed.
+  const names = [full, plain, singular(plain)];
   // "3x EXP Coupon" is a name; "3x Karma Cube" is an amount. Try both readings.
-  names.push(tidy(plain.replace(/\b\d[\d,]*\s?x\b/gi, " ")));
+  names.push(singular(tidy(plain.replace(/\b\d[\d,]*\s?x\b/gi, " "))));
   // "Arcane/Sacred Symbol Selector" is two items: look for either.
   for (const word of plain.split(" ")) {
     if (!word.includes("/")) continue;
-    for (const side of word.split("/")) names.push(tidy(plain.replace(word, side)));
+    for (const side of word.split("/")) names.push(singular(tidy(plain.replace(word, side))));
+  }
+  // "Monster Yetiroid & Lidium Heart" names two items: either one's picture
+  // is a fair picture of the reward. "Hair & Face Transfer Coupons" shares
+  // its ending, so it is read like "Hair/Face Transfer Coupons".
+  const parts = plain.split(/\s+(?:&|and)\s+/i);
+  if (parts.length === 2) {
+    const [first, second] = parts;
+    if (!first.includes(" ")) {
+      names.push(singular(tidy(`${first} ${second.split(" ").slice(1).join(" ")}`)));
+    }
+    // One bare word ("Hearts") names nothing in particular.
+    for (const part of parts) if (part.includes(" ")) names.push(singular(part));
   }
   // The search does not find "Hyper Burninator" when asked for the coupon.
   names.push(
@@ -147,9 +149,17 @@ export function pickItem(name: string, items: FoundItem[], reward = name): Found
     const theirs = bracketNumbers(item.name);
     if (stated.size > 0 && theirs.size > 0 && ![...stated].some((n) => theirs.has(n))) continue;
     const extra = outside.filter((word) => !named.has(word));
-    if (!extra.every((word) => FORM_WORDS.has(word) || /^x\d+$|^\d+%$/.test(word))) continue;
+    const plainExtra = extra.every((word) => FORM_WORDS.has(word) || /^x\d+$|^\d+%$/.test(word));
+    // The game prefixes some items with their family ("Karma Star Force
+    // 22-Star Enhancement (Lv. 200)"). When the reward states the same level
+    // or duration in brackets as the item does, that agreement is strong
+    // enough to allow a few such words, as a last resort.
+    const sameBracket =
+      stated.size > 0 && theirs.size === stated.size && [...stated].every((n) => theirs.has(n));
+    if (!plainExtra && !(sameBracket && extra.length <= 3)) continue;
 
-    const added = all.size - wanted.size;
+    // A match that needed the bracket allowance ranks behind every plain one.
+    const added = all.size - wanted.size + (plainExtra ? 0 : 100);
     const better =
       !best ||
       added < best.added ||
