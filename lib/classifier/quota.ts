@@ -24,6 +24,8 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 // How long a model is left alone after it says its daily quota is gone.
 const DAY_REFUSAL_PAUSE = 2 * HOUR;
+// How long a model is left alone after it answers "overloaded".
+const BUSY_PAUSE = 10 * MINUTE;
 
 const usageSchema = z.object({
   /** The quota day (Pacific date) that `used` belongs to. */
@@ -150,6 +152,21 @@ export function recordRateLimit(
     models: {
       ...ledger.models,
       [model]: { ...entry, blockedUntil: new Date(until).toISOString() },
+    },
+  };
+}
+
+/**
+ * Notes that `model` is overloaded or broken right now (HTTP 503 and the like),
+ * so the rest of this run goes straight to a model that answers instead of
+ * asking the busy one again for every batch.
+ */
+export function recordBusy(ledger: QuotaLedger, model: string, now: number): QuotaLedger {
+  const entry = usage(ledger, model, now);
+  return {
+    models: {
+      ...ledger.models,
+      [model]: { ...entry, blockedUntil: new Date(now + BUSY_PAUSE).toISOString() },
     },
   };
 }

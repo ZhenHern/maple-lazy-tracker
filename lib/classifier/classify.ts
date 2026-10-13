@@ -5,6 +5,7 @@ import { fallbackModels, primaryModels } from "./models";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
 import {
   isAvailable,
+  recordBusy,
   parseRateLimit,
   recordCall,
   recordRateLimit,
@@ -148,6 +149,8 @@ export async function classifyBatch(
         const reason = error instanceof ApiError ? `HTTP ${error.status}` : String(error);
         outcome.failures.push(`${model}: ${reason}`);
         console.warn(`[classify] ${model} failed: ${reason}`);
+        quota.ledger = recordBusy(quota.ledger, model, Date.now());
+        await quota.save();
         break;
       }
 

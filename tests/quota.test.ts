@@ -4,6 +4,7 @@ import {
   isAvailable,
   minGapMs,
   nextQuotaReset,
+  recordBusy,
   parseRateLimit,
   quotaDay,
   recordCall,
@@ -51,6 +52,12 @@ describe("ledger", () => {
     const ledger = recordRateLimit(emptyLedger(), MODEL, { scope: "day", retryMs: 32_779_000 }, NOON);
     expect(isAvailable(ledger, MODEL, NOON + 119 * 60_000)).toBe(false);
     expect(isAvailable(ledger, MODEL, NOON + 121 * 60_000)).toBe(true);
+  });
+
+  it("leaves an overloaded model alone for ten minutes", () => {
+    const ledger = recordBusy(emptyLedger(), MODEL, NOON);
+    expect(isAvailable(ledger, MODEL, NOON + 9 * 60_000)).toBe(false);
+    expect(isAvailable(ledger, MODEL, NOON + 11 * 60_000)).toBe(true);
   });
 
   it("blocks a model only as long as asked after a per-minute refusal", () => {

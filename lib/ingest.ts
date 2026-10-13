@@ -276,7 +276,11 @@ export async function ingest({
         for (const job of unsettled.keys()) unsettled.set(job, messageOf(error));
         break batches;
       }
-      requests += outcome.requests;
+      // The run's budget is for requests that were answered. Attempts on a
+      // model that turned out to be overloaded are not charged when another
+      // model then answered, or three busy models would end the run after
+      // one batch.
+      requests += outcome.model ? 1 : outcome.requests;
 
       if (!outcome.model) {
         // Nobody of this tier answered. The fallback tier gets the jobs it may take.
