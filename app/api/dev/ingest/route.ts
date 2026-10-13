@@ -9,6 +9,8 @@ export const maxDuration = 300;
 // Local development only. GET /api/dev/ingest?limit=<Gemini requests to spend, default 2>
 // One request carries several posts, so a small limit goes a long way.
 // Add &images to re-match pictures on unchanged posts (no Gemini calls).
+// Add &recheck to run the plain-code grounding checks again on stored posts
+// (no Gemini calls): for when a check was added and stored ratings need it.
 // The scheduled, secured version is app/api/cron/ingest/route.ts.
 export async function GET(request: NextRequest) {
   if (process.env.NODE_ENV === "production") {
@@ -22,7 +24,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const refreshImages = request.nextUrl.searchParams.has("images");
-    const report = await ingest({ maxRequests: limit, refreshImages });
+    const recheck = request.nextUrl.searchParams.has("recheck");
+    const report = await ingest({ maxRequests: limit, refreshImages, recheck });
     // Tell Next.js the cached list is out of date, so the next visit rebuilds it.
     revalidateTag(POSTS_TAG, "max");
     return NextResponse.json(report);

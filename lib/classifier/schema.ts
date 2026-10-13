@@ -31,7 +31,13 @@ const stepSchema = z.object({
   reward: z.string(),
   // When it opens, if later than the quest. null = open from the start.
   startsAt: isoDate.nullable(),
+  // When it is over, if earlier than the quest: one day of a schedule, one
+  // phase of an event. null = lasts as long as the quest.
+  endsAt: isoDate.nullable(),
 });
+
+// Steps stored before a step could end have no endsAt.
+const storedStepSchema = stepSchema.extend({ endsAt: isoDate.nullable().default(null) });
 
 // The item shape is the same for Gemini's reply and for what we store; only the
 // rating type differs (a 0-100 score from Gemini, a tier once calibrated).
@@ -98,7 +104,7 @@ export const storedItemSchema = scoredItemSchema.extend({
   timeCost: z.enum(TIME_COSTS).default("short"),
   daysPerWeek: z.number().default(7),
   claimUntil: isoDate.nullable().default(null),
-  steps: z.array(stepSchema).default([]),
+  steps: z.array(storedStepSchema).default([]),
   requires: z.string().nullable().default(null),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.

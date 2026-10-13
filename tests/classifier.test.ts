@@ -296,8 +296,8 @@ describe("steps", () => {
       [
         item({
           steps: [
-            { name: "Virtual Training", what: "Shoot the targets.", reward: "Virtual Master Chair at 10,000 points", startsAt: null },
-            { name: "Gunny", what: "Find the enemies.", reward: "", startsAt: "2026-10-14T00:00:00Z" },
+            { name: "Virtual Training", what: "Shoot the targets.", reward: "Virtual Master Chair at 10,000 points", startsAt: null, endsAt: null },
+            { name: "Gunny", what: "Find the enemies.", reward: "", startsAt: "2026-10-14T00:00:00Z", endsAt: null },
           ],
         }),
       ],
@@ -313,15 +313,15 @@ describe("steps", () => {
       [
         item({
           steps: [
-            { name: "Dragon Racing", what: "Race.", reward: "", startsAt: null },
-            { name: "Virtual Training", what: "Shoot.", reward: "Golden Yacht", startsAt: "2027-01-01T00:00:00Z" },
+            { name: "Dragon Racing", what: "Race.", reward: "", startsAt: null, endsAt: null },
+            { name: "Virtual Training", what: "Shoot.", reward: "Golden Yacht", startsAt: "2027-01-01T00:00:00Z", endsAt: null },
           ],
         }),
       ],
       post({ text }),
     );
     expect(items[0].steps).toEqual([
-      { name: "Virtual Training", what: "Shoot.", reward: "", startsAt: null },
+      { name: "Virtual Training", what: "Shoot.", reward: "", startsAt: null, endsAt: null },
     ]);
   });
 });

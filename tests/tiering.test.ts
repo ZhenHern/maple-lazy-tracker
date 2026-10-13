@@ -111,6 +111,16 @@ describe("planDay", () => {
     const plans = planDay(items, "casual", ["progression"], 30, NOW);
     expect(plans.get("rank-track")).toEqual({ tier: "must_do", note: null });
     expect(plans.get("unrelated")?.tier).toBe("if_free");
+    // The gate is lifted to Must Do but keeps its own score: with room for
+    // one quest, a better-rewarded quest still goes first.
+    const crowded = [
+      quest("rank-track", "if_free", 60, "short"),
+      quest("prize-draw", "must_do", 98, "instant", { requires: "rank-track" }),
+      quest("sidekick", "must_do", 95, "short"),
+    ];
+    const tight = planDay(crowded, "casual", ["progression"], 15, NOW);
+    expect(tight.get("sidekick")?.tier).toBe("must_do");
+    expect(tight.get("rank-track")).toEqual({ tier: "if_free", note: "over" });
     // A link to a quest that is not on the list changes nothing.
     const alone = planDay([quest("prize", "must_do", 92, "instant", { requires: "gone" })], "casual", [], 30, NOW);
     expect(alone.get("prize")?.tier).toBe("must_do");

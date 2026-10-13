@@ -169,8 +169,9 @@ export function planDay(
     const mine = worth.get(item.id)!;
     const gate = item.requires ? worth.get(item.requires) : undefined;
     if (!gate || gate === mine) continue;
+    // The tier is lifted, the score is not: the gate must be done, but it
+    // should not jump ahead of quests whose own rewards are better.
     if (TIERS.indexOf(mine.tier) < TIERS.indexOf(gate.tier)) gate.tier = mine.tier;
-    gate.score = Math.max(gate.score, mine.score);
     gate.core ||= mine.core;
   }
 

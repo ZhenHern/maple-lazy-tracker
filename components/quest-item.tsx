@@ -125,6 +125,10 @@ export function QuestItem({
   const task = isTask(item);
   const estimate = task ? item.timeEstimate : null;
   const moreLoot = item.rewards.length - LOOT_NAMES;
+  // A step that is over (a past day of a schedule) is no use to anyone now.
+  const steps = item.steps.filter(
+    (step) => now === null || step.endsAt === null || Date.parse(step.endsAt) > now,
+  );
 
   return (
     <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
@@ -231,9 +235,9 @@ export function QuestItem({
                 <dt>Time</dt>
                 <dd>
                   {estimate.basis === "uncertain" ? (
-                    <>
-                      Unknown. <span className="fact-note">{estimate.label}</span>
-                    </>
+                    // A guess after "unknown" contradicts itself; our own
+                    // estimate is the Effort line below.
+                    <>The post does not say.</>
                   ) : (
                     <>
                       {estimate.label}
@@ -270,11 +274,11 @@ export function QuestItem({
             </div>
           </dl>
 
-          {item.steps.length > 0 && (
+          {steps.length > 0 && (
             <div>
               <h4 className="label">How to progress</h4>
               <ol className="quest-steps">
-                {item.steps.map((step) => {
+                {steps.map((step) => {
                   const later = now !== null && step.startsAt !== null && Date.parse(step.startsAt) > now;
                   return (
                     <li key={step.name} className="step">
@@ -298,7 +302,7 @@ export function QuestItem({
             </div>
           )}
 
-          {item.rewards.length > 0 && (
+          {task && item.rewards.length > 0 && (
             <div>
               <h4 className="label">Rewards</h4>
               <ul className="flex flex-wrap gap-2">

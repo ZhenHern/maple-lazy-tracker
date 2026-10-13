@@ -6,6 +6,7 @@ import { PROMPT_VERSION } from "@/lib/classifier/prompt";
 import { describeLedger, emptyLedger, ledgerSchema } from "@/lib/classifier/quota";
 import { rulesClassify } from "@/lib/classifier/rules";
 import { getStore, writePost } from "@/lib/db/store";
+import { groundItems } from "@/lib/classifier/grounding";
 import { matchRewardImage, pickImages, sectionImages } from "@/lib/images";
 import { findItemIcon, latestGmsVersion } from "@/lib/scraper/maplestory-io";
 import { fetchImageSizes, fetchPost, listTrackedPosts } from "@/lib/scraper/nexon";
@@ -42,6 +43,11 @@ export interface IngestOptions {
   maxRequests: number;
   /** Re-match pictures on unchanged posts (costs no Gemini requests). */
   refreshImages?: boolean;
+  /**
+   * Run the grounding checks again on what is stored, with no AI call. For
+   * when a check was added or sharpened and stored ratings should get it now.
+   */
+  recheck?: boolean;
   /** Stop starting new work after this time (ms). Keeps a cron run inside its time limit. */
   deadline?: number;
 }
@@ -173,6 +179,7 @@ function messageOf(error: unknown): string {
 export async function ingest({
   maxRequests,
   refreshImages = false,
+  recheck = false,
   deadline = Date.now() + 9 * 60_000,
 }: IngestOptions): Promise<IngestReport> {
   const store = getStore();
@@ -219,8 +226,18 @@ export async function ingest({
     let stored = storedById.get(summary.sourceId) ?? null;
     // Done for every stored post, not only up-to-date ones: a post waiting for
     // quota should not also have to wait for better pictures.
-    if (stored && refreshImages) {
-      stored = { ...stored, items: await withImages(stored.items, scraped, iconPool) };
+    if (stored && (refreshImages || recheck)) {
+      let items: ScoredItem[] = stored.items;
+      let warnings = stored.warnings;
+      if (recheck && stored.model !== RULES_MODEL) {
+        const grounded = groundItems(items, scraped);
+        // An empty result means the check went wrong, not the post.
+        if (grounded.items.length > 0) {
+          items = grounded.items;
+          warnings = [...new Set([...warnings, ...grounded.warnings])];
+        }
+      }
+      stored = { ...stored, warnings, items: await withImages(items, scraped, iconPool) };
       await writePost(stored);
     }
     const plan = planJob(scraped, stored);

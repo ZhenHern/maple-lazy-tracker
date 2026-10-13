@@ -74,13 +74,20 @@ function rewardWords(rewards: string[]): Set<string> {
   );
 }
 
-/** True when two reward lists mostly name the same things. */
-function sameRewards(a: string[], b: string[]): boolean {
+/** True when two reward lists name the same things, for at least `share` of the shorter one. */
+function sameRewards(a: string[], b: string[], share: number): boolean {
   const [fewer, more] = [rewardWords(a), rewardWords(b)].sort((p, q) => p.size - q.size);
   if (fewer.size < 4) return false;
   const shared = [...fewer].filter((word) => more.has(word)).length;
-  return shared / fewer.size >= 0.5;
+  return shared / fewer.size >= share;
 }
+
+function sameDay(a: string | null, b: string | null): boolean {
+  return a !== null && b !== null && Math.abs(Date.parse(a) - Date.parse(b)) <= DAY;
+}
+
+// Something bought is not news to read; it is an offer.
+const PAID = /\bNX\b|\bmaple points?\b|\bcash shop\b/i;
 
 function stripImages(item: StoredItem): StoredItem {
   return { ...item, images: [], rewardImages: [] };
@@ -126,7 +133,14 @@ export function selectOngoing(
       publishedAt: post.publishedAt,
       rating: ratingOf(post.model),
     };
+    // News belongs to the current patch: its own notes, and notices published
+    // since. A system change from an older notice is no longer "what changed".
+    const current =
+      post.kind === "patch"
+        ? post.publishedAt === latestPatch
+        : latestPatch === undefined || post.publishedAt >= latestPatch;
     for (const item of post.items) {
+      if (!isTask(item) && (!current || PAID.test(`${item.title} ${item.summary}`))) continue;
       // A quest stays until its rewards can no longer be claimed.
       const closes = item.claimUntil ?? item.endsAt;
       if (closes !== null && Date.parse(closes) <= now) continue;
@@ -145,10 +159,14 @@ export function selectOngoing(
           existing.source.sourceId !== post.sourceId &&
           ((sameTitle(existing.title, item.title) &&
             sameDeadline(existing.endsAt, item.endsAt, RERUN_GAP)) ||
-            (existing.endsAt !== null &&
-              item.endsAt !== null &&
-              sameDeadline(existing.endsAt, item.endsAt, DAY) &&
-              sameRewards(existing.rewards, item.rewards))),
+            // Same end day and half the rewards; or same start AND end day,
+            // where a smaller overlap is already telling.
+            (sameDay(existing.endsAt, item.endsAt) &&
+              sameRewards(
+                existing.rewards,
+                item.rewards,
+                sameDay(existing.startsAt, item.startsAt) ? 0.4 : 0.5,
+              ))),
       );
       if (repeat) continue;
       // Patch notes summarise a festival in one entry and its own notice then

@@ -101,6 +101,37 @@ describe("buildOngoing", () => {
     expect(titles(items)).toEqual(["Mesotron-S Project", "Unrelated Hunt"]);
   });
 
+  it("needs less reward overlap when two posts give the same start and end day", () => {
+    const dated = { startsAt: "2026-09-30T00:00:00Z", endsAt: "2026-11-10T23:59:00Z" };
+    const notice = item("Mesotron-S Project (Designer Rank)", {
+      ...dated,
+      rewards: ["Equipment Transfer", "Hair and Face Transfer Coupons", "Weekly Boss Reset Ticket", "Monster Park EXP"],
+    });
+    const patch = item("Night Troupe: Mesotron-S", {
+      ...dated,
+      rewards: ["Equipment Transfer", "Hair Coupons", "Weekly Energy", "Star Force Safeguard", "Symbol Boost"],
+    });
+    const both = buildOngoing([post("10", "event", [notice]), post("1", "patch", [patch])], NOW, false);
+    expect(titles(both.items)).toEqual(["Mesotron-S Project (Designer Rank)"]);
+    // With only the end day in common, the same overlap is not enough.
+    const later = { ...patch, startsAt: "2026-10-14T00:00:00Z" };
+    const apart = buildOngoing([post("10", "event", [notice]), post("1", "patch", [later])], NOW, false);
+    expect(apart.items).toHaveLength(2);
+  });
+
+  it("keeps news to the current patch, and leaves out anything sold", () => {
+    const oldNotice = {
+      ...post("5", "event", [item("Old System Change", { category: "system", endsAt: null })]),
+      publishedAt: "2026-07-22T00:00:00.000Z",
+    };
+    const patch = post("1", "patch", [
+      item("Ring Overhaul", { category: "system", endsAt: null }),
+      item("Genesis Pass", { category: "system", summary: "A pass sold for 30,000 NX." }),
+    ]);
+    const { news } = buildOngoing([oldNotice, patch], NOW, false);
+    expect(titles(news)).toEqual(["Ring Overhaul"]);
+  });
+
   it("drops a patch entry named after a festival whose own notice is live", () => {
     const notice = { ...post("10", "event", [item("Mesotron-S Project"), item("Go Go Sidekick!")]), title: "Defend the Omega Sector!" };
     const { items } = buildOngoing(

@@ -1,6 +1,6 @@
 import { normalizeTitle } from "@/lib/images";
 import type { ScoredItem } from "@/lib/types";
-import { findDates, isGroundedDate } from "./dates";
+import { findDates, isGroundedDate, type TextDate } from "./dates";
 import { eventPeriod } from "./rules";
 
 // Checks a model's answer against the post it was given, in plain code.
@@ -54,14 +54,146 @@ function numbersIn(text: string): Set<string> {
 // Models like to add quantities up ("x30" three times becomes "x90"). A sum is
 // not a fact from the post, and a player cannot check it. An amount that the
 // post never writes is taken out; the reward's name stays.
-function withoutInventedAmounts(reward: string, textNumbers: Set<string>): string {
+// An amount as models write it: "(x30)", "(x500 per claim, 3x/week)", "x30",
+// "30x". A bracket that opens with an amount is taken whole, so removing the
+// amount never leaves half a bracket behind.
+const AMOUNT = /\(\s*x\s?(\d[\d,]*)[^)]*\)|\(?\bx\s?(\d[\d,]*)\)?|\b(\d[\d,]*)\s?x\b/gi;
+
+function tidyReward(reward: string): string {
   return reward
-    .replace(/\(?\bx\s?(\d[\d,]*)\)?|\b(\d[\d,]*)\s?x\b/gi, (match, a, b) =>
-      textNumbers.has(String(a ?? b).replace(/,/g, "")) ? match : "",
-    )
     .replace(/\s{2,}/g, " ")
     .replace(/\s+([,;)])/g, "$1")
+    // "x300 total" with the amount gone would read "... total".
+    .replace(/[\s,]+(in\s+)?total\s*$/i, "")
     .trim();
+}
+
+function withoutInventedAmounts(reward: string, textNumbers: Set<string>): string {
+  const cleaned = reward.replace(AMOUNT, (match, a, b, c) =>
+    textNumbers.has(String(a ?? b ?? c).replace(/,/g, "")) ? match : "",
+  );
+  return cleaned === reward ? reward : tidyReward(cleaned);
+}
+
+// Models also move an amount from one reward to its neighbour ("Symbol
+// Selector Coupon (x60)" becomes "Sol Erda Fragment (x60)"). Posts write
+// amounts in two ways: beside the name on one line, or alone in a table cell
+// far from it. So an amount stays when the post has that number on a line
+// with the reward's name, or on a line with no name at all. It goes when the
+// only places the number appears are lines about something else.
+function withoutMisplacedAmounts(reward: string, flatText: string): string {
+  const name = words(reward.replace(AMOUNT, " "));
+  if (name.length === 0) return reward;
+  const cleaned = reward.replace(AMOUNT, (match, a, b, c) => {
+    const amount = String(a ?? b ?? c).replace(/,/g, "");
+    const pattern = new RegExp(`(?<![\\d.])${amount}(?!\\d)`, "g");
+    for (const found of flatText.matchAll(pattern)) {
+      const lineStart = flatText.lastIndexOf("\n", found.index) + 1;
+      const before = words(flatText.slice(lineStart, found.index));
+      if (before.length === 0) return match;
+      const shared = name.filter((word) => before.includes(word)).length;
+      if (shared / name.length >= 0.5) return match;
+    }
+    return "";
+  });
+  return cleaned === reward ? reward : tidyReward(cleaned);
+}
+
+// A claim deadline is only real when the post talks about claiming next to
+// that date. An item's expiry date ("expires November 11") is not one.
+function isStatedClaimDate(iso: string, text: string, dates: TextDate[]): boolean {
+  const day = Date.parse(iso);
+  return dates.some((date) => {
+    if (Math.abs(date.time - day) > DAY) return false;
+    return /claim/i.test(text.slice(Math.max(0, date.index - 200), date.index + 60));
+  });
+}
+
+const CHANCE = /^\s*(a\s+)?chance\s+(at|for|of)\b/i;
+// A random draw is worth its usual result, however good the jackpot sounds.
+const MAX_SCORE_FOR_A_DRAW = 80;
+
+const EXP_COUPON = /\bexp coupons?\b/i;
+const LEVEL_RANGE = /\b(\d{3})\s*-\s*(\d{3})\b/;
+// From this level on a character is past every "catch-up" growth potion.
+const SETTLED_LEVEL = 260;
+
+// True when neither a Casual nor an Endgame character gets more out of the
+// rewards than the other: EXP Coupons, which are worth the same to everyone,
+// and growth potions whose level range ends below both of them.
+function sameForSettledPlayers(rewards: string[]): boolean {
+  return (
+    rewards.length > 0 &&
+    rewards.every((reward) => {
+      if (EXP_COUPON.test(reward)) return true;
+      const range = /growth potion/i.test(reward) ? LEVEL_RANGE.exec(reward) : null;
+      return range !== null && Number(range[2]) < SETTLED_LEVEL;
+    })
+  );
+}
+
+// A reward that is progress on something else, not a thing to keep.
+const PROGRESS_CURRENCY = /\b(exp|points?|stamps?|gauge)\s*$/i;
+const GENERIC_CURRENCY = /^(character|bonus|weekly character|monster park|passive)?\s*exp$/i;
+
+/**
+ * Folds an activity that only feeds a progress track into that track.
+ *
+ * The prompt asks for one item per track with its minigames as steps, and
+ * models still return the minigames as an item of their own. The sign is
+ * plain: the feeder's rewards name a progress currency ("Designer EXP") that
+ * the track's summary says it runs on, and the track itself does not hand that
+ * currency out. Counted twice, the same ten minutes fill a short day.
+ */
+function foldFeeders(items: ScoredItem[], warnings: string[]): ScoredItem[] {
+  const result = items.map((item) => ({ ...item }));
+  const removed = new Set<string>();
+
+  for (const feeder of result) {
+    const currency = feeder.rewards
+      .map((reward) => reward.replace(/\(.*?\)|\bx\s?\d[\d,]*/gi, " ").trim().toLowerCase())
+      .find((reward) => PROGRESS_CURRENCY.test(reward) && !GENERIC_CURRENCY.test(reward));
+    if (!currency) continue;
+
+    const track = result.find(
+      (other) =>
+        other !== feeder &&
+        !removed.has(other.id) &&
+        other.endsAt !== null &&
+        other.endsAt === feeder.endsAt &&
+        other.summary.toLowerCase().includes(currency) &&
+        !other.rewards.some((reward) => reward.toLowerCase().includes(currency)),
+    );
+    if (!track) continue;
+
+    const own = feeder.rewards.filter((reward) => !reward.toLowerCase().includes(currency));
+    const steps =
+      feeder.steps.length > 0
+        ? feeder.steps
+        : [
+            {
+              name: feeder.title,
+              what: feeder.summary,
+              reward: own.join(", "),
+              startsAt: feeder.startsAt === track.startsAt ? null : feeder.startsAt,
+              endsAt: null,
+            },
+          ];
+    const known = new Set(track.steps.map((step) => normalizeTitle(step.name)));
+    track.steps = [...track.steps, ...steps.filter((step) => !known.has(normalizeTitle(step.name)))];
+    // Chairs and outfits from the minigames are part of what the track offers.
+    track.value = {
+      ...track.value,
+      limited: Math.max(track.value.limited, feeder.value.limited),
+      cosmetic: Math.max(track.value.cosmetic, feeder.value.cosmetic),
+    };
+    removed.add(feeder.id);
+    warnings.push(`"${feeder.title}": only feeds "${track.title}", folded into it as steps`);
+    for (const other of result) {
+      if (other.requires === feeder.id) other.requires = track.id;
+    }
+  }
+  return result.filter((item) => !removed.has(item.id));
 }
 
 const DAY = 86_400_000;
@@ -76,6 +208,8 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
   const dates = findDates(post.text, post.publishedAt);
   const textWords = new Set(words(post.text));
   const textNumbers = numbersIn(post.text);
+  // Lower case, thousands separators gone: "1,000" in the post is "1000" here.
+  const flatText = post.text.toLowerCase().replace(/(\d),(?=\d{3})/g, "$1");
 
   const kept: ScoredItem[] = [];
   for (const item of items) {
@@ -104,7 +238,8 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       claimUntil &&
       (!endsAt ||
         Date.parse(claimUntil) <= Date.parse(endsAt) ||
-        !isGroundedDate(claimUntil, dates, post.publishedAt))
+        !isGroundedDate(claimUntil, dates, post.publishedAt) ||
+        !isStatedClaimDate(claimUntil, post.text, dates))
     ) {
       warnings.push(`"${item.title}": claim deadline ${claimUntil} is not usable, cleared`);
       claimUntil = null;
@@ -123,7 +258,10 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
         return grounded;
       })
       .map((reward) => {
-        const cleaned = withoutInventedAmounts(reward, textNumbers);
+        const cleaned = withoutMisplacedAmounts(
+          withoutInventedAmounts(reward, textNumbers),
+          flatText,
+        );
         if (cleaned !== reward) {
           warnings.push(`"${item.title}": amount in "${reward}" is not in the post, removed`);
         }
@@ -168,15 +306,42 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
           warnings.push(`"${item.title}": step reward "${reward}" is not in the post, removed`);
           reward = "";
         }
-        const opens =
-          step.startsAt && isGroundedDate(step.startsAt, dates, post.publishedAt)
-            ? step.startsAt
-            : null;
-        return { ...step, reward: withoutInventedAmounts(reward, textNumbers), startsAt: opens };
+        const stated = (date: string | null) =>
+          date && isGroundedDate(date, dates, post.publishedAt) ? date : null;
+        return {
+          ...step,
+          reward: withoutInventedAmounts(reward, textNumbers),
+          startsAt: stated(step.startsAt),
+          endsAt: stated(step.endsAt),
+        };
       });
 
-    kept.push({ ...item, startsAt, endsAt, claimUntil, rewards, steps, timeEstimate });
+    let value = item.value;
+    // Every reward is a draw: the score may not be the jackpot's.
+    if (rewards.length > 0 && rewards.every((reward) => CHANCE.test(reward))) {
+      const { casual, endgame, returning } = value.progression;
+      if (Math.max(casual, endgame, returning) > MAX_SCORE_FOR_A_DRAW) {
+        warnings.push(`"${item.title}": every reward is a draw, scores capped at ${MAX_SCORE_FOR_A_DRAW}`);
+        value = {
+          ...value,
+          progression: {
+            casual: Math.min(casual, MAX_SCORE_FOR_A_DRAW),
+            endgame: Math.min(endgame, MAX_SCORE_FOR_A_DRAW),
+            returning: Math.min(returning, MAX_SCORE_FOR_A_DRAW),
+          },
+        };
+      }
+    }
+    if (sameForSettledPlayers(rewards) && value.progression.endgame !== value.progression.casual) {
+      warnings.push(`"${item.title}": rewards are worth the same at 260+, Endgame set to Casual's score`);
+      value = { ...value, progression: { ...value.progression, endgame: value.progression.casual } };
+    }
+
+    kept.push({ ...item, value, startsAt, endsAt, claimUntil, rewards, steps, timeEstimate });
   }
+  const folded = foldFeeders(kept, warnings);
+  kept.length = 0;
+  kept.push(...folded);
   // A notice about a single event states its period outright, and code reads
   // that more reliably than a model does (models sometimes copy the Pacific
   // time as if it were UTC). When the two ends are within a day of each other
