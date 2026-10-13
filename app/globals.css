@@ -461,6 +461,13 @@ body {
   vertical-align: -0.3rem;
 }
 
+.reward-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .npc-dots span {
   width: 0.5rem;
   height: 0.5rem;
@@ -1036,13 +1043,6 @@ body {
   color: var(--tier-color);
 }
 
-.reward-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  object-fit: contain;
-  image-rendering: pixelated;
-}
-
 /* A reward, shown like an inventory slot with its name beside it. */
 .slot {
   display: flex;
@@ -1074,6 +1074,164 @@ body {
   max-height: 1.75rem;
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+/* A slot with no picture: a pixel icon for the kind of reward, on a dashed
+   frame so it does not pass for the item's real artwork. */
+.slot-kind {
+  border-style: dashed;
+  background: #f6f8fd;
+  cursor: help;
+}
+
+/* ---------- Pictures that enlarge ---------- */
+
+/* A thumbnail that opens the lightbox. The frame classes (.quest-preview,
+   .quest-thumb, .slot-icon) keep deciding its size and border. */
+.zoom {
+  position: relative;
+  padding: 0;
+  cursor: zoom-in;
+  transition:
+    border-color 120ms,
+    filter 120ms;
+}
+
+.zoom:hover {
+  border-color: var(--color-gold);
+  filter: brightness(1.04);
+}
+
+/* Corner badge on the larger thumbnails, so it is plain they can be opened. */
+.quest-preview.zoom::after,
+.quest-thumb.zoom::after {
+  position: absolute;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--color-frame-dark);
+  border-radius: 5px;
+  background: linear-gradient(#ffe07a, #ffb21f);
+  color: #3d2200;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+  content: "+";
+}
+
+/* The hover preview, pinned beside its thumbnail (see zoom-image.tsx). */
+.zoom-pop {
+  position: fixed;
+  z-index: 60;
+  padding: 0.35rem;
+  border: 3px solid var(--color-frame-dark);
+  border-radius: 12px;
+  background: var(--color-cream);
+  box-shadow:
+    inset 0 0 0 2px #9db6ee,
+    0 6px 0 rgb(22 34 74 / 0.3);
+  transform: translateY(-50%);
+  pointer-events: none;
+  animation: fade-in 120ms ease-out;
+}
+
+.zoom-pop img {
+  display: block;
+  max-width: calc(var(--pop-w) - 1.1rem);
+  max-height: calc(var(--pop-h) - 1.1rem);
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+/* Game icons are tiny, so they are scaled up with hard pixel edges. */
+.zoom-pop.zoom-pixel img {
+  width: 7rem;
+  height: 7rem;
+  image-rendering: pixelated;
+}
+
+.lightbox {
+  width: fit-content;
+  max-width: min(64rem, calc(100vw - 1.5rem));
+  max-height: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: 0;
+  color: var(--color-ink);
+}
+
+.lightbox[open] {
+  animation: rise 160ms ease-out;
+}
+
+.lightbox::backdrop {
+  background: rgb(22 34 74 / 0.72);
+}
+
+/* The page behind an open picture stays put. */
+:root:has(.lightbox[open]) {
+  overflow: hidden;
+}
+
+.lightbox-frame {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: calc(100dvh - 1.5rem - 6px);
+}
+
+.lightbox .window-title {
+  flex-wrap: nowrap;
+}
+
+.lightbox-name {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-stage {
+  display: grid;
+  place-items: center;
+  min-width: min(18rem, calc(100vw - 2rem));
+  min-height: 8rem;
+  padding: 0.75rem;
+  overflow: auto;
+  background: var(--color-panel);
+}
+
+.lightbox-stage img {
+  max-width: 100%;
+  max-height: calc(100dvh - 11rem);
+  object-fit: contain;
+}
+
+.lightbox-stage.zoom-pixel img {
+  width: 12rem;
+  height: 12rem;
+  image-rendering: pixelated;
+}
+
+.lightbox-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 0.75rem 0.75rem;
+  border-top: 2px dashed var(--color-line);
+}
+
+.lightbox-foot > span {
+  margin-right: auto;
+}
+
+.lightbox-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 .stars {
@@ -1552,6 +1710,12 @@ body {
   }
   70% {
     transform: scale(1.25);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }
 

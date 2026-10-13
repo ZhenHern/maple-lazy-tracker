@@ -1,9 +1,11 @@
 import type { CSSProperties } from "react";
 import { isAnimated } from "@/lib/images";
+import { rewardKind } from "@/lib/reward-kind";
 import type { Profile, Tier, TrackerItem } from "@/lib/types";
 import { Countdown, ENDING_SOON, formatDate, formatRemaining } from "./countdown";
 import { PixelSprite } from "./pixel-sprite";
 import { PROFILE_INFO } from "./profile-picker";
+import { ZoomImage } from "./zoom-image";
 
 const CATEGORY_LABEL: Record<TrackerItem["category"], string> = {
   event: "Event",
@@ -62,17 +64,6 @@ const TIME_COST_LABEL = {
   long: "More than 45 minutes a day",
   idle: "Runs while you are away",
 };
-
-// Images load straight from Nexon's CDN in the visitor's browser. next/image is
-// avoided on purpose: it would copy and re-serve them from our own server.
-function NexonImage({ src, alt, className }: { src: string; alt: string; className: string }) {
-  return (
-    <a href={src} target="_blank" rel="noreferrer" className={className}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} loading="lazy" decoding="async" referrerPolicy="no-referrer" />
-    </a>
-  );
-}
 
 // How much of the event's run has already passed, 0-100, or null when unknown.
 function elapsedPercent(item: TrackerItem, now: number | null): number | null {
@@ -134,14 +125,14 @@ export function QuestItem({
     <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
       <details className="quest">
         <summary className="quest-head">
-          <span className="quest-icon">
-            {thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={thumbnail} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
-            ) : (
+          {thumbnail ? (
+            // Hovering shows the picture larger. A click still opens the quest.
+            <ZoomImage src={thumbnail} alt="" className="quest-icon" hoverOnly />
+          ) : (
+            <span className="quest-icon">
               <PixelSprite name="bulb" className="h-8" />
-            )}
-          </span>
+            </span>
+          )}
 
           <div className="quest-main">
             <h3 className="quest-title">{item.title}</h3>
@@ -180,15 +171,7 @@ export function QuestItem({
                     <span key={reward + position}>
                       {position > 0 && ", "}
                       {icon && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={icon}
-                          alt=""
-                          className="reward-icon"
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                        />
+                        <ZoomImage src={icon} alt="" className="reward-icon" pixelated hoverOnly />
                       )}
                       {reward}
                     </span>
@@ -314,16 +297,19 @@ export function QuestItem({
               <ul className="flex flex-wrap gap-2">
                 {item.rewards.map((reward, position) => {
                   const icon = item.rewardImages[position];
+                  // No picture in the patch notes: an icon for the kind of
+                  // reward stands in, so the slot still says something.
+                  const kind = rewardKind(reward);
                   return (
                     <li key={reward + position} className="slot">
-                      <span className="slot-icon" aria-hidden="true">
-                        {icon ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={icon} alt="" loading="lazy" referrerPolicy="no-referrer" />
-                        ) : (
-                          "★"
-                        )}
-                      </span>
+                      {icon ? (
+                        <ZoomImage src={icon} alt={reward} className="slot-icon" pixelated />
+                      ) : (
+                        <span className="slot-icon slot-kind" title={kind.label}>
+                          <PixelSprite name={kind.sprite} className="h-5 w-5" />
+                          <span className="sr-only">{kind.label}: </span>
+                        </span>
+                      )}
                       {reward}
                     </li>
                   );
@@ -334,14 +320,22 @@ export function QuestItem({
 
           {preview && (
             <div className="quest-media">
-              <NexonImage src={preview} alt={`${item.title} preview`} className="quest-preview" />
+              <ZoomImage
+                src={preview}
+                alt={`${item.title} preview`}
+                title={item.title}
+                group={item.images}
+                className="quest-preview"
+              />
               {gallery.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {gallery.map((src, position) => (
-                    <NexonImage
+                    <ZoomImage
                       key={src}
                       src={src}
                       alt={`${item.title} image ${position + 2}`}
+                      title={item.title}
+                      group={item.images}
                       className="quest-thumb"
                     />
                   ))}
