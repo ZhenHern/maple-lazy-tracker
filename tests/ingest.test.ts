@@ -59,6 +59,8 @@ function scored(title: string): ScoredItem {
     why: "",
     timeCost: "short",
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,

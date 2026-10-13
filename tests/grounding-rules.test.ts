@@ -33,6 +33,8 @@ function item(id: string, overrides: Partial<ScoredItem> = {}): ScoredItem {
     why: "",
     timeCost: "short",
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,
@@ -126,5 +128,63 @@ describe("amounts and claim dates", () => {
     expect(stated.items[0].claimUntil).toBe("2026-11-17T23:59:00Z");
     const expiry = groundItems([item("Robot", { claimUntil: "2026-11-20T00:00:00Z" })], post);
     expect(expiry.items[0].claimUntil).toBeNull();
+  });
+});
+
+describe("rates, draws and days per week", () => {
+  const text = [
+    TEXT,
+    "## Go Go Sidekick",
+    "Clear All Waves | 500 |",
+    "Rewards can be claimed up to 3 times per week.",
+    "You need 2,500 Designer EXP each week, and can earn at most 500 a day.",
+  ].join("\n");
+
+  it("drops a per-week unit the post does not write after that number", () => {
+    const { items } = groundItems(
+      [item("Go Go Sidekick", { rewards: ["Sol Erda Fragment (up to 500/week)", "EXP Voucher (up to 500 per claim)"] })],
+      { ...post, text },
+    );
+    expect(items[0].rewards).toEqual(["Sol Erda Fragment (up to 500)", "EXP Voucher (up to 500 per claim)"]);
+  });
+
+  it("caps a draw even when not every prize says 'Chance at'", () => {
+    const { items } = groundItems(
+      [
+        item("Hello World, Hello Robot", {
+          summary: "Talk to the robot daily to receive a random gift.",
+          rewards: ["Chance at Karma Cube", "Sol Erda Fragment (x300)", "Virtual Master Chair"],
+          value: { progression: { casual: 88, endgame: 88, returning: 60 }, limited: 0, cosmetic: 0 },
+        }),
+      ],
+      { ...post, text },
+    );
+    expect(items[0].value.progression).toEqual({ casual: 80, endgame: 80, returning: 60 });
+  });
+
+  it("works out the days a week from a weekly target and a daily cap", () => {
+    const track = item("Mesotron-S Project", { daysPerWeek: 7, weeklyTarget: 2500, dailyCap: 500 });
+    const { items, warnings } = groundItems([track], { ...post, text });
+    expect(items[0].daysPerWeek).toBe(5);
+    expect(warnings.some((warning) => warning.includes("5 days a week"))).toBe(true);
+    // Numbers the post never writes are ignored.
+    const invented = item("Mesotron-S Project", { daysPerWeek: 7, weeklyTarget: 900, dailyCap: 300 });
+    expect(groundItems([invented], { ...post, text }).items[0].daysPerWeek).toBe(7);
+  });
+
+  it("folds an AFK seat that pays the track's currency into the track", () => {
+    const track = item("Mesotron-S Project", {
+      summary: "Earn Designer EXP every day to rank up and unlock perks.",
+    });
+    const seat = item("Real Gains in Virtual Training", {
+      timeCost: "idle",
+      requires: track.id,
+      summary: "Sit in the venue to earn Designer EXP while away.",
+      rewards: ["Virtual Master Chair"],
+    });
+    const guardian = item("Hello World", { requires: track.id, summary: "Needs Master rank.", rewards: ["Karma Cube"] });
+    const { items } = groundItems([track, seat, guardian], post);
+    expect(items.map((each) => each.id)).toEqual([track.id, guardian.id]);
+    expect(items[0].steps.map((step) => step.name)).toEqual(["Real Gains in Virtual Training"]);
   });
 });

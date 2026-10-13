@@ -1,0 +1,106 @@
+{
+  "sourceId": "42465",
+  "kind": "event",
+  "title": "Kinesis Redux!",
+  "url": "https://www.nexon.com/maplestory/news/events/42465",
+  "publishedAt": "2026-07-22T11:41:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/ss1nap01/540x304-kinesis-redux-maplestory.png",
+  "contentHash": "d94417d521c2543d4e58473c59a30265a59c30eb10996cb068037cfc1c66017d",
+  "items": [
+    {
+      "id": "kinesis-revamp",
+      "why": "Major class overhaul; free HEXA reset items for existing Kinesis mains.",
+      "steps": [],
+      "title": "Kinesis Redux",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 35,
+          "endgame": 35,
+          "returning": 35
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [],
+      "rewards": [
+        "HEXA Matrix Reset Scroll",
+        "Change Circulator"
+      ],
+      "summary": "Kinesis characters now use MP instead of Psychic Points. Kinesis characters created before July 22 can claim a HEXA Matrix Reset Scroll and Change Circulator via the Maple Administrator.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T11:41:00Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 1,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2831068/icon",
+        "https://maplestory.io/api/GMS/270/item/2831312/icon"
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "kinetic-event",
+      "why": "Best growth event for Kinesis players, offering a Hyper Burninator and complete theme set.",
+      "steps": [],
+      "title": "Kinetic",
+      "value": {
+        "limited": 82,
+        "cosmetic": 90,
+        "progression": {
+          "casual": 55,
+          "endgame": 45,
+          "returning": 92
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/5y4fshpp/kinetic-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/wribshlc/lil-jay-and-lil-jays-cat-mask.png",
+        "https://g.nexonstatic.com/media/tdeo2wdz/kinesisfacehairfemale.png",
+        "https://g.nexonstatic.com/media/srjiqsw0/kinesishaireyesm.png",
+        "https://g.nexonstatic.com/media/fcuoybnx/yunaroid.png"
+      ],
+      "rewards": [
+        "Hyper Burninator Coupon",
+        "Yunaroid Coupon",
+        "Lil Jay Pet Package",
+        "Kinetic Medal",
+        "Sol Erda Fragment (x30)"
+      ],
+      "summary": "Complete 12 daily check-ins by defeating 1,000 monsters each on a Kinesis character. Participation rewards a Hyper Burninator.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T11:41:00Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2534007/icon",
+        "https://maplestory.io/api/GMS/270/item/2831197/icon",
+        "https://maplestory.io/api/GMS/270/item/2831194/icon",
+        "https://maplestory.io/api/GMS/270/item/2831202/icon",
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png"
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "4 min/day",
+        "effort": "low",
+        "minutesPerWeek": 28
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:52:41.842Z",
+  "warnings": [
+    "\"Kinesis Redux\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Kinetic\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared"
+  ],
+  "error": null
+}

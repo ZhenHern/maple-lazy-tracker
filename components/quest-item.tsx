@@ -171,7 +171,7 @@ export function QuestItem({
               )}
             </div>
             <span className="quest-summary">{item.summary}</span>
-            {item.rewards.length > 0 && (
+            {task && item.rewards.length > 0 && (
               <span className="quest-loot">
                 <PixelSprite name="chest" className="h-4 w-5 shrink-0" />
                 <span className="sr-only">Rewards: </span>

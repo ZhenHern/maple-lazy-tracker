@@ -134,7 +134,31 @@ function sameForSettledPlayers(rewards: string[]): boolean {
 
 // A reward that is progress on something else, not a thing to keep.
 const PROGRESS_CURRENCY = /\b(exp|points?|stamps?|gauge)\s*$/i;
-const GENERIC_CURRENCY = /^(character|bonus|weekly character|monster park|passive)?\s*exp$/i;
+const GENERIC_CURRENCY =
+  /^(character|bonus|weekly|monster park|passive|more|extra|massive|of|and|or|the|earn|gain|for|in)?\s*(exp|points?)$/i;
+
+/** The progress currency a summary names ("designer exp"), or null. */
+function currencyIn(summary: string): string | null {
+  for (const match of summary.toLowerCase().matchAll(/\b[a-z]+ (?:exp|points?)\b/g)) {
+    if (!GENERIC_CURRENCY.test(match[0])) return match[0];
+  }
+  return null;
+}
+
+// A rate a model attached to an amount: "500/week", "500 a day". "Per claim"
+// is left alone: it is the plain reading of an amount and overstates nothing.
+const RATE = /(\d[\d,]*)\s*(?:\/|per\s+|a\s+)\s*(week|day)\b/gi;
+
+// "Up to 500" per completion, three completions a week, comes back as "up to
+// 500/week": the number is real and the unit is invented, a factor of three
+// off. A unit stays only when the post writes it after that number.
+function withoutInventedRates(reward: string, flatText: string): string {
+  return reward.replace(RATE, (match, amount: string, unit: string) => {
+    const number = amount.replace(/,/g, "");
+    const stated = new RegExp(`(?<![\\d.])${number}\\s*(?:/|per|a|each)\\s*${unit}`, "i");
+    return stated.test(flatText) ? match : amount;
+  });
+}
 
 /**
  * Folds an activity that only feeds a progress track into that track.
@@ -150,21 +174,34 @@ function foldFeeders(items: ScoredItem[], warnings: string[]): ScoredItem[] {
   const removed = new Set<string>();
 
   for (const feeder of result) {
-    const currency = feeder.rewards
-      .map((reward) => reward.replace(/\(.*?\)|\bx\s?\d[\d,]*/gi, " ").trim().toLowerCase())
-      .find((reward) => PROGRESS_CURRENCY.test(reward) && !GENERIC_CURRENCY.test(reward));
-    if (!currency) continue;
+    let currency =
+      feeder.rewards
+        .map((reward) => reward.replace(/\(.*?\)|\bx\s?\d[\d,]*/gi, " ").trim().toLowerCase())
+        .find((reward) => PROGRESS_CURRENCY.test(reward) && !GENERIC_CURRENCY.test(reward)) ?? null;
+    let track = currency
+      ? result.find(
+          (other) =>
+            other !== feeder &&
+            !removed.has(other.id) &&
+            other.endsAt !== null &&
+            other.endsAt === feeder.endsAt &&
+            other.summary.toLowerCase().includes(currency!) &&
+            !other.rewards.some((reward) => reward.toLowerCase().includes(currency!)),
+        )
+      : undefined;
 
-    const track = result.find(
-      (other) =>
-        other !== feeder &&
-        !removed.has(other.id) &&
-        other.endsAt !== null &&
-        other.endsAt === feeder.endsAt &&
-        other.summary.toLowerCase().includes(currency) &&
-        !other.rewards.some((reward) => reward.toLowerCase().includes(currency)),
-    );
-    if (!track) continue;
+    // The same thing said another way: the item needs the track (the model
+    // linked them) and its own summary says it earns the track's currency. An
+    // AFK seat that pays out "Designer EXP" is a feeder like any minigame.
+    if (!track && feeder.requires) {
+      const gate = result.find((other) => other.id === feeder.requires && !removed.has(other.id));
+      const named = gate ? currencyIn(gate.summary) : null;
+      if (gate && named && feeder.summary.toLowerCase().includes(named)) {
+        track = gate;
+        currency = named;
+      }
+    }
+    if (!track || !currency) continue;
 
     const own = feeder.rewards.filter((reward) => !reward.toLowerCase().includes(currency));
     const steps =
@@ -258,8 +295,8 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
         return grounded;
       })
       .map((reward) => {
-        const cleaned = withoutMisplacedAmounts(
-          withoutInventedAmounts(reward, textNumbers),
+        const cleaned = withoutInventedRates(
+          withoutMisplacedAmounts(withoutInventedAmounts(reward, textNumbers), flatText),
           flatText,
         );
         if (cleaned !== reward) {
@@ -317,8 +354,14 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       });
 
     let value = item.value;
-    // Every reward is a draw: the score may not be the jackpot's.
-    if (rewards.length > 0 && rewards.every((reward) => CHANCE.test(reward))) {
+    // A draw: the score may not be the jackpot's. Models do not prefix every
+    // prize with "Chance at", so half the list is enough, or one such prize
+    // in an item whose summary calls itself random.
+    const draws = rewards.filter((reward) => CHANCE.test(reward)).length;
+    const isDraw =
+      draws > 0 &&
+      (draws * 2 >= rewards.length || /\brandom\b|\bgacha\b|\blottery\b|\braffle\b/i.test(item.summary));
+    if (isDraw) {
       const { casual, endgame, returning } = value.progression;
       if (Math.max(casual, endgame, returning) > MAX_SCORE_FOR_A_DRAW) {
         warnings.push(`"${item.title}": every reward is a draw, scores capped at ${MAX_SCORE_FOR_A_DRAW}`);
@@ -337,7 +380,37 @@ export function groundItems(items: ScoredItem[], post: GroundingInput): Grounded
       value = { ...value, progression: { ...value.progression, endgame: value.progression.casual } };
     }
 
-    kept.push({ ...item, value, startsAt, endsAt, claimUntil, rewards, steps, timeEstimate });
+    // "2,500 a week, at most 500 a day" is five days. Both numbers must be
+    // in the post; then the division is ours, not the model's.
+    let daysPerWeek = item.daysPerWeek;
+    const { weeklyTarget, dailyCap } = item;
+    if (
+      weeklyTarget &&
+      dailyCap &&
+      weeklyTarget >= dailyCap &&
+      textNumbers.has(String(weeklyTarget)) &&
+      textNumbers.has(String(dailyCap))
+    ) {
+      const days = Math.min(7, Math.ceil(weeklyTarget / dailyCap));
+      if (days !== daysPerWeek) {
+        warnings.push(
+          `"${item.title}": ${weeklyTarget} a week at ${dailyCap} a day is ${days} days a week, not ${daysPerWeek}`,
+        );
+        daysPerWeek = days;
+      }
+    }
+
+    kept.push({
+      ...item,
+      value,
+      daysPerWeek,
+      startsAt,
+      endsAt,
+      claimUntil,
+      rewards,
+      steps,
+      timeEstimate,
+    });
   }
   const folded = foldFeeders(kept, warnings);
   kept.length = 0;

@@ -1,0 +1,65 @@
+{
+  "sourceId": "43992",
+  "kind": "event",
+  "title": "[Update Aug 26] Fantasia Finale Event",
+  "url": "https://www.nexon.com/maplestory/news/events/43992",
+  "publishedAt": "2026-08-25T17:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/okwkyj45/540x304-fantasia-finale-event-maplestory.png",
+  "contentHash": "c1a4c09b267335c1acc53cb35d10367a8d51f32ae188163e9a5990a5f8940d39",
+  "items": [
+    {
+      "id": "fantasia-finale",
+      "why": "Simple daily task for AFK EXP coupons and a unique Ellanos home furnishing.",
+      "steps": [],
+      "title": "Fantasia Finale",
+      "value": {
+        "limited": 60,
+        "cosmetic": 70,
+        "progression": {
+          "casual": 40,
+          "endgame": 25,
+          "returning": 50
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/vmjgkwhq/1100x225-fantasia-finale-event-maplestory.png",
+        "https://g.nexonstatic.com/media/mprmwryp/ellanos-coupon-furnishing.gif"
+      ],
+      "rewards": [
+        "Ellanos Home Furnishing",
+        "Illusion Ring: Ellanos",
+        "Permanent Alongside Ellanos Mount",
+        "Luxe Sauna Coupon (x10)"
+      ],
+      "summary": "A 10-day check-in event. Defeat 1,000 monsters daily to receive Luxe Sauna Coupons and permanent Home furniture items.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-08-26T00:00:00Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/hcoe0uw5/illusion-ring-ellanos.gif",
+        "https://g.nexonstatic.com/media/0u3fhtok/alongside-ellanos-mount.png",
+        "https://maplestory.io/api/GMS/270/item/2638457/icon"
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "~5 min/day",
+        "effort": "low",
+        "minutesPerWeek": 35
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:42:11.900Z",
+  "warnings": [
+    "\"Fantasia Finale\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared"
+  ],
+  "error": null
+}

@@ -9,49 +9,98 @@
   "items": [
     {
       "id": "winter-countdown",
-      "title": "Winter Countdown Event",
-      "category": "event",
-      "summary": "Participate in daily check-ins and complete missions to claim valuable progression items, growth potions, and cosmetics.",
+      "why": "Easy daily check-in for growth potions, 60 symbols, and a legendary potential scroll for event rings.",
+      "steps": [],
+      "title": "Winter Countdown",
       "value": {
+        "limited": 35,
+        "cosmetic": 45,
         "progression": {
-          "new": 95,
-          "casual": 90,
-          "endgame": 85,
-          "returning": 95
-        },
-        "limited": 80,
-        "cosmetic": 75
+          "casual": 82,
+          "endgame": 65,
+          "returning": 88
+        }
       },
+      "endsAt": "2026-11-10T23:59:00Z",
+      "images": [],
       "rewards": [
-        "Magnificent Growth Potion",
         "Transcendent Growth Potion",
-        "Sol Erda and Fragments",
-        "Event Ring Selector Coupon",
+        "Event Ring Exclusive Legendary Potential Scroll 100%",
+        "Sol Erda/Sol Erda Fragment Selector Coupon (x2)",
+        "Symbol Selector Coupon (x60)",
         "Rosy or Flushed Skin Coupon"
       ],
+      "summary": "Check in daily by clicking 'Participate' in the event UI to earn progression rewards. Starting November 11, claim additional milestone 'Winter Gifts' based on your total attendance count.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
       "startsAt": "2026-10-07T00:00:00Z",
-      "endsAt": "2026-11-24T23:59:00Z",
-      "timeEstimate": {
-        "label": "1 min/day for check-in; up to 10k kills/week for mission",
-        "minutesPerWeek": null,
-        "effort": null,
-        "basis": "uncertain"
-      },
-      "images": [
-        "https://g.nexonstatic.com/media/p1tnsv51/image.png",
-        "https://g.nexonstatic.com/media/kx4hjco3/1100x225-winter-countdown-event-maplestory.png",
-        "https://g.nexonstatic.com/media/um4johnu/specialpower-special-mission.png"
+      "timeCost": "instant",
+      "claimUntil": "2026-11-24T23:59:00Z",
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://maplestory.io/api/GMS/270/item/2644100/icon",
+        "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
+        "https://maplestory.io/api/GMS/270/item/5681263/icon"
       ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "1 min/day",
+        "effort": "low",
+        "minutesPerWeek": 7
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "winter-countdown-special-mission",
+      "why": "Extra 3x and 4x EXP coupons while hunting, plus a 200-249 growth potion when the community finishes the gauge.",
+      "steps": [],
+      "title": "Winter Countdown Special Mission",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 40,
+          "endgame": 40,
+          "returning": 65
+        }
+      },
+      "endsAt": "2026-11-06T23:59:00Z",
+      "images": [],
+      "rewards": [
+        "Magnificent Growth Potion (200 - 249)",
+        "4x EXP Coupon (30 min)",
+        "3x EXP Coupon (30 min)"
+      ],
+      "summary": "Defeat 2,000 enemies near your level and click 'Fill' to contribute to a global gauge. You can fill the gauge 5 times per week for a total of 20 times.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-10-07T00:00:00Z",
+      "timeCost": "short",
+      "claimUntil": "2026-11-10T23:59:00Z",
+      "daysPerWeek": 5,
       "rewardImages": [
         "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
-        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
-        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
-        "https://maplestory.io/api/GMS/270/item/2637656/icon",
-        "https://maplestory.io/api/GMS/270/item/5681263/icon"
-      ]
+        "https://maplestory.io/api/GMS/270/item/2450187/icon",
+        "https://g.nexonstatic.com/media/kkada4kz/icon_3x-exp-coupon-30-min.png"
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "~10 min, 5 days/week",
+        "effort": "low",
+        "minutesPerWeek": 50
+      },
+      "weeklyTarget": null
     }
   ],
-  "model": "gemini-3.5-flash-lite",
-  "promptVersion": 4,
-  "classifiedAt": "2026-10-12T12:02:57.357Z"
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 14,
+  "classifiedAt": "2026-10-13T11:08:13.571Z",
+  "warnings": [
+    "\"Winter Countdown Special Mission\": rewards are worth the same at 260+, Endgame set to Casual's score"
+  ],
+  "error": null
 }

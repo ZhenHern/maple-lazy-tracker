@@ -40,6 +40,8 @@ function item(overrides: Partial<ScoredItem> = {}): ScoredItem {
     why: "A potion a day for one minute.",
     timeCost: "instant",
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,

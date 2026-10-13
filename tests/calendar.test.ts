@@ -11,6 +11,8 @@ function quest(overrides: Partial<TrackerItem>): TrackerItem {
     why: "",
     timeCost: "instant",
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,

@@ -20,6 +20,8 @@ function quest(
     why: "",
     timeCost,
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,
@@ -201,6 +203,16 @@ describe("planDay", () => {
       outfit: "must_do",
       "rank-track": "skip",
     });
+  });
+
+  it("with no priority picked, does not call a cosmetics-only quest a Must Do", () => {
+    const outfit = cosmeticQuest("outfit", 99, "short");
+    // Nothing competes for the time, and it still tops out at If Free.
+    expect(planDay([outfit], "casual", [], 60, NOW).get("outfit")?.tier).toBe("if_free");
+    expect(planDay([outfit], "casual", ["cosmetic"], 60, NOW).get("outfit")?.tier).toBe("must_do");
+    // A one-minute cosmetic claim is still worth the minute.
+    const claim = cosmeticQuest("free-hat", 99, "instant");
+    expect(planDay([claim], "casual", [], 60, NOW).get("free-hat")).toEqual({ tier: "must_do", note: "quick" });
   });
 
   it("uses the best of the chosen priorities, like the base tier does", () => {

@@ -1,0 +1,122 @@
+{
+  "sourceId": "42466",
+  "kind": "event",
+  "title": "[Update Aug 13] Mystic Frontier Champions",
+  "url": "https://www.nexon.com/maplestory/news/events/42466",
+  "publishedAt": "2026-07-22T12:40:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/4ytjbi2o/540x304-mystic-frontier-champions-maplestory.png",
+  "contentHash": "d6858ea8e16e41b1fc2be6d5d2712e2492418556a4fb1824f772c22731273519",
+  "items": [
+    {
+      "id": "mystic-frontier-champions",
+      "why": "Excellent weekly Sol Erda Fragment source (up to 50) for established players.",
+      "steps": [],
+      "title": "Mystic Frontier Champions",
+      "value": {
+        "limited": 65,
+        "cosmetic": 25,
+        "progression": {
+          "casual": 75,
+          "endgame": 85,
+          "returning": 40
+        }
+      },
+      "endsAt": "2026-09-06T23:30:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/zyblqhiu/image.png",
+        "https://g.nexonstatic.com/media/a41i2gqa/image.png",
+        "https://g.nexonstatic.com/media/dhbdatw1/image.png",
+        "https://g.nexonstatic.com/media/mroj2hiz/image.png",
+        "https://g.nexonstatic.com/media/mckb4fyh/image.png"
+      ],
+      "rewards": [
+        "Sol Erda Fragment Coupon (up to x50)",
+        "Pitched Whispers Coupon (up to x3)",
+        "Frontier Ticket Coupon (up to x10)",
+        "Exclusive Champion Medals"
+      ],
+      "summary": "Build a Familiar deck during the week and compete in weekend matches. Win up to 10 matches for rewards. Requires Lv. 200+.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T12:40:00Z",
+      "timeCost": "medium",
+      "claimUntil": null,
+      "daysPerWeek": 2,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        null,
+        "https://maplestory.io/api/GMS/270/item/2832607/icon",
+        null
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "Up to 10 wins or 4 losses/weekend",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "familiar-adventure",
+      "why": "Steady source for Familiar progression items and Sol Erda fragments.",
+      "steps": [],
+      "title": "Familiar Adventure",
+      "value": {
+        "limited": 20,
+        "cosmetic": 15,
+        "progression": {
+          "casual": 65,
+          "endgame": 65,
+          "returning": 60
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/r3ep4cdg/familiaradventure.png",
+        "https://g.nexonstatic.com/media/akvp2zfv/dense-sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/5tgiscg3/glowing-familiar-card-pack.png",
+        "https://g.nexonstatic.com/media/nqqanfhn/fauxmiliar-card.png",
+        "https://g.nexonstatic.com/media/bsmjwl52/frontier-ticket-coupon.png"
+      ],
+      "rewards": [
+        "Familiar Card Pack",
+        "Sol Erda Fragment Coupon",
+        "Sol Erda Energy",
+        "Familiar Essence"
+      ],
+      "summary": "Use Frontier Tickets (3 daily, 5x/week) to explore the dungeon and attack Treasure Chests to upgrade their rank. Requires Lv. 200+.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T12:40:00Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 5,
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/x4ypyuj2/familiar-card-pack.png",
+        "https://g.nexonstatic.com/media/njgholxt/sol-erda-fragment-coupon.png",
+        "https://g.nexonstatic.com/media/py0b0pjb/sol-erda-energy.png",
+        "https://g.nexonstatic.com/media/bzzlrreb/familiar-essence.png"
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "5-10 min per ticket",
+        "effort": "low",
+        "minutesPerWeek": 50
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:52:29.391Z",
+  "warnings": [
+    "\"Familiar Adventure\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Mystic Frontier Champions\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Mystic Frontier Champions\": amount in \"Sol Erda Fragment Coupon (up to x50/week)\" is not in the post, removed",
+    "\"Mystic Frontier Champions\": amount in \"Pitched Whispers Coupon (up to x3/week)\" is not in the post, removed",
+    "\"Mystic Frontier Champions\": amount in \"Frontier Ticket Coupon (up to x10/week)\" is not in the post, removed"
+  ],
+  "error": null
+}

@@ -1,0 +1,130 @@
+{
+  "sourceId": "44414",
+  "kind": "event",
+  "title": "[Update Sept 11] Frieren's Spell Collection",
+  "url": "https://www.nexon.com/maplestory/news/events/44414",
+  "publishedAt": "2026-09-09T11:01:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/iaehl5sy/540x304_frierens_spell_collection_maplestory_x_frieren_event.png",
+  "contentHash": "ce4ef988f235a18543dad0d6b93d8b8f88a5fa8215b1e5960c630c713f1bea61",
+  "items": [
+    {
+      "id": "frierens-spell-collection",
+      "why": "Highly limited collaboration with rare permanent outfits, totems with stats, and a Skill Node Lv. 25 reward.",
+      "steps": [
+        {
+          "name": "Adventure Journal",
+          "what": "Defeat 1,000 monsters to claim journal rewards 5 times per week.",
+          "endsAt": null,
+          "reward": "Growth Potions and Totems",
+          "startsAt": null
+        },
+        {
+          "name": "Adventure with Companions",
+          "what": "Defeat 10,000 monsters per day to spawn replicas for fragments and coins.",
+          "endsAt": null,
+          "reward": "Sol Erda Fragments and Adventure Coins",
+          "startsAt": null
+        },
+        {
+          "name": "Grimoire Missions",
+          "what": "Complete specific tasks like Star Force or locating items for high-tier scrolls and wardrobe access.",
+          "endsAt": null,
+          "reward": "Karma Star Force 15-Star Scroll",
+          "startsAt": null
+        }
+      ],
+      "title": "Frieren's Spell Collection",
+      "value": {
+        "limited": 98,
+        "cosmetic": 95,
+        "progression": {
+          "casual": 75,
+          "endgame": 60,
+          "returning": 85
+        }
+      },
+      "endsAt": "2026-10-07T23:59:00Z",
+      "images": [],
+      "rewards": [
+        "Sol Erda Fragment (x10)",
+        "Ultimate Nodestone (Skill Node Lv. 25)",
+        "Frieren Totem (Permanent with 30-day stats)",
+        "Transcendent Growth Potion",
+        "Cursed Doll or Havoc Permanent Outfits"
+      ],
+      "summary": "A major collaboration event. Hunt monsters daily to progress through an adventure journal (5/week) and fill gauges for hunting skills. Includes a coin shop and a wardrobe system for permanent outfits.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-09T00:00:00Z",
+      "timeCost": "medium",
+      "claimUntil": "2026-10-08T02:00:00Z",
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        null,
+        null,
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        null
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "~45-60 min/day for full hunting cap",
+        "effort": "high",
+        "minutesPerWeek": 420
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "frieren-mighty-foes",
+      "why": "Limited collaboration Starkroid (Android) and permanent title with 30-day stats.",
+      "steps": [],
+      "title": "Frieren: Defeat Mighty Foes",
+      "value": {
+        "limited": 95,
+        "cosmetic": 85,
+        "progression": {
+          "casual": 45,
+          "endgame": 35,
+          "returning": 60
+        }
+      },
+      "endsAt": "2026-10-07T23:59:00Z",
+      "images": [],
+      "rewards": [
+        "Starkroid and Lidium Heart",
+        "I Bought This Title Coupon",
+        "Frieren Totem Selector Coupon",
+        "Odd Expression (Frieren) Coupon"
+      ],
+      "summary": "Defeat Chaos Vellum, Normal Lotus, Normal Slime, and Lucid solo to earn limited collaboration rewards. Practice mode clears also count.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-09T00:00:00Z",
+      "timeCost": "short",
+      "claimUntil": "2026-10-08T02:00:00Z",
+      "daysPerWeek": 1,
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/yftp5xri/icon_i_bought_this_title_coupon.png",
+        "https://g.nexonstatic.com/media/loeh2ti5/icon_frieren_beyond-journeys-end-totem-selector-coupon.png",
+        "https://g.nexonstatic.com/media/kmmlftoo/icon_odd-expression-frieren-coupon.png"
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "~5-10 min per boss clear",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:42:11.491Z",
+  "warnings": [
+    "\"Frieren's Spell Collection\": amount in \"Sol Erda Fragment (x10 per day)\" is not in the post, removed"
+  ],
+  "error": null
+}

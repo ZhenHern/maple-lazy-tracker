@@ -106,6 +106,8 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         why: "",
         timeCost: "short",
         daysPerWeek: 7,
+        weeklyTarget: null,
+        dailyCap: null,
         claimUntil: null,
         steps: [],
         requires: null,

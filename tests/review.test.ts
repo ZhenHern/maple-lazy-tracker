@@ -13,6 +13,8 @@ function item(title: string, casual: number, overrides: Partial<StoredItem> = {}
     why: "",
     timeCost: "short",
     daysPerWeek: 7,
+    weeklyTarget: null,
+    dailyCap: null,
     claimUntil: null,
     steps: [],
     requires: null,

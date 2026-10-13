@@ -1,0 +1,181 @@
+{
+  "sourceId": "42477",
+  "kind": "event",
+  "title": "Operation: Dive Phase 2",
+  "url": "https://www.nexon.com/maplestory/news/events/42477",
+  "publishedAt": "2026-07-22T11:39:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/mhin343j/540x304-operation-dive-phase-2-maplestory.png",
+  "contentHash": "8748891bd62d90286ccecbf5d6763a6c1933258c9b3620ce501ad0f662ec85c6",
+  "items": [
+    {
+      "id": "operation-dive-pass",
+      "why": "High-value progression pass providing hundreds of Sol Erda Fragments and exclusive cosmetics.",
+      "steps": [
+        {
+          "name": "Collection Tasks",
+          "what": "Complete weekly missions to earn Kroma Points for pass levels.",
+          "endsAt": null,
+          "reward": "Kroma Points",
+          "startsAt": null
+        },
+        {
+          "name": "Pass Milestone Rewards",
+          "what": "Manually claim rewards as you reach new levels.",
+          "endsAt": null,
+          "reward": "Sol Erda Fragments and Cosmetics",
+          "startsAt": null
+        }
+      ],
+      "title": "Operation: Dive Kroma Pack",
+      "value": {
+        "limited": 75,
+        "cosmetic": 85,
+        "progression": {
+          "casual": 95,
+          "endgame": 95,
+          "returning": 75
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/tgqnc1n0/magatia-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/sfjf424x/image.png",
+        "https://g.nexonstatic.com/media/j4cplbxf/image.png",
+        "https://g.nexonstatic.com/media/cxwnnfe1/those-who-began-again.png",
+        "https://g.nexonstatic.com/media/tmni2rch/althearoid.png"
+      ],
+      "rewards": [
+        "Sol Erda Fragment Coupon (hundreds total)",
+        "Special Kroma Coin",
+        "Althearoid Coupon",
+        "Mini Kroma Pet",
+        "Melin Face/Hair Coupons"
+      ],
+      "summary": "Complete weekly and special tasks to level up the Kroma Pack for progression and cosmetic rewards. Requires Lv. 101+.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T11:39:00Z",
+      "timeCost": "medium",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        "https://maplestory.io/api/GMS/270/item/4310493/icon",
+        "https://maplestory.io/api/GMS/270/item/2832780/icon",
+        "https://maplestory.io/api/GMS/270/item/5004030/icon",
+        null
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "Variable weekly tasks",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "operation-dive-story",
+      "why": "One-time rewards including Nodestones and Medals for finishing the unique story.",
+      "steps": [],
+      "title": "Operation: Dive Episodes",
+      "value": {
+        "limited": 50,
+        "cosmetic": 35,
+        "progression": {
+          "casual": 40,
+          "endgame": 30,
+          "returning": 50
+        }
+      },
+      "endsAt": null,
+      "images": [
+        "https://g.nexonstatic.com/media/tgqnc1n0/magatia-damage-skin-unit.png",
+        "https://g.nexonstatic.com/media/sfjf424x/image.png",
+        "https://g.nexonstatic.com/media/j4cplbxf/image.png",
+        "https://g.nexonstatic.com/media/cxwnnfe1/those-who-began-again.png",
+        "https://g.nexonstatic.com/media/tmni2rch/althearoid.png"
+      ],
+      "rewards": [
+        "Nodestone total)",
+        "Medal of Honor (x100 total)",
+        "Onyx Apple (x15 total)",
+        "Forward to the Beginning Medal"
+      ],
+      "summary": "GMS-exclusive story episodes in Grand Athenaeum style where you play as Althea. Must be viewed in chronological order.",
+      "category": "content",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-07-22T11:39:00Z",
+      "timeCost": "medium",
+      "claimUntil": null,
+      "daysPerWeek": 1,
+      "rewardImages": [
+        null,
+        "https://maplestory.io/api/GMS/270/item/4031160/icon",
+        "https://maplestory.io/api/GMS/270/item/2012018/icon",
+        null
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "operation-dive-dungeon",
+      "why": "Primary source for Record Shop coins, used to buy Star Force enhancements and fragments.",
+      "steps": [],
+      "title": "Operation: Dive Dungeon",
+      "value": {
+        "limited": 25,
+        "cosmetic": 20,
+        "progression": {
+          "casual": 70,
+          "endgame": 70,
+          "returning": 50
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/kihf1pak/image.png",
+        "https://g.nexonstatic.com/media/jl4fc5g2/image.png",
+        "https://g.nexonstatic.com/media/3s2n3b1x/crystal-altar.png",
+        "https://g.nexonstatic.com/media/jyflvpbv/research-record.png",
+        "https://g.nexonstatic.com/media/strba4ts/multistrike-crystal-range.png"
+      ],
+      "rewards": [
+        "Special Kroma Coin (up to 1,000)",
+        "Chance at Sol Erda Fragment Coupon (Shop)",
+        "17-Star Enhancement Scroll (Shop)"
+      ],
+      "summary": "Roguelite dungeon challenge using Althea. Earn Research Records to enhance stats and Special Kroma Coins for the shop. Requires Episode 6 completion.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": "operation-dive-story",
+      "startsAt": "2026-07-22T11:39:00Z",
+      "timeCost": "medium",
+      "claimUntil": null,
+      "daysPerWeek": 3,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4310493/icon",
+        "https://maplestory.io/api/GMS/270/item/2637690/icon",
+        "https://maplestory.io/api/GMS/270/item/2049393/icon"
+      ],
+      "timeEstimate": {
+        "basis": "stated",
+        "label": "Max 30 min per run",
+        "effort": "medium",
+        "minutesPerWeek": 90
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:52:53.617Z",
+  "warnings": [
+    "\"Operation: Dive Kroma Pack\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Operation: Dive Episodes\": amount in \"Nodestone (x230 total)\" is not in the post, removed",
+    "\"Operation: Dive Dungeon\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Operation: Dive Dungeon\": amount in \"Special Kroma Coin (up to 1,000/week)\" is not in the post, removed"
+  ],
+  "error": null
+}

@@ -1,0 +1,64 @@
+{
+  "sourceId": "43492",
+  "kind": "event",
+  "title": "Momentum Pass Continues!",
+  "url": "https://www.nexon.com/maplestory/news/events/43492",
+  "publishedAt": "2026-08-04T17:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/3lzeh03i/540x304-july-2026-momentum-pass-maplestory.png",
+  "contentHash": "3943852ca729c71593133ac81b9153a0eafb4b924791a18b510a792f5f4bc0a7",
+  "items": [
+    {
+      "id": "momentum-pass",
+      "why": "Essential for Level 280+ players; provides Sol Erda and massive Advanced EXP Vouchers.",
+      "steps": [],
+      "title": "Momentum Pass",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 0,
+          "endgame": 88,
+          "returning": 0
+        }
+      },
+      "endsAt": "2026-09-08T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/mfqcpjov/momentum-pass-part-2-maplestory.png"
+      ],
+      "rewards": [
+        "Sol Erda (x3 total)",
+        "Advanced EXP Voucher total)",
+        "Luxe Sauna Coupon (x3 total)"
+      ],
+      "summary": "Complete weekly missions including Grandis daily quests, Monster Park, and monster hunting to level up the pass. Requires Level 280+.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-08-05T00:00:00Z",
+      "timeCost": "long",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4009546/icon",
+        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
+        "https://maplestory.io/api/GMS/270/item/2638457/icon"
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "100k monsters/week plus activities",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:52:27.739Z",
+  "warnings": [
+    "\"Momentum Pass\": claim deadline 2026-09-08T23:59:00Z is not usable, cleared",
+    "\"Momentum Pass\": amount in \"Advanced EXP Voucher (x500 total)\" is not in the post, removed",
+    "\"Momentum Pass\": time estimate \"100k monsters/week plus activities\" has no duration, marked uncertain"
+  ],
+  "error": null
+}

@@ -1,0 +1,96 @@
+{
+  "sourceId": "44415",
+  "kind": "event",
+  "title": "Adventure with Frieren's Companions",
+  "url": "https://www.nexon.com/maplestory/news/events/44415",
+  "publishedAt": "2026-09-09T11:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/nkbn3m0p/540x304_adventure_with_frierens_companions_maplestory_x_frieren_event.png",
+  "contentHash": "e7659ebeed6f8a6109e17574f15b1bab1a0fcb64c439fe082c09cb95176b902a",
+  "items": [
+    {
+      "id": "adventure-with-frieren",
+      "why": "Top-tier source for Sol Erda Fragments (10 per day) and limited Frieren collaboration items.",
+      "steps": [
+        {
+          "name": "Travel Companions",
+          "what": "Defeat monsters near your level to fill the event gauge.",
+          "endsAt": null,
+          "reward": "Magic Replica Monster spawn",
+          "startsAt": null
+        },
+        {
+          "name": "Magic Replica Hunt",
+          "what": "Defeat the spawned Elite Monster based on your character.",
+          "endsAt": null,
+          "reward": "Adventure Coins and Random Mimic Boxes",
+          "startsAt": null
+        },
+        {
+          "name": "Frieren's Companions' Cheer",
+          "what": "Reach monster kill milestones to increase map Burning levels.",
+          "endsAt": null,
+          "reward": "Burning Field Stage +1 Coupon",
+          "startsAt": null
+        }
+      ],
+      "title": "Adventure with Frieren's Companions",
+      "value": {
+        "limited": 98,
+        "cosmetic": 55,
+        "progression": {
+          "casual": 90,
+          "endgame": 90,
+          "returning": 60
+        }
+      },
+      "endsAt": "2026-10-07T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/pjdji4lh/ui_min_max_ex.png",
+        "https://g.nexonstatic.com/media/z0qfojal/ui_defeat-monsters-fill-gauge.png",
+        "https://g.nexonstatic.com/media/ooriwyl5/ui_limit_20.png",
+        "https://g.nexonstatic.com/media/l51htuqh/icon_skill_demon-killing-magic_zoltraak.png",
+        "https://g.nexonstatic.com/media/pv4did2o/icon_skill_ordinary-offensive-magic_zoltraak.png"
+      ],
+      "rewards": [
+        "Sol Erda Fragment (max 10)",
+        "Adventure Coin x1 Coupon (x35)",
+        "Random Mimic Box (x3)",
+        "Symbol Selector Coupon (x1-2)",
+        "Special Medal of Honor"
+      ],
+      "summary": "Defeat up to 10,000 monsters near your level daily to fill a gauge 20 times. Spawns Magic Replica Monsters that drop shop currency and reward Sol Erda Fragments. Requires Lv. 101+ and participation in 'Frieren’s Spell Collection'.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-09T11:00:00Z",
+      "timeCost": "long",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/4k0hl3js/icon_adventure_coin_x1_coupon.png",
+        "https://g.nexonstatic.com/media/pxseawhv/icon_random_mimic_box.png",
+        "https://g.nexonstatic.com/media/ypyhgff1/icon_symbol_selector_coupon.png",
+        "https://g.nexonstatic.com/media/zsshidmt/icon_special_medal_of_honor.png"
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "Approx. 40-60 min/day for full cap",
+        "effort": "high",
+        "minutesPerWeek": 420
+      },
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:52:27.331Z",
+  "warnings": [
+    "\"Adventure with Frieren's Companions\": claim deadline 2026-10-07T23:59:00Z is not usable, cleared",
+    "\"Adventure with Frieren's Companions\": amount in \"Sol Erda Fragment (max 10/day)\" is not in the post, removed",
+    "\"Adventure with Frieren's Companions\": amount in \"Adventure Coin x1 Coupon (x35/day)\" is not in the post, removed",
+    "\"Adventure with Frieren's Companions\": amount in \"Random Mimic Box (x3/day)\" is not in the post, removed",
+    "\"Adventure with Frieren's Companions\": amount in \"Symbol Selector Coupon (x1-2/day)\" is not in the post, removed"
+  ],
+  "error": null
+}

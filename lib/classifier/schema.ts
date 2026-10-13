@@ -52,6 +52,11 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     // On how many days a week the quest is played for full rewards (1 to 7).
     // A weekly claim is 1; a daily check-in is 7.
     daysPerWeek: z.number(),
+    // When the post gives a weekly amount to reach (or a weekly cap) and a
+    // daily cap in the same unit, both numbers. Code then works out the days
+    // itself, because models get this division wrong. null when not stated.
+    weeklyTarget: z.number().nullable(),
+    dailyCap: z.number().nullable(),
     // One sentence on who should bother and why. Shown on the card so a
     // player can judge the rating instead of taking it on trust.
     why: z.string(),
@@ -103,6 +108,8 @@ export const storedItemSchema = scoredItemSchema.extend({
   why: z.string().default(""),
   timeCost: z.enum(TIME_COSTS).default("short"),
   daysPerWeek: z.number().default(7),
+  weeklyTarget: z.number().nullable().default(null),
+  dailyCap: z.number().nullable().default(null),
   claimUntil: isoDate.nullable().default(null),
   steps: z.array(storedStepSchema).default([]),
   requires: z.string().nullable().default(null),

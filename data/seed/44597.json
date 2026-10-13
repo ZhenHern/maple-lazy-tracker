@@ -8,79 +8,359 @@
   "contentHash": "ca6912feace2356df2775e8948e6c22107f7cb01f9cf7abfeb199c368f9a521f",
   "items": [
     {
-      "id": "frierens-spell-collection",
-      "title": "Frieren's Spell Collection",
-      "category": "event",
-      "summary": "Defeat 1,000 monsters daily to progress through the adventure journal, unlocking totems, symbols, growth potions, and adventure coins.",
+      "id": "skill-ring-overhaul",
+      "why": "The new second slot and rebalance are a massive power boost for bossers. High meso compensation for old polished rings.",
+      "steps": [],
+      "title": "Special Skill Ring Overhaul",
       "value": {
+        "limited": 0,
+        "cosmetic": 0,
         "progression": {
-          "new": 95,
-          "casual": 90,
-          "endgame": 85,
-          "returning": 95
-        },
-        "limited": 95,
-        "cosmetic": 90
+          "casual": 80,
+          "endgame": 100,
+          "returning": 20
+        }
       },
+      "endsAt": null,
+      "images": [],
       "rewards": [
-        "Frieren Totem Selector Coupon",
-        "Symbol Selector Coupon",
-        "Magnificent Growth Potion",
-        "Transcendent Growth Potion",
-        "Spell to Create a Field of Flowers Chair"
+        "Additional Special Skill Ring Slot",
+        "Up to 25B Mesos compensation",
+        "Grindstone of Faith x20 compensation",
+        "Restraint Ring Zone range +95%"
       ],
-      "startsAt": "2026-09-09T00:00:00Z",
-      "endsAt": "2026-10-07T23:59:00Z",
-      "timeEstimate": {
-        "label": "15-20 min/day",
-        "minutesPerWeek": 140,
-        "effort": "low",
-        "basis": "calculated"
+      "summary": "Major revamp to bossing rings: new slot allows equipping one active (Restraint/Continuous) and one passive ring simultaneously. Restraint and Continuous rings rebalanced, and polished rings Lv. 5-6 are capped at Lv. 4 with massive meso/material compensation. Claim rewards via the Reward System until September 8, 2027.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "leveling-symbol-revamp",
+      "why": "Best catch-up change in years. Returning players will fly through Arcane River, and symbols max out significantly faster.",
+      "steps": [],
+      "title": "Level-Up & Symbol Flow Revamp",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 90,
+          "endgame": 15,
+          "returning": 100
+        }
       },
+      "endsAt": null,
+      "images": [],
+      "rewards": [
+        "Up to 58% EXP Reduction (210-259)",
+        "Daily Arcane Symbols x40 per region",
+        "Daily Sacred Symbols x30/x15 per region"
+      ],
+      "summary": "EXP required to level from 210-259 is reduced by up to 58%. Daily and Weekly Arcane Symbol rewards are doubled for all regions, and Grandis Sacred Symbol daily rewards are increased by 50%. Symbols now auto-merge upon claiming.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "bonus-stat-flame-revamp",
+      "why": "Removes the RNG of limited flame supply. High-end gear can now be perfected using mesos, though bosses no longer drop free flames.",
+      "steps": [],
+      "title": "Bonus Stat & Flame Revamp",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 85,
+          "endgame": 95,
+          "returning": 70
+        }
+      },
+      "endsAt": null,
+      "images": [],
+      "rewards": [
+        "Meso Bonus Stat Reset (3M each)",
+        "Burning Rebirth Flames",
+        "Increased Legion Shop flame limits"
+      ],
+      "summary": "Bonus stats (flames) can now be reset using 3,000,000 mesos instead of flames. Added new 'Burning Rebirth Flames' (choice to keep stats) to Legion, Dojo, and Monster Collection shops. Old flames removed from boss drops.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        "https://g.nexonstatic.com/media/juwbsnp3/burning-rebirth-flame.png",
+        null
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    },
+    {
+      "id": "go-go-sidekick",
+      "why": "500 Sol Erda Fragments per claim is an unprecedented amount for casual play. A must-do for anyone level 260+.",
+      "steps": [],
+      "title": "Go Go Sidekick!",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 98,
+          "endgame": 98,
+          "returning": 60
+        }
+      },
+      "endsAt": "2026-11-03T23:59:00.000Z",
       "images": [
-        "https://g.nexonstatic.com/media/vkgouqmr/ui_spell_collection_journal.png",
+        "https://g.nexonstatic.com/media/kbxdi5cd/go-go.png"
+      ],
+      "rewards": [
+        "Sol Erda Fragment x500 (Per claim)",
+        "Advanced EXP Voucher x4,000 (Choice)",
+        "EXP Voucher x15,000 (Choice)"
+      ],
+      "summary": "Strategic hunting track. Hunt monsters to fill a gauge, deploy sidekicks to clear waves, and use Ranger Points to upgrade them. Claim rewards up to 3 times per week, choosing between massive EXP or up to 500 Sol Erda Fragments.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-30T00:00:00.000Z",
+      "timeCost": "medium",
+      "claimUntil": null,
+      "daysPerWeek": 3,
+      "rewardImages": [
+        "https://maplestory.io/api/GMS/270/item/4009547/icon",
+        "https://maplestory.io/api/GMS/270/item/2638500/icon",
+        "https://maplestory.io/api/GMS/270/item/4037073/icon"
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "15-30 min per claim, 3x per week",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "mesotron-s-project",
+      "why": "Equipment and cosmetic transfers are rare. Rank up to unlock Sol Erda buffs and boss reset tickets.",
+      "steps": [
+        {
+          "name": "Mesotron-S Development",
+          "what": "Spend Troupe Coins to upgrade Inferno Burst and Heaven Breaker buffs.",
+          "endsAt": null,
+          "reward": "Enhanced combat stats and EXP buffs",
+          "startsAt": null
+        },
+        {
+          "name": "Festival Decorations",
+          "what": "Spend coins to unlock secondary perks for Daily Quests and Monster Park.",
+          "endsAt": null,
+          "reward": "+2 Daily Quest rewards, 2x Monster Park EXP",
+          "startsAt": null
+        }
+      ],
+      "title": "Night Troupe: Mesotron-S Project",
+      "value": {
+        "limited": 80,
+        "cosmetic": 85,
+        "progression": {
+          "casual": 95,
+          "endgame": 100,
+          "returning": 90
+        }
+      },
+      "endsAt": "2026-11-10T23:59:00.000Z",
+      "images": [
+        "https://g.nexonstatic.com/media/oykhbn21/mesotron-s-heaven-breaker.png",
+        "https://g.nexonstatic.com/media/wnyjd1cu/mesotron-s-inferno-burst.png",
+        "https://g.nexonstatic.com/media/2idjsl0p/omega-sector.png",
+        "https://g.nexonstatic.com/media/uwql4ipm/mesotron-s-heaven-breaker.gif"
+      ],
+      "rewards": [
+        "Equipment Transfer (Lv. 100-160/Secondary)",
+        "Hair & Face Transfer Coupons",
+        "Sol Erda Energy from Bosses (Perk)",
+        "Weekly Boss Reset Tickets (Perk)",
+        "100% Star Force Safeguard up to 21* (Perk)"
+      ],
+      "summary": "The main festival rank track. Earn Designer EXP via mini-games to rank up. Unlocks powerful permanent-duration perks (Hair, Face, Equipment, and Mount transfers) and combat buffs. Master Designer rank is required for the daily lottery.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-30T00:00:00.000Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "~10 min/day",
+        "effort": "low",
+        "minutesPerWeek": 70
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "frierens-spell-collection",
+      "why": "Exclusive collab cosmetics and high-value progression items (Star Force, Nodestones) for very low effort.",
+      "steps": [
+        {
+          "name": "Adventure Journal",
+          "what": "Defeat 1,000 monsters daily, up to 5 times per week.",
+          "endsAt": null,
+          "reward": "Growth Potions, Sol Erda, Cubes",
+          "startsAt": null
+        },
+        {
+          "name": "Grimoire Collection",
+          "what": "Complete 6 hidden missions (Incinerate items, hunt replicas, use detectors).",
+          "endsAt": null,
+          "reward": "15-Star Scroll, Level 25 Node, Magic Wardrobe",
+          "startsAt": null
+        }
+      ],
+      "title": "Frieren's Spell Collection",
+      "value": {
+        "limited": 100,
+        "cosmetic": 90,
+        "progression": {
+          "casual": 85,
+          "endgame": 60,
+          "returning": 90
+        }
+      },
+      "endsAt": "2026-10-07T23:59:00.000Z",
+      "images": [
         "https://g.nexonstatic.com/media/1fshz3ri/ui_adventure-journal.png",
         "https://g.nexonstatic.com/media/54ubpsoc/ui_defeat_1000.png",
         "https://g.nexonstatic.com/media/0msfsy0e/ui_coin_open_shop.png",
-        "https://g.nexonstatic.com/media/a0yhfga4/icon_pendant.png"
+        "https://g.nexonstatic.com/media/a0yhfga4/icon_pendant.png",
+        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png"
       ],
+      "rewards": [
+        "Karma Star Force 15-Star Enhancement (Lv. 160)",
+        "Ultimate Nodestone (Skill Lv. 25)",
+        "Frieren/Fern/Stark Totems (Timed Stats)",
+        "Frieren/Starkroids and Hearts",
+        "Collab Medals and Backgrounds"
+      ],
+      "summary": "Collab check-in and mission event. Defeat 1,000 monsters daily for Adventure Journal rewards. Complete specific Grimoire missions for high-value growth items like a 15-star enhancement scroll and a level 25 skill node voucher.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "short",
+      "claimUntil": "2026-10-08T02:00:00.000Z",
+      "daysPerWeek": 5,
       "rewardImages": [
-        "https://g.nexonstatic.com/media/loeh2ti5/icon_frieren_beyond-journeys-end-totem-selector-coupon.png",
-        "https://g.nexonstatic.com/media/rdicblcm/icon_symbol-selector-coupon.png",
-        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
-        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
-        "https://g.nexonstatic.com/media/xidlnnze/icon_spell-to-create-a-field-of-flowers.png"
-      ]
+        "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
+        null,
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "5-10 min/day",
+        "effort": "low",
+        "minutesPerWeek": 50
+      },
+      "weeklyTarget": null
     },
     {
-      "id": "adventure-with-frierens-companions",
-      "title": "Adventure with Frieren's Companions",
-      "category": "event",
-      "summary": "Activate the event skill while hunting to spawn Magic Replica Monsters, gaining Sol Erda Fragments and Zoltraak skill charges.",
+      "id": "winter-countdown",
+      "why": "Requires only a single click for massive long-term rewards like Event Ring Legendaries and Sol Erda.",
+      "steps": [],
+      "title": "Winter Countdown",
       "value": {
+        "limited": 30,
+        "cosmetic": 40,
         "progression": {
-          "new": 90,
-          "casual": 85,
-          "endgame": 90,
-          "returning": 80
-        },
-        "limited": 85,
-        "cosmetic": 0
+          "casual": 92,
+          "endgame": 65,
+          "returning": 95
+        }
       },
-      "rewards": [
-        "Sol Erda Fragments",
-        "Adventure Coins",
-        "Random Mimic Box",
-        "Symbol Selector Coupons"
+      "endsAt": "2026-11-10T23:59:00.000Z",
+      "images": [
+        "https://g.nexonstatic.com/media/um4johnu/specialpower-special-mission.png",
+        "https://g.nexonstatic.com/media/p1tnsv51/image.png"
       ],
-      "startsAt": "2026-09-09T00:00:00Z",
-      "endsAt": "2026-10-07T23:59:00Z",
+      "rewards": [
+        "Transcendent Growth Potion",
+        "Sol Erda Fragment x30 (choice)",
+        "Event Ring Selector & Legendary Scroll",
+        "Experience Nodestone x5",
+        "Rosy or Flushed Skin Coupon"
+      ],
+      "summary": "Long-term check-in event. Click 'Participate' daily for Countdown Gifts, then claim a second set of 'Winter Gifts' in November based on your total attendance. Includes event rings and magnificent growth potions.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-10-07T00:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": "2026-11-24T23:59:00.000Z",
+      "daysPerWeek": 7,
+      "rewardImages": [
+        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
+        "https://maplestory.io/api/GMS/270/item/4009547/icon",
+        null,
+        "https://g.nexonstatic.com/media/rzdl0olv/icon_experience-nodestone.png",
+        "https://maplestory.io/api/GMS/270/item/5681263/icon"
+      ],
       "timeEstimate": {
-        "label": "Up to 500 kills/spawn, 20 spawns/day",
-        "minutesPerWeek": null,
-        "effort": null,
-        "basis": "uncertain"
+        "basis": "calculated",
+        "label": "1 min/day",
+        "effort": "low",
+        "minutesPerWeek": 7
       },
+      "weeklyTarget": null
+    },
+    {
+      "id": "adventure-with-companions",
+      "why": "The primary source of Sol Erda Fragments and Coins during the collab. Essential for leveling 6th job skills.",
+      "steps": [],
+      "title": "Adventure with Frieren's Companions",
+      "value": {
+        "limited": 20,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 90,
+          "endgame": 85,
+          "returning": 40
+        }
+      },
+      "endsAt": "2026-10-07T23:59:00.000Z",
       "images": [
         "https://g.nexonstatic.com/media/pjdji4lh/ui_min_max_ex.png",
         "https://g.nexonstatic.com/media/z0qfojal/ui_defeat-monsters-fill-gauge.png",
@@ -88,370 +368,335 @@
         "https://g.nexonstatic.com/media/ooriwyl5/ui_limit_20.png",
         "https://g.nexonstatic.com/media/l51htuqh/icon_skill_demon-killing-magic_zoltraak.png"
       ],
+      "rewards": [
+        "Sol Erda Fragment x1 (Per 2 replicas)",
+        "Up to 10 Sol Erda Fragments per day",
+        "Adventure Coins",
+        "Chance at Epic Dungeon Express Passes"
+      ],
+      "summary": "Hunting buff event. Frieren and friends appear to attack while you hunt. Defeating 'Magic Replica' monsters every 500 kills rewards Sol Erda Fragments (up to 10/day) and Adventure Coins for the Magic Shop.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "medium",
+      "claimUntil": "2026-10-08T02:00:00.000Z",
+      "daysPerWeek": 7,
       "rewardImages": [
-        "https://g.nexonstatic.com/media/l4iddjzp/ui_reward_sol_erda.png",
+        "https://maplestory.io/api/GMS/270/item/4009547/icon",
+        null,
         "https://g.nexonstatic.com/media/4k0hl3js/icon_adventure_coin_x1_coupon.png",
-        "https://g.nexonstatic.com/media/pxseawhv/icon_random_mimic_box.png",
-        "https://g.nexonstatic.com/media/ypyhgff1/icon_symbol_selector_coupon.png"
-      ]
-    },
-    {
-      "id": "grimoire-collection-missions",
-      "title": "Grimoire Collection Missions",
-      "category": "event",
-      "summary": "Complete specific milestones tied to your adventure progress to claim high-value growth and enhancement items.",
-      "value": {
-        "progression": {
-          "new": 90,
-          "casual": 90,
-          "endgame": 95,
-          "returning": 90
-        },
-        "limited": 90,
-        "cosmetic": 85
-      },
-      "rewards": [
-        "Superior Extreme Growth Potion",
-        "Ultimate Nodestone",
-        "Karma Star Force 15-Star Enhancement",
-        "Advanced Profession Coupon",
-        "Frieren Background Coupon"
+        null
       ],
-      "startsAt": "2026-09-09T00:00:00Z",
-      "endsAt": "2026-10-07T23:59:00Z",
-      "timeEstimate": null,
-      "images": [],
-      "rewardImages": [
-        "https://g.nexonstatic.com/media/vxpnalpp/icon_superior-extreme-growth-potion.png",
-        "https://g.nexonstatic.com/media/uxtlov4i/icon_ultimate-nodestone.png",
-        "https://g.nexonstatic.com/media/k5yocppc/icon_karma-star-force-15-star-enhancement.png",
-        "https://g.nexonstatic.com/media/0j1fayhe/icon_advanced-profession-coupon.png",
-        "https://g.nexonstatic.com/media/lkmddir1/icon_frieren-beyond-journeys-end-background-coupon.png"
-      ]
-    },
-    {
-      "id": "defeat-mighty-foes-missions",
-      "title": "Defeat Mighty Foes Missions",
-      "category": "event",
-      "summary": "Defeat solo bosses including Chaos Vellum, Lotus, Guardian Angel Slime, and Lucid to claim exclusive collaboration rewards.",
-      "value": {
-        "progression": {
-          "new": 40,
-          "casual": 75,
-          "endgame": 85,
-          "returning": 60
-        },
-        "limited": 95,
-        "cosmetic": 90
-      },
-      "rewards": [
-        "Frieren Totem Selector Coupon",
-        "Starkroid Coupon",
-        "Odd Expression (Frieren) Coupon",
-        "I Bought This Title Coupon"
-      ],
-      "startsAt": "2026-09-09T00:00:00Z",
-      "endsAt": "2026-10-08T02:00:00Z",
-      "timeEstimate": null,
-      "images": [],
-      "rewardImages": [
-        "https://g.nexonstatic.com/media/loeh2ti5/icon_frieren_beyond-journeys-end-totem-selector-coupon.png",
-        "https://g.nexonstatic.com/media/afdfjrpi/icon_starkroid-coupon.png",
-        "https://g.nexonstatic.com/media/kmmlftoo/icon_odd-expression-frieren-coupon.png",
-        "https://g.nexonstatic.com/media/yftp5xri/icon_i_bought_this_title_coupon.png"
-      ]
-    },
-    {
-      "id": "night-troupe-mesotron-s-project",
-      "title": "Mesotron-S Project",
-      "category": "event",
-      "summary": "Earn Designer EXP from mini-games to rank up, develop festival parts, activate festival decorations, and unlock powerful account perks.",
-      "value": {
-        "progression": {
-          "new": 95,
-          "casual": 95,
-          "endgame": 95,
-          "returning": 95
-        },
-        "limited": 90,
-        "cosmetic": 90
-      },
-      "rewards": [
-        "Troupe Coins",
-        "Transcendent Growth Potion",
-        "Equipment Transfer Coupon",
-        "Mount Transfer Certificate",
-        "Weekly Boss Clear Count Reset Ticket"
-      ],
-      "startsAt": "2026-09-30T12:00:00Z",
-      "endsAt": "2026-11-10T23:59:00Z",
       "timeEstimate": {
-        "label": "Daily cap based on rank, mini-game dependent",
-        "minutesPerWeek": null,
-        "effort": null,
-        "basis": "uncertain"
+        "basis": "calculated",
+        "label": "~30-40 min to cap 10 fragments",
+        "effort": "medium",
+        "minutesPerWeek": 250
       },
-      "images": [
-        "https://g.nexonstatic.com/media/hghb2xmz/mesotron-s-inferno-burst.gif",
-        "https://g.nexonstatic.com/media/uwql4ipm/mesotron-s-heaven-breaker.gif",
-        "https://g.nexonstatic.com/media/2idjsl0p/omega-sector.png",
-        "https://g.nexonstatic.com/media/oykhbn21/mesotron-s-heaven-breaker.png",
-        "https://g.nexonstatic.com/media/wnyjd1cu/mesotron-s-inferno-burst.png"
-      ],
-      "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/4310297/icon",
-        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
-        null,
-        null,
-        "https://maplestory.io/api/GMS/270/item/2636033/icon"
-      ]
+      "weeklyTarget": null
     },
     {
-      "id": "night-troupe-go-go-sidekick",
-      "title": "Go Go Sidekick!",
-      "category": "event",
-      "summary": "Remotely deploy sidekicks while hunting to battle waves of enemies and claim weekly EXP vouchers or Sol Erda Fragments.",
+      "id": "sunny-sunday-schedule",
+      "why": "Mandatory for gear progression. The November 1st 2x Sol Erda and Oct 11th 1+1 Star Force are the high points.",
+      "steps": [],
+      "title": "Sunny Sunday Schedule",
       "value": {
-        "progression": {
-          "new": 85,
-          "casual": 80,
-          "endgame": 80,
-          "returning": 80
-        },
         "limited": 0,
-        "cosmetic": 0
+        "cosmetic": 0,
+        "progression": {
+          "casual": 90,
+          "endgame": 90,
+          "returning": 90
+        }
       },
+      "endsAt": "2026-11-08T23:59:00.000Z",
+      "images": [],
       "rewards": [
-        "Advanced EXP Vouchers",
-        "EXP Vouchers",
-        "Sol Erda Fragment Coupons"
+        "30% Star Force Discount",
+        "1+1 Star Force (Up to 10*)",
+        "2x Sol Erda while hunting (Nov 1)",
+        "50% off Ability Resets"
       ],
-      "startsAt": "2026-09-30T12:00:00Z",
-      "endsAt": "2026-11-03T23:59:00Z",
-      "timeEstimate": {
-        "label": "Up to 10 deployments/day, 3 claims/week; run length not stated",
-        "minutesPerWeek": null,
-        "effort": null,
-        "basis": "uncertain"
-      },
-      "images": [
-        "https://g.nexonstatic.com/media/kbxdi5cd/go-go.png"
-      ],
+      "summary": "A series of 9 specialized perk days. Key dates: Sept 13/27 & Oct 11/25 (30% off Star Force), Oct 11 (1+1 SF), and Nov 1 (2x Sol Erda hunting & 5x Magnificent Soul).",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-13T00:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 1,
       "rewardImages": [
-        "https://g.nexonstatic.com/media/avhctxnr/icon_advanced_exp_voucher.png",
-        "https://g.nexonstatic.com/media/nu0ex5pu/icon_exp_voucher.png",
-        "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png"
-      ]
+        null,
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": {
+        "basis": "uncertain",
+        "label": "Sundays only",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "hello-world-lottery",
+      "why": "The potential for a 22-star Lv.200 scroll makes this a daily requirement for endgame players once they reach Master rank.",
+      "steps": [],
+      "title": "Hello World, Hello Robot",
+      "value": {
+        "limited": 20,
+        "cosmetic": 60,
+        "progression": {
+          "casual": 75,
+          "endgame": 80,
+          "returning": 10
+        }
+      },
+      "endsAt": "2026-11-10T23:59:00.000Z",
+      "images": [
+        "https://g.nexonstatic.com/media/3imdtjqq/night-troupe-bed-furnishing.png",
+        "https://g.nexonstatic.com/media/3ypcqjwt/image.png",
+        "https://g.nexonstatic.com/media/0x1pcyul/night-troupe-festival-outfit-set-f.png",
+        "https://g.nexonstatic.com/media/c35ciawd/night-troupe-festival-outfit-set-m.png",
+        "https://g.nexonstatic.com/media/z2clwjn0/omega-sector-festival-intruder-eye-accessory.gif"
+      ],
+      "rewards": [
+        "Chance at 22-Star Enhancement (Lv. 200)",
+        "Chance at 18-Star Enhancement (Lv. 250)",
+        "Sol Erda Fragments x30",
+        "Magnificent Growth Potion",
+        "Exclusive Mateon/Festival Cosmetics"
+      ],
+      "summary": "Daily reward lottery for Master Designers. Talk to Strange Mateon for a random gift. Very low chance at 22-star and 18-star scrolls (world-limited), with common rewards like growth potions and nodestones.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": "mesotron-s-project",
+      "startsAt": "2026-10-28T00:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        null,
+        "https://g.nexonstatic.com/media/lqipnpsu/icon_sol_erda_fragment.png",
+        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
+        null
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "1 min/day",
+        "effort": "low",
+        "minutesPerWeek": 7
+      },
+      "weeklyTarget": null
     },
     {
       "id": "night-of-the-yeti",
+      "why": "Purely for cosmetics and collection. The Yetiroid and Giant Yeti mount are unique permanent rewards.",
+      "steps": [],
       "title": "Night of the Yeti",
-      "category": "event",
-      "summary": "Participate in the El Nath survival minigame as a Hunter or Monster Yeti to earn Hunting Points and unlock exclusive items.",
       "value": {
+        "limited": 90,
+        "cosmetic": 95,
         "progression": {
-          "new": 30,
-          "casual": 50,
-          "endgame": 30,
-          "returning": 40
-        },
-        "limited": 95,
-        "cosmetic": 95
+          "casual": 15,
+          "endgame": 15,
+          "returning": 15
+        }
       },
-      "rewards": [
-        "Hallowkitty’s Hat Picker Coupon",
-        "Magic School Purple Uniform Selection Box",
-        "Night Cat Damage Skin",
-        "Monster Yetiroid Coupon",
-        "Giant Monster Yeti Mount Coupon"
-      ],
-      "startsAt": "2026-10-14T12:00:00Z",
-      "endsAt": "2026-11-11T23:59:00Z",
-      "timeEstimate": {
-        "label": "Up to 1,000 points/day, 3,000 points/week",
-        "minutesPerWeek": null,
-        "effort": null,
-        "basis": "uncertain"
-      },
+      "endsAt": "2026-11-11T23:59:00.000Z",
       "images": [
-        "https://g.nexonstatic.com/media/rdzfvtdc/night-of-the-yeti-hunter-nightime.gif",
-        "https://g.nexonstatic.com/media/vspdz5es/night-of-the-yeti-night-time.gif",
-        "https://g.nexonstatic.com/media/0jcbadsr/night-of-the-yeti-hunter-daytime.gif",
-        "https://g.nexonstatic.com/media/m0pkgwt0/mornin.gif",
-        "https://g.nexonstatic.com/media/mt2k2eyi/hallowkitty-s-neon-hat.png"
+        "https://g.nexonstatic.com/media/mt2k2eyi/hallowkitty-s-neon-hat.png",
+        "https://g.nexonstatic.com/media/0hrb5445/hallowkitty-s-witch-hat.png",
+        "https://g.nexonstatic.com/media/sg1jgvcq/magic-school-purple-uniform.png",
+        "https://g.nexonstatic.com/media/ckohw0c4/magic-school-purple-uniform-m.png"
       ],
+      "rewards": [
+        "Monster Yetiroid & Lidium Heart",
+        "Giant Monster Yeti Mount",
+        "Hallowkitty Hat & Magic School Outfit",
+        "Night Cat Damage Skin"
+      ],
+      "summary": "Halloween survival mini-game. Play as a Hunter or a Yeti in a PvP match. Accumulate points and wins to unlock exclusive Yeti-themed cosmetics, mounts, and a Monster Yetiroid.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-10-14T00:00:00.000Z",
+      "timeCost": "short",
+      "claimUntil": null,
+      "daysPerWeek": 7,
       "rewardImages": [
         null,
-        "https://maplestory.io/api/GMS/270/item/2636833/icon",
-        "https://g.nexonstatic.com/media/ddxjzb0d/night-cat-damage-skin.png",
-        "https://g.nexonstatic.com/media/pqsbcbg0/monster-yetiroid.png",
-        "https://g.nexonstatic.com/media/iinpbxnb/giant-monster-yeti-mount.gif"
-      ]
-    },
-    {
-      "id": "winter-countdown",
-      "title": "Winter Countdown",
-      "category": "event",
-      "summary": "Complete daily check-ins and special missions to collect a massive array of growth potions, EXP coupons, and event rewards.",
-      "value": {
-        "progression": {
-          "new": 95,
-          "casual": 95,
-          "endgame": 90,
-          "returning": 95
-        },
-        "limited": 80,
-        "cosmetic": 85
-      },
-      "rewards": [
-        "Magnificent Growth Potion",
-        "Transcendent Growth Potion",
-        "Sol Erda / Sol Erda Fragment Selector Coupon",
-        "Event Ring Selector Coupon",
-        "Sweet Spirit Pet Box"
+        "https://g.nexonstatic.com/media/iinpbxnb/giant-monster-yeti-mount.gif",
+        null,
+        "https://g.nexonstatic.com/media/ddxjzb0d/night-cat-damage-skin.png"
       ],
-      "startsAt": "2026-10-07T12:00:00Z",
-      "endsAt": "2026-11-24T23:59:00Z",
       "timeEstimate": {
-        "label": "1 min/day check-in, 2,000 mobs for missions",
-        "minutesPerWeek": null,
+        "basis": "uncertain",
+        "label": "~15 min/day to weekly cap",
         "effort": null,
-        "basis": "uncertain"
+        "minutesPerWeek": null
       },
-      "images": [
-        "https://g.nexonstatic.com/media/p1tnsv51/image.png",
-        "https://g.nexonstatic.com/media/um4johnu/specialpower-special-mission.png"
-      ],
-      "rewardImages": [
-        "https://g.nexonstatic.com/media/k0qbusjt/icon_magnificent-growth-potion-200-249.png",
-        "https://g.nexonstatic.com/media/tujb2z52/icon_transcendent-growth-potion-200-269.png",
-        "https://g.nexonstatic.com/media/03nghgsa/icon_sol-erda_sol-erda-fragment-selector-coupon.png",
-        "https://maplestory.io/api/GMS/270/item/2637656/icon",
-        null
-      ]
+      "weeklyTarget": null
     },
     {
-      "id": "level-up-flow-revamp",
-      "title": "Level-Up Flow & Symbol Revamp",
-      "category": "system",
-      "summary": "EXP requirements for levels 210-259 have been reduced by up to 58%, and Daily/Weekly Symbol quest rewards are significantly increased.",
+      "id": "boss-difficulty-changes",
+      "why": "Lowers the barrier for casual players to clear Seren and Kalos, and significantly speeds up Kaling/Limbo clears.",
+      "steps": [],
+      "title": "Grandis Boss Rebalance",
       "value": {
-        "progression": {
-          "new": 95,
-          "casual": 80,
-          "endgame": 40,
-          "returning": 95
-        },
         "limited": 0,
-        "cosmetic": 0
-      },
-      "rewards": [],
-      "startsAt": null,
-      "endsAt": null,
-      "timeEstimate": null,
-      "images": [],
-      "rewardImages": []
-    },
-    {
-      "id": "bonus-stat-enhancement-revamp",
-      "title": "Bonus Stat & Star Force Revamp",
-      "category": "system",
-      "summary": "Bonus stats can now be reset using mesos, and Star Catching has been removed with its success rate permanently applied.",
-      "value": {
+        "cosmetic": 0,
         "progression": {
-          "new": 80,
           "casual": 85,
-          "endgame": 90,
-          "returning": 85
-        },
-        "limited": 0,
-        "cosmetic": 0
+          "endgame": 60,
+          "returning": 0
+        }
       },
-      "rewards": [],
-      "startsAt": null,
       "endsAt": null,
-      "timeEstimate": null,
       "images": [],
-      "rewardImages": []
+      "rewards": [
+        "Increased Death Count (Seren/Kalos)",
+        "HP Reduction for Kaling & Kalos",
+        "Will Phase 1 HP segment reduction"
+      ],
+      "summary": "Major nerfs and quality-of-life improvements for mid-to-late bosses. HP reductions for Kaling (up to 36%) and Kalos, increased death counts for Seren and Kalos (5 to 8), and mechanical nerfs to Will and Crimson Queen.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [
+        null,
+        null,
+        null
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
     },
     {
-      "id": "special-skill-ring-changes",
-      "title": "Special Skill Ring Changes",
-      "category": "system",
-      "summary": "Ring of Restraint, Continuous Ring, and other special rings have been adjusted. Claim compensation rewards for pre-existing Lv. 5 and Lv. 6 rings.",
+      "id": "hexa-common-node-3",
+      "why": "New permanent power source for 6th job characters. Significant endgame progression.",
+      "steps": [],
+      "title": "HEXA Skill: 3rd Common Node",
       "value": {
-        "progression": {
-          "new": 40,
-          "casual": 75,
-          "endgame": 95,
-          "returning": 70
-        },
         "limited": 0,
-        "cosmetic": 0
+        "cosmetic": 0,
+        "progression": {
+          "casual": 75,
+          "endgame": 90,
+          "returning": 0
+        }
       },
+      "endsAt": null,
+      "images": [],
       "rewards": [
-        "Grindstone of Life",
-        "Grindstone of Faith",
-        "Mesos compensation"
+        "Job-specific 3rd Common HEXA Skill"
       ],
-      "startsAt": null,
-      "endsAt": "2027-09-08T23:59:00Z",
-      "timeEstimate": null,
-      "images": [
-        "https://g.nexonstatic.com/media/2zjbzxk1/specialskillringui.gif"
-      ],
+      "summary": "New common HEXA skill node added for all classes at Level 260+. Requires Sol Erda and Fragments to unlock and enhance.",
+      "category": "content",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 7,
       "rewardImages": [
-        "https://maplestory.io/api/GMS/270/item/2539001/icon",
-        "https://maplestory.io/api/GMS/270/item/2539003/icon",
         null
-      ]
+      ],
+      "timeEstimate": null,
+      "weeklyTarget": null
     },
     {
       "id": "luxe-sauna",
-      "title": "Luxe Sauna",
-      "category": "event",
-      "summary": "Charge usage time up to 48 hours per week and idle in the sauna room to gain passive EXP and cumulative milestone furnishing rewards.",
+      "why": "Good for leveling mules or getting those last few percentages while away from the keyboard.",
+      "steps": [],
+      "title": "Luxe Sauna AFK EXP",
       "value": {
-        "progression": {
-          "new": 85,
-          "casual": 90,
-          "endgame": 75,
-          "returning": 80
-        },
         "limited": 0,
-        "cosmetic": 90
+        "cosmetic": 65,
+        "progression": {
+          "casual": 50,
+          "endgame": 10,
+          "returning": 70
+        }
       },
-      "rewards": [
-        "Passive EXP",
-        "Sleepywood Sink",
-        "Sleepywood Sauna Bathtub",
-        "Sleepywood Foot Bath",
-        "Luxe Sauna Cafe"
-      ],
-      "startsAt": "2026-09-09T00:00:00Z",
-      "endsAt": "2026-11-10T23:59:00Z",
-      "timeEstimate": {
-        "label": "Up to 48 hours/week charged time",
-        "minutesPerWeek": 2880,
-        "effort": "high",
-        "basis": "stated"
-      },
+      "endsAt": "2026-11-10T23:59:00.000Z",
       "images": [
-        "https://g.nexonstatic.com/media/1aabrcdd/luxe-sauna-timer.gif",
-        "https://g.nexonstatic.com/media/3oyotrxn/opt-foot-bath.gif",
         "https://g.nexonstatic.com/media/k0rnbk4g/bathtub.png",
-        "https://g.nexonstatic.com/media/t3zdwvdw/cafe.gif"
+        "https://g.nexonstatic.com/media/boqdcpn1/sleepywood-sink.png",
+        "https://g.nexonstatic.com/media/t3zdwvdw/cafe.gif",
+        "https://g.nexonstatic.com/media/3oyotrxn/opt-foot-bath.gif",
+        "https://g.nexonstatic.com/media/1aabrcdd/luxe-sauna-timer.gif"
       ],
+      "rewards": [
+        "Passive EXP Every 5 Seconds",
+        "Luxe Sauna Cafe Furniture",
+        "Sleepywood Sauna Bathtub Furniture"
+      ],
+      "summary": "AFK EXP map in Sleepywood. Charge up to 48 hours per week using coupons or Maple Points (3k for 1 hour). Cumulative charge time unlocks permanent furniture rewards.",
+      "category": "event",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "idle",
+      "claimUntil": null,
+      "daysPerWeek": 7,
       "rewardImages": [
         null,
-        "https://g.nexonstatic.com/media/boqdcpn1/sleepywood-sink.png",
-        "https://maplestory.io/api/GMS/270/item/4037416/icon",
-        "https://maplestory.io/api/GMS/270/item/4037442/icon",
-        "https://maplestory.io/api/GMS/270/item/4037458/icon"
-      ]
+        null,
+        null
+      ],
+      "timeEstimate": {
+        "basis": "calculated",
+        "label": "AFK up to 48 hours/week",
+        "effort": null,
+        "minutesPerWeek": null
+      },
+      "weeklyTarget": null
+    },
+    {
+      "id": "familiar-crucible-badge",
+      "why": "New permanent badge offering Crit Damage and IED. Requires significant farming or buying cards from other players.",
+      "steps": [],
+      "title": "Familiar Update: Crucible Badge",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 40,
+          "endgame": 65,
+          "returning": 10
+        }
+      },
+      "endsAt": null,
+      "images": [],
+      "rewards": [],
+      "summary": "New familiars added to Geardock region. Collecting Tallahart and Geardock sets unlocks the Crucible Badge.",
+      "category": "content",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-09-08T18:00:00.000Z",
+      "timeCost": "long",
+      "claimUntil": null,
+      "daysPerWeek": 7,
+      "rewardImages": [],
+      "timeEstimate": null,
+      "weeklyTarget": null
     }
   ],
-  "model": "gemini-3.5-flash-lite",
-  "promptVersion": 4,
-  "classifiedAt": "2026-10-12T12:04:40.340Z"
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T10:41:14.171Z",
+  "warnings": [
+    "\"Special Skill Ring Overhaul\": claim deadline 2027-09-08T23:59:00.000Z is not usable, cleared",
+    "\"Night Troupe: Mesotron-S Project\": step \"Rank Progression\" is not in the post, removed",
+    "\"Sunny Sunday Schedule\": time estimate \"Sundays only\" has no duration, marked uncertain",
+    "\"Familiar Update: Crucible Badge\": reward \"Crucible Badge: +1% Crit DMG, +3% IED\" is not in the post, removed"
+  ],
+  "error": null
 }

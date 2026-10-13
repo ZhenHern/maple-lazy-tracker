@@ -1,0 +1,53 @@
+{
+  "sourceId": "43431",
+  "kind": "event",
+  "title": "Miracle Summer 2026 Redux",
+  "url": "https://www.nexon.com/maplestory/news/events/43431",
+  "publishedAt": "2026-08-06T18:00:00.000Z",
+  "thumbnailUrl": "https://g.nexonstatic.com/media/2uwpzpoy/newspost-540x304-miracle-summer-2026-redux-maplestory.jpg",
+  "contentHash": "4459a7d30430bda37227fe1ec79548802498ed5faeaa80ba47a7f676420eee20",
+  "items": [
+    {
+      "id": "miracle-summer-redux",
+      "why": "The single best time to spend cubes and mesos on gear progression; doubles legendary rank-up rates.",
+      "steps": [],
+      "title": "Miracle Summer 2026 Redux",
+      "value": {
+        "limited": 0,
+        "cosmetic": 0,
+        "progression": {
+          "casual": 99,
+          "endgame": 100,
+          "returning": 85
+        }
+      },
+      "endsAt": "2026-08-19T23:59:00Z",
+      "images": [
+        "https://g.nexonstatic.com/media/qt2lzphm/postheader_1100x225-miracle-summer-2026-redux-maplestory.jpg",
+        "https://g.nexonstatic.com/media/ovciqyy0/miracle-time-redux-cubes-maplestory.png",
+        "https://g.nexonstatic.com/media/sh3mguel/accessories-and-more-miracle-time-maplestory.png",
+        "https://g.nexonstatic.com/media/y1ef4ekw/top-bottom-overall-cape-miracle-time-maplestory.png",
+        "https://g.nexonstatic.com/media/xrpilsb5/weapons-shields-secondaries-miracle-time-maplestory.png"
+      ],
+      "rewards": [],
+      "summary": "Double rank-up chance when cubing equipment on specific days. Aug 14: Accessories/Emblems. Aug 15: Weapons/Secondary. Aug 16: Top/Bot. Aug 17: Hats. Aug 18: Gloves. Aug 19: Shoes.",
+      "category": "system",
+      "dailyCap": null,
+      "requires": null,
+      "startsAt": "2026-08-14T00:00:00Z",
+      "timeCost": "instant",
+      "claimUntil": null,
+      "daysPerWeek": 1,
+      "rewardImages": [],
+      "timeEstimate": null,
+      "weeklyTarget": null
+    }
+  ],
+  "model": "gemini-3-flash-preview",
+  "promptVersion": 13,
+  "classifiedAt": "2026-10-13T08:42:12.185Z",
+  "warnings": [
+    "\"Miracle Summer 2026 Redux\": claim deadline 2026-08-19T23:59:00Z is not usable, cleared"
+  ],
+  "error": null
+}

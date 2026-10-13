@@ -28,19 +28,28 @@ const QUICK_MINUTES = 2;
 
 /**
  * The tier from reward value alone: the best rating among the priorities the
- * player cares about. With no priorities chosen, all three count.
+ * player cares about.
+ *
+ * With no priority chosen, a Must Do needs progression value. A quest that is
+ * only worth it for its looks or for collecting tops out at If Free there: a
+ * player who never said they care about outfits should not be told they
+ * "must" get one. Picking Cosmetics or Limited makes those count in full.
  */
 export function resolveTier(
   item: TrackerItem,
   profile: Profile,
   priorities: readonly Priority[],
 ): Tier {
-  const active = priorities.length > 0 ? priorities : PRIORITIES;
-  const ratings = active.map((priority) =>
-    priority === "progression" ? item.value.progression[profile] : item.value[priority],
-  );
+  const rating = (priority: Priority) =>
+    priority === "progression" ? item.value.progression[profile] : item.value[priority];
   // TIERS is ordered best first, so the lowest index is the best rating.
-  return TIERS[Math.min(...ratings.map((rating) => TIERS.indexOf(rating)))];
+  const best = (list: readonly Priority[]) =>
+    TIERS[Math.min(...list.map((priority) => TIERS.indexOf(rating(priority))))];
+
+  if (priorities.length > 0) return best(priorities);
+  const progression = rating("progression");
+  if (progression === "must_do") return "must_do";
+  return best(PRIORITIES) === "skip" ? "skip" : "if_free";
 }
 
 /** The raw 0-100 score behind that tier: the highest among the chosen priorities. */
