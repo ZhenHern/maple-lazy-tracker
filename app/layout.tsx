@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Nunito, Pixelify_Sans } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/site";
@@ -34,7 +35,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${bodyFont.variable} ${pixelFont.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        {/* Vercel Web Analytics: counts page views without cookies. It only
+            reports from a Vercel deployment, never from local runs. */}
+        <Analytics />
+      </body>
     </html>
   );
 }
