@@ -98,6 +98,16 @@ describe("buildOngoing", () => {
     expect(titles(items)).toEqual(["Mesotron-S Project", "Unrelated Hunt"]);
   });
 
+  it("drops a patch entry named after a festival whose own notice is live", () => {
+    const notice = { ...post("10", "event", [item("Mesotron-S Project"), item("Go Go Sidekick!")]), title: "Defend the Omega Sector!" };
+    const { items } = buildOngoing(
+      [notice, post("1", "patch", [item("Night Troupe: Omega Sector"), item("Unrelated Hunt")])],
+      NOW,
+      false,
+    );
+    expect(titles(items)).toEqual(["Mesotron-S Project", "Go Go Sidekick!", "Unrelated Hunt"]);
+  });
+
   it("keeps two activities of one post even when their titles overlap", () => {
     const { items } = buildOngoing(
       [post("10", "event", [item("Operation: Dive"), item("Operation: Dive Dungeon")])],

@@ -1,6 +1,6 @@
 import { calibrate } from "@/lib/classifier/calibrate";
 import { ratingOf } from "@/lib/classifier/models";
-import { sameTitle } from "@/lib/images";
+import { relatedTitle, sameTitle } from "@/lib/images";
 import type { ItemSource, PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
 
 // Turns stored posts into the list of quests that are running now. Pure code:
@@ -118,6 +118,9 @@ export function selectOngoing(
     .at(-1);
 
   const items: SourcedItem[] = [];
+  // Event notices that have something running. Posts are sorted notices
+  // first, so this is complete by the time the patch notes are read.
+  const liveNotices: StoredPost[] = [];
   for (const post of posts) {
     const stale =
       (post.kind === "patch" && post.publishedAt !== latestPatch) ||
@@ -152,12 +155,23 @@ export function selectOngoing(
               sameRewards(existing.rewards, item.rewards))),
       );
       if (repeat) continue;
+      // Patch notes summarise a festival in one entry and its own notice then
+      // breaks it into quests. When a patch entry is named after a notice
+      // that is already contributing quests, the notice's detail replaces it.
+      const umbrella =
+        post.kind === "patch" &&
+        item.endsAt !== null &&
+        liveNotices.some((notice) => relatedTitle(notice.title, item.title));
+      if (umbrella) continue;
       items.push({
         ...(showImages ? item : stripImages(item)),
         // Item ids are unique per post only, so the post id is added.
         id: `${post.sourceId}-${item.id}`,
         source,
       });
+    }
+    if (post.kind === "event" && items.some((item) => item.source.sourceId === post.sourceId)) {
+      liveNotices.push(post);
     }
   }
 

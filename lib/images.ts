@@ -31,6 +31,17 @@ export function sameTitle(a: string, b: string): boolean {
   return fewer.size >= 2 && [...fewer].every((word) => more.has(word));
 }
 
+/**
+ * True when two titles share most of their distinctive words without one
+ * containing the other: "Night Troupe: Omega Sector" and "Defend the Omega
+ * Sector!" are about the same festival.
+ */
+export function relatedTitle(a: string, b: string): boolean {
+  const [fewer, more] = [titleWords(a), titleWords(b)].sort((p, q) => p.size - q.size);
+  const shared = [...fewer].filter((word) => more.has(word)).length;
+  return shared >= 2 && shared / fewer.size >= 0.6;
+}
+
 // Words that carry no identity: "Winter Countdown Event" is "Winter Countdown".
 const TITLE_FILLER = new Set(["the", "a", "an", "of", "and", "event", "events"]);
 
