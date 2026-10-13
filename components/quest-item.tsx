@@ -171,7 +171,7 @@ export function QuestItem({
                     <span key={reward + position}>
                       {position > 0 && ", "}
                       {icon && (
-                        <ZoomImage src={icon} alt="" className="reward-icon" pixelated hoverOnly />
+                        <ZoomImage src={icon} alt="" className="reward-icon" hoverOnly />
                       )}
                       {reward}
                     </span>
@@ -303,7 +303,7 @@ export function QuestItem({
                   return (
                     <li key={reward + position} className="slot">
                       {icon ? (
-                        <ZoomImage src={icon} alt={reward} className="slot-icon" pixelated />
+                        <ZoomImage src={icon} alt={reward} className="slot-icon" />
                       ) : (
                         <span className="slot-icon slot-kind" title={kind.label}>
                           <PixelSprite name={kind.sprite} className="h-5 w-5" />

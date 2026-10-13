@@ -1126,30 +1126,27 @@ body {
 .zoom-pop {
   position: fixed;
   z-index: 60;
-  padding: 0.35rem;
+  /* Border plus padding is FRAME in zoom-image.tsx, which sizes the picture. */
+  padding: 6px;
   border: 3px solid var(--color-frame-dark);
   border-radius: 12px;
   background: var(--color-cream);
   box-shadow:
     inset 0 0 0 2px #9db6ee,
     0 6px 0 rgb(22 34 74 / 0.3);
-  transform: translateY(-50%);
   pointer-events: none;
   animation: fade-in 120ms ease-out;
 }
 
 .zoom-pop img {
   display: block;
-  max-width: calc(var(--pop-w) - 1.1rem);
-  max-height: calc(var(--pop-h) - 1.1rem);
+  max-width: none;
   border-radius: 6px;
-  object-fit: contain;
+  background: var(--color-panel);
 }
 
-/* Game icons are tiny, so they are scaled up with hard pixel edges. */
-.zoom-pop.zoom-pixel img {
-  width: 7rem;
-  height: 7rem;
+/* Game icons are tiny, so they are enlarged with hard pixel edges. */
+.zoom-crisp img {
   image-rendering: pixelated;
 }
 
@@ -1198,20 +1195,16 @@ body {
   min-width: min(18rem, calc(100vw - 2rem));
   min-height: 8rem;
   padding: 0.75rem;
-  overflow: auto;
   background: var(--color-panel);
 }
 
+/* zoom-image.tsx sizes the picture once it has loaded. These limits, in
+   screen units because a percentage would be measured against the picture
+   itself, keep a large one on screen until then. */
 .lightbox-stage img {
-  max-width: 100%;
-  max-height: calc(100dvh - 11rem);
+  max-width: min(60rem, calc(100vw - 3.75rem));
+  max-height: calc(100dvh - 12rem);
   object-fit: contain;
-}
-
-.lightbox-stage.zoom-pixel img {
-  width: 12rem;
-  height: 12rem;
-  image-rendering: pixelated;
 }
 
 .lightbox-foot {
