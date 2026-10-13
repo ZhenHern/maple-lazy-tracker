@@ -104,8 +104,9 @@ function post(sourceId: string, publishedAt: string): StoredPost {
         category: "event",
         summary: "Do it.",
         why: "",
+        timeCost: "short",
         value: {
-          progression: { new: 1, casual: 2, endgame: 3, returning: 4 },
+          progression: { casual: 2, endgame: 3, returning: 4 },
           limited: 5,
           cosmetic: 6,
         },

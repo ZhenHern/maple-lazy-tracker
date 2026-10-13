@@ -44,7 +44,21 @@ interface QuestItemProps {
   index: number;
   /** True when the quest appeared since the visitor's previous visit. */
   isNew?: boolean;
+  /** Set when the daily playtime moved this quest to another tier. */
+  planNote?: "quick" | "over" | null;
 }
+
+const PLAN_NOTE = {
+  quick: { chip: "1-min claim", text: "Promoted to Must Do because it takes about a minute." },
+  over: { chip: "Over your time", text: "Moved down because it does not fit your daily playtime." },
+};
+
+const TIME_COST_LABEL = {
+  instant: "About a minute a day",
+  short: "About 5 to 15 minutes a day",
+  medium: "About 15 to 45 minutes a day",
+  long: "More than 45 minutes a day",
+};
 
 // Images load straight from Nexon's CDN in the visitor's browser. next/image is
 // avoided on purpose: it would copy and re-serve them from our own server.
@@ -78,7 +92,14 @@ function whenText(item: TrackerItem, now: number | null): string {
     : `${dates} (UTC). ${formatRemaining(remaining)}.`;
 }
 
-export function QuestItem({ item, profile, now, index, isNew = false }: QuestItemProps) {
+export function QuestItem({
+  item,
+  profile,
+  now,
+  index,
+  isNew = false,
+  planNote = null,
+}: QuestItemProps) {
   const ratings: [string, Tier][] = [
     ["Progression", item.value.progression[profile]],
     ["Limited", item.value.limited],
@@ -123,6 +144,11 @@ export function QuestItem({ item, profile, now, index, isNew = false }: QuestIte
             <h3 className="quest-title">{item.title}</h3>
             <div className="quest-meta">
               {isNew && <span className="chip chip-new">New</span>}
+              {planNote && (
+                <span className="chip chip-quiet" title={PLAN_NOTE[planNote].text}>
+                  {PLAN_NOTE[planNote].chip}
+                </span>
+              )}
               <Countdown startsAt={item.startsAt} endsAt={item.endsAt} now={now} />
               {ratingNote && (
                 // A list that is mostly rough hides this chip and shows one
@@ -217,6 +243,13 @@ export function QuestItem({ item, profile, now, index, isNew = false }: QuestIte
                 </dd>
               </div>
             )}
+            <div className="fact">
+              <dt>Effort</dt>
+              <dd>
+                {TIME_COST_LABEL[item.timeCost]}
+                {planNote && <span className="fact-note"> {PLAN_NOTE[planNote].text}</span>}
+              </dd>
+            </div>
             <div className="fact">
               <dt>Type</dt>
               <dd>

@@ -1,10 +1,10 @@
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
+import { PLAYTIMES, type Playtime } from "@/lib/tiering";
 import type { Priority, Profile } from "@/lib/types";
 import { PixelSprite, type SpriteName } from "./pixel-sprite";
 
 export const PROFILE_INFO: Record<Profile, { name: string; hint: string; sprite: SpriteName }> = {
-  new: { name: "Beginner", hint: "Still leveling a first main", sprite: "sprout" },
-  casual: { name: "Casual", hint: "30-60 min a day", sprite: "cup" },
+  casual: { name: "Casual", hint: "Settled main, steady progress", sprite: "cup" },
   endgame: { name: "Endgame", hint: "Bossing and progression", sprite: "sword" },
   returning: { name: "Returning", hint: "Back after a break", sprite: "door" },
 };
@@ -15,21 +15,32 @@ const PRIORITY_INFO: Record<Priority, { name: string; hint: string; sprite: Spri
   cosmetic: { name: "Cosmetics", hint: "Looks and collections", sprite: "hat" },
 };
 
+export const PLAYTIME_LABEL: Record<Playtime, { name: string; hint: string }> = {
+  15: { name: "15 min", hint: "Quick login" },
+  30: { name: "30 min", hint: "A short session" },
+  60: { name: "1 hour", hint: "A full session" },
+  0: { name: "No limit", hint: "Show me everything" },
+};
+
 interface ProfilePickerProps {
   profile: Profile;
   priorities: Priority[];
+  playtime: Playtime;
   onProfileChange: (profile: Profile) => void;
   onPrioritiesChange: (priorities: Priority[]) => void;
+  onPlaytimeChange: (playtime: Playtime) => void;
 }
 
-// Kept short on purpose: on a phone all four jobs sit in one row and the three
+// Kept short on purpose: on a phone the three jobs sit in one row and the three
 // priorities in another, so the quest list stays close to the top of the page.
 // Hints that do not fit are still read out by screen readers (max-sm:sr-only).
 export function ProfilePicker({
   profile,
   priorities,
+  playtime,
   onProfileChange,
   onPrioritiesChange,
+  onPlaytimeChange,
 }: ProfilePickerProps) {
   function togglePriority(priority: Priority) {
     onPrioritiesChange(
@@ -43,7 +54,7 @@ export function ProfilePicker({
     <div className="grid gap-4">
       <fieldset className="min-w-0">
         <legend className="label">Choose your job</legend>
-        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
           {PROFILES.map((each) => (
             <button
               key={each}
@@ -64,6 +75,28 @@ export function ProfilePicker({
         {/* On a phone only the chosen job's hint is shown, under the row. */}
         <p className="pick-caption sm:hidden" aria-hidden="true">
           <strong>{PROFILE_INFO[profile].name}:</strong> {PROFILE_INFO[profile].hint}
+        </p>
+      </fieldset>
+
+      <fieldset className="min-w-0">
+        <legend className="label">How long do you play a day?</legend>
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+          {PLAYTIMES.map((each) => (
+            <button
+              key={each}
+              type="button"
+              className="pick pick-time"
+              aria-pressed={each === playtime}
+              onClick={() => onPlaytimeChange(each)}
+            >
+              <span className="pick-name">{PLAYTIME_LABEL[each].name}</span>
+              <span className="pick-hint max-sm:sr-only">{PLAYTIME_LABEL[each].hint}</span>
+            </button>
+          ))}
+        </div>
+        <p className="pick-caption">
+          One-minute claims are always Must Do. Bigger quests are fitted into this time, best
+          value first.
         </p>
       </fieldset>
 

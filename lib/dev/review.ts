@@ -1,13 +1,13 @@
 import { calibrate } from "@/lib/classifier/calibrate";
 import { normalizeTitle } from "@/lib/images";
 import { selectOngoing, type SourcedItem } from "@/lib/ongoing";
-import type { StoredPost, Tier, TrackerItem } from "@/lib/types";
+import type { Profile, StoredPost, Tier, TrackerItem } from "@/lib/types";
 
 // Builds the comparison the review page shows: every running quest with its
 // live rating, and next to it the rating the latest trial would give. Pure
 // code, so it is easy to test.
 
-export const AXES = ["new", "casual", "endgame", "returning", "limited", "cosmetic"] as const;
+export const AXES = ["casual", "endgame", "returning", "limited", "cosmetic"] as const;
 export type Axis = (typeof AXES)[number];
 
 export interface Rated {
@@ -28,6 +28,7 @@ export interface ReviewRow {
   why: string;
   rewards: string[];
   time: string | null;
+  timeCost: string;
   /** Which model produced the version shown (the trial's when there is one). */
   model: string;
   /** same: no tier moved. changed: at least one did. new/gone: only one side has it. */
@@ -37,12 +38,11 @@ export interface ReviewRow {
 }
 
 function ratings(scored: SourcedItem, tiered: TrackerItem): Record<Axis, Rated> {
-  const progression = (profile: "new" | "casual" | "endgame" | "returning") => ({
+  const progression = (profile: Profile) => ({
     tier: tiered.value.progression[profile],
     score: scored.value.progression[profile],
   });
   return {
-    new: progression("new"),
     casual: progression("casual"),
     endgame: progression("endgame"),
     returning: progression("returning"),
@@ -124,6 +124,7 @@ export function buildReview(livePosts: StoredPost[], trialPosts: StoredPost[], n
       why: shown.item.why,
       rewards: shown.item.rewards,
       time: shown.item.timeEstimate?.label ?? null,
+      timeCost: shown.item.timeCost,
       model: shown.model,
       status,
       live: before?.ratings ?? null,

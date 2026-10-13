@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-Lazy Tracker tells Global MapleStory (GMS) players what in the latest patch is worth their time. It scrapes official patch notes and event notices, has Gemini sort each item into `must_do` / `if_free` / `skip` for four player profiles, caches the result, and shows it as an illustrated quest log. It is a read-only information page: nothing is ticked off or tracked per player.
+Lazy Tracker tells Global MapleStory (GMS) players what in the latest patch is worth their time. It scrapes official patch notes and event notices, has Gemini sort each item into `must_do` / `if_free` / `skip` for three kinds of player, fits them to the player's daily playtime, caches the result, and shows it as an illustrated quest log. It is a read-only information page: nothing is ticked off or tracked per player.
 
 **Non-goals for v1:** accounts, cross-device sync, per-user AI calls, Cash Shop coverage, admin UI, other regions.
 
@@ -10,7 +10,8 @@ Lazy Tracker tells Global MapleStory (GMS) players what in the latest patch is w
 
 | Topic | Decision |
 |---|---|
-| Tiering | 4 preset profiles: `new`, `casual`, `endgame`, `returning` |
+| Tiering | 3 preset profiles: `casual`, `endgame`, `returning`. A profile says where the player is in the game, not how much time they have |
+| Playtime | Players pick a daily playtime: 15 min, 30 min, 1 hour or no limit. One-minute claims are always Must Do; bigger quests are fitted into the time |
 | Priorities | Players pick any of `progression`, `limited`, `cosmetic`; the tier shown is the best rating among those picked |
 | Refresh | Daily Vercel Cron; visitors only ever read cache |
 | Checklist | None. The page only shows information (the tick-off feature was built, then removed) |
@@ -24,10 +25,11 @@ Profiles:
 
 | Key | Who | Cares most about |
 |---|---|---|
-| `new` | Under roughly level 260, still building a main | Leveling events, free gear |
-| `casual` | Established main, 30-60 minutes a day | Best reward per minute |
+| `casual` | Settled main around level 260 to 275 | Sol Erda Fragments, symbols, reachable gear upgrades |
 | `endgame` | Progression-focused bosser | Combat power, boss-relevant resources |
-| `returning` | Back after a long break | Catch-up rewards, what changed |
+| `returning` | Back after a long break, usually level 200 to 260 | Levels, free gear, what changed |
+
+A "new player" profile existed at first and was removed: its needs overlap with `returning`, and three jobs are easier to rate apart.
 
 ## 3. Architecture
 
@@ -77,7 +79,8 @@ Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `lib/types.ts` | Shared types |
 | `tests/` | Vitest tests for the ledger, the checks, the ingest flow and the Supabase store |
 | `components/` | `QuestLog` (the stateful client component), `QuestItem`, `ProfilePicker`, `Countdown`, `ArchiveLog`, `SiteHeader` |
-| `lib/tiering.ts` | `resolveTier()`: profile + priorities to one tier |
+| `lib/tiering.ts` | `resolveTier()`: profile + priorities to one tier. `planDay()`: fits every quest into the player's daily playtime |
+| `.claude/agents/mapler.md` | The Mapler: a reviewer agent that plays the site as each kind of player and reports wrong placements to the developer. It never edits code or spends AI quota |
 | `lib/use-local-storage.ts`, `lib/use-now.ts` | Hydration-safe hooks for browser storage and the clock |
 | `app/globals.css` | Theme tokens and the quest-log component styles |
 
@@ -92,6 +95,7 @@ Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 7. **Two model lists in env vars.** `GEMINI_MODEL` is the ordered list of trusted models; `GEMINI_FALLBACK_MODEL` lists weaker backups. If a trusted model is overloaded, out of quota or retired, the next is tried, and the row records which one answered. See "Running out of quota" below for when backups are used.
 8. **Priorities are resolved in code, not by prompting per user.** Players pick what they care about: `progression`, `limited` items, `cosmetic` (any combination). Gemini rates every item once on all three axes (progression once per profile), and `resolveTier()` in `lib/tiering.ts` returns the best rating among the chosen priorities. Switching priorities is instant and costs no AI calls.
 9. **Gemini scores, code decides tiers.** Gemini returns a 0-100 score per axis. `lib/classifier/calibrate.ts` maps scores to tiers: `must_do` needs a score of 70+ and a place in the top quarter of the post for that axis; 35+ is `if_free`; the rest is `skip`. Models rank far more reliably than they follow "be strict", so this keeps `must_do` rare whichever model answers.
+10a. **Value from the model, time from the code.** Gemini scores the value of the rewards only, and separately gives each quest a coarse time class: `instant` (about a minute), `short` (5 to 15 minutes a day), `medium` (15 to 45), `long` (over 45). It never sees the player's free time. `planDay()` in `lib/tiering.ts` then applies three rules for the chosen playtime: (1) an instant quest is Must Do unless its rewards were a Skip, so a daily check-in is Must Do for everyone; (2) a quest that alone is longer than the whole playtime drops one tier; (3) the remaining Must Do quests are taken best value per minute first until the playtime is full, and the rest become If Free. Changing the playtime re-sorts the page at once and costs no AI call. A card says when playtime moved it ("1-min claim", "Over your time").
 10. **No guessed time estimates.** Posts describe mechanics, not duration, and a wrong number is worse than none. Each estimate records its basis: `stated` (the post gives the duration), `calculated` (the post gives every quantity needed), or `uncertain`. An uncertain estimate says what is known and never carries a number; the code strips one if the model sends it anyway.
 11. **Community research (planned, not built).** To replace `uncertain` with real figures, a research step will look up how an event played out for players and on other servers (KMS, TMS, JMS, MSEA), and estimates from it will carry a `community` basis with source links. Nothing is hard-coded per event. Every candidate source needs a credential: Reddit blocks anonymous requests (official API app required), web search across other regions' sites needs Gemini search grounding (billed) or a search API key, and Discord has no public search (a bot invited to a server is the only route).
 
@@ -149,7 +153,8 @@ This API is undocumented and could change without notice, so every response is v
 
 ```ts
 type Tier = 'must_do' | 'if_free' | 'skip';
-type Profile = 'new' | 'casual' | 'endgame' | 'returning';
+type Profile = 'casual' | 'endgame' | 'returning';
+type TimeCost = 'instant' | 'short' | 'medium' | 'long';
 type Priority = 'progression' | 'limited' | 'cosmetic';
 
 interface TrackerItem {
@@ -157,6 +162,7 @@ interface TrackerItem {
   title: string;
   category: 'event' | 'content' | 'system';
   summary: string;               // one or two sentences
+  timeCost: TimeCost;            // coarse time per day, always set
   why: string;                   // one sentence justifying the scores
   value: {
     progression: Record<Profile, Tier>;
@@ -217,6 +223,8 @@ alter table meta  enable row level security;
 |---|---|
 | `lazy-tracker:profile` | `Profile` |
 | `lazy-tracker:priorities` | `Priority[]` (empty means all three count) |
+| `lazy-tracker:playtime` | `15`, `30`, `60` or `0` (no limit). Default 30 |
+| `lazy-tracker:visits` | Previous and current visit times, for the "New" marker |
 
 ### Environment variables
 
@@ -250,7 +258,7 @@ The home page shows everything running now in one list, so players do not open p
 
 ### What the prompt knows about progression
 
-The same reward is worth different amounts to different players, so the prompt (version 8) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
+The same reward is worth different amounts to different players, so the prompt (version 9) carries a short model of the game, built from Nexon's official Maple Guides and current community guides: level 200 opens 5th job and Arcane Symbols; level 260 opens 6th job, HEXA and Sacred Symbols, and Sol Erda and Fragments cannot be spent before it; growth potions only work inside their level range; strong players want free or discounted gear enhancement. EXP rewards are told apart: EXP Coupons (hunting multipliers) are an ordinary reward worth the same modest amount to every profile, endgame included; EXP Vouchers need level 200 and Advanced EXP Vouchers level 260. It also sets hard rules: a stated level or rank requirement lowers the score for profiles that cannot meet it, random rewards are scored on the usual result and worded "chance at", anything bought with NX or Maple Points scores at most 30, class-specific changes at most 30, and passive system changes at most 55.
 
 ### Picking pictures
 
@@ -271,7 +279,7 @@ Matching is strict on purpose: a wrong icon is worse than none. Rewards that are
 
 Scaffold Next.js + TypeScript + Tailwind. Find the news data source, build the scraper, write the prompt and Zod schema, call Gemini. Expose it on a local-only route that returns the classified JSON, and render it on a plain unstyled page.
 
-- **Done when:** hitting the route for a real patch post returns valid `TrackerItem[]` with sensible tiers for all four profiles.
+- **Done when:** hitting the route for a real patch post returns valid `TrackerItem[]` with sensible tiers for every profile.
 - **Concepts:** App Router, Route Handlers, Server vs Client Components, env vars, structured LLM output, Zod.
 
 ### Phase 2: Cache, cron, archive

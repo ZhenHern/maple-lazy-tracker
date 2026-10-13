@@ -2,11 +2,11 @@ import { type NextRequest } from "next/server";
 import { buildCalendar } from "@/lib/calendar";
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
 import { siteUrl, SITE_NAME } from "@/lib/site";
-import { resolveTier } from "@/lib/tiering";
+import { DEFAULT_PLAYTIME, planDay, PLAYTIMES } from "@/lib/tiering";
 import { getOngoing } from "@/lib/tracker";
 import type { Priority, Profile, Tier } from "@/lib/types";
 
-// GET /api/calendar?profile=casual&priorities=progression,limited&tier=must_do
+// GET /api/calendar?profile=casual&priorities=progression,limited&playtime=30&tier=must_do
 //
 // Returns the end dates of ongoing quests as a calendar file. A calendar app
 // can import it once, or subscribe to this URL and stay up to date. The job
@@ -32,13 +32,18 @@ export async function GET(request: NextRequest) {
   const depth = params.get("tier") ?? "worth";
   const tiers = Object.hasOwn(TIERS_BY_DEPTH, depth) ? TIERS_BY_DEPTH[depth] : TIERS_BY_DEPTH.worth;
 
+  const playtime =
+    PLAYTIMES.find((each) => String(each) === params.get("playtime")) ?? DEFAULT_PLAYTIME;
+
   const { items } = await getOngoing();
-  const chosen = items.filter((item) => tiers.includes(resolveTier(item, profile, priorities)));
+  const now = Date.now();
+  const plans = planDay(items, profile, priorities, playtime, now);
+  const chosen = items.filter((item) => tiers.includes(plans.get(item.id)?.tier ?? "skip"));
 
   const body = buildCalendar(chosen, {
     name: `${SITE_NAME} deadlines`,
     siteUrl: siteUrl(),
-    now: new Date(),
+    now: new Date(now),
   });
   return new Response(body, {
     headers: {

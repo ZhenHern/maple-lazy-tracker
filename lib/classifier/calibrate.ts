@@ -33,7 +33,6 @@ type SourcedItem = StoredItem & { source: ItemSource };
 export function calibrate(items: SourcedItem[]): TrackerItem[] {
   const column = (pick: (item: SourcedItem) => number) => toTiers(items.map(pick));
   const progression = {
-    new: column((item) => item.value.progression.new),
     casual: column((item) => item.value.progression.casual),
     endgame: column((item) => item.value.progression.endgame),
     returning: column((item) => item.value.progression.returning),
@@ -43,9 +42,9 @@ export function calibrate(items: SourcedItem[]): TrackerItem[] {
 
   return items.map((item, index) => ({
     ...item,
+    scores: item.value,
     value: {
       progression: {
-        new: progression.new[index],
         casual: progression.casual[index],
         endgame: progression.endgame[index],
         returning: progression.returning[index],

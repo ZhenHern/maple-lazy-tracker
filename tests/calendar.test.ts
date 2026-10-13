@@ -9,8 +9,10 @@ function quest(overrides: Partial<TrackerItem>): TrackerItem {
     category: "event",
     summary: "Log in daily; claim gifts.",
     why: "",
+    timeCost: "instant",
+    scores: { progression: { casual: 90, endgame: 50, returning: 90 }, limited: 0, cosmetic: 0 },
     value: {
-      progression: { new: "must_do", casual: "must_do", endgame: "if_free", returning: "must_do" },
+      progression: { casual: "must_do", endgame: "if_free", returning: "must_do" },
       limited: "skip",
       cosmetic: "skip",
     },

@@ -78,9 +78,9 @@ export function rulesClassify(post: ScrapedPost): ScoredItem[] {
       category: "event",
       summary: SUMMARY,
       why: "",
+      timeCost: "short",
       value: {
         progression: {
-          new: NEUTRAL_SCORE,
           casual: NEUTRAL_SCORE,
           endgame: NEUTRAL_SCORE,
           returning: NEUTRAL_SCORE,

@@ -17,7 +17,6 @@ import { readLatestTrial } from "@/lib/dev/trial";
 export const metadata: Metadata = { title: "Prompt lab | Lazy Tracker", robots: { index: false } };
 
 const AXIS_LABEL: Record<Axis, string> = {
-  new: "Beginner",
   casual: "Casual",
   endgame: "Endgame",
   returning: "Returning",
@@ -63,7 +62,9 @@ function Row({ row }: { row: ReviewRow }) {
         <span className="review-note">{row.summary}</span>
         <span className="review-note">
           {row.category} · starts {day(row.startsAt)} · ends {day(row.endsAt)}
-          {row.time && ` · time: ${row.time}`}
+{" "}
+          · time class: {row.timeCost}
+          {row.time && ` (${row.time})`}
         </span>
         {row.rewards.length > 0 && <span className="review-note">Rewards: {row.rewards.join("; ")}</span>}
       </th>

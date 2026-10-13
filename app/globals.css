@@ -371,6 +371,7 @@ body {
 /* Phone first: sprite above the name, so four jobs (or three priorities) fit
    in one row. From 640px up there is room for the hint as well. */
 .pick-job,
+.pick-time,
 .pick-skill {
   display: grid;
   align-content: start;

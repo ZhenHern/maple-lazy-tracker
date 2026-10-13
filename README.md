@@ -1,6 +1,6 @@
 # maple-lazy-tracker
 
-Lazy Tracker tells Global MapleStory players what in the latest patch is worth their time. It reads the official patch notes and event notices, has Gemini sort each item into `must_do`, `if_free` or `skip` for four player profiles, and shows the result as an illustrated quest log.
+Lazy Tracker tells Global MapleStory players what in the latest patch is worth their time. It reads the official patch notes and event notices, has Gemini sort each item into `must_do`, `if_free` or `skip` for three kinds of player and their daily playtime, and shows the result as an illustrated quest log.
 
 See [SPEC.md](SPEC.md) for the architecture, data schema and build phases.
 
@@ -37,6 +37,10 @@ The scheduled job only re-rates a post when it is new, its text changed, or `PRO
    - `?ids=45330,45393` picks posts. `?limit=2` allows more requests (patch notes need one each).
 3. Open `/dev/review`. Every running quest is listed with the tier each kind of player gets and the model's raw score. An arrow shows the trial's value, and a yellow cell means the tier moved.
 4. Happy with it? `/api/dev/try?promote` saves the trial as the live data without spending the requests again. Then bump `PROMPT_VERSION` so the posts the trial did not cover are re-rated on the next run.
+
+## Having a player check the ratings
+
+`.claude/agents/mapler.md` defines the Mapler, a reviewer agent for Claude Code. It reads `/dev/review`, opens the site as a Returning, a Casual and an Endgame player at 15 minutes, 30 minutes and 1 hour, and reports quests that are placed wrongly, with a player's reasoning and the kind of fix each needs. It does not edit code and does not spend Gemini requests. In Claude Code, with the dev server running, ask: "use the mapler agent to review the current quests".
 
 ## Useful URLs
 

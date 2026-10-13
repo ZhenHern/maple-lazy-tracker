@@ -31,6 +31,11 @@ function byPreference(a: StoredPost, b: StoredPost): number {
   return b.publishedAt.localeCompare(a.publishedAt);
 }
 
+function sameDeadline(a: string | null, b: string | null): boolean {
+  if (a === null || b === null) return true;
+  return Math.abs(Date.parse(a) - Date.parse(b)) <= 2 * DAY;
+}
+
 function stripImages(item: StoredItem): StoredItem {
   return { ...item, images: [], rewardImages: [] };
 }
@@ -77,9 +82,13 @@ export function selectOngoing(
       // A repeat is the same title in ANOTHER post (the patch notes and the
       // event's own notice). Inside one post, "Operation: Dive" and
       // "Operation: Dive Dungeon" are two activities and both stay.
+      // Matching titles are not enough when both give an end date and the
+      // dates are far apart: those are two runs of a recurring event.
       const repeat = items.some(
         (existing) =>
-          existing.source.sourceId !== post.sourceId && sameTitle(existing.title, item.title),
+          existing.source.sourceId !== post.sourceId &&
+          sameTitle(existing.title, item.title) &&
+          sameDeadline(existing.endsAt, item.endsAt),
       );
       if (repeat) continue;
       items.push({

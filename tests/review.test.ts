@@ -11,8 +11,9 @@ function item(title: string, casual: number, overrides: Partial<StoredItem> = {}
     category: "event",
     summary: "Do it.",
     why: "",
+    timeCost: "short",
     value: {
-      progression: { new: 10, casual, endgame: 10, returning: 10 },
+      progression: { casual, endgame: 10, returning: 10 },
       limited: 0,
       cosmetic: 0,
     },

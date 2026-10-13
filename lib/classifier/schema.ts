@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const TIERS = ["must_do", "if_free", "skip"] as const;
-export const PROFILES = ["new", "casual", "endgame", "returning"] as const;
+export const PROFILES = ["casual", "endgame", "returning"] as const;
+// How long a quest takes a day, as a coarse class. The model must always pick
+// one, even when the exact duration is unknown (see timeEstimate for that).
+export const TIME_COSTS = ["instant", "short", "medium", "long"] as const;
 export const PRIORITIES = ["progression", "limited", "cosmetic"] as const;
 export const MAX_ITEMS = 40;
 export const MAX_REWARDS = 5;
@@ -22,6 +25,8 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     title: z.string().min(1),
     category: z.enum(["event", "content", "system"]),
     summary: z.string().min(1),
+    // The coarse time class used to fit quests into a player's daily playtime.
+    timeCost: z.enum(TIME_COSTS),
     // One sentence on who should bother and why. Shown on the card so a
     // player can judge the rating instead of taking it on trust.
     why: z.string(),
@@ -29,7 +34,6 @@ function itemSchema<Rating extends z.ZodType>(rating: Rating) {
     // decide which of these count (see lib/tiering.ts).
     value: z.object({
       progression: z.object({
-        new: rating,
         casual: rating,
         endgame: rating,
         returning: rating,
@@ -61,8 +65,9 @@ export const scoredItemSchema = itemSchema(z.number());
 // turned into tiers at read time, so items from different posts are ranked
 // against each other.
 export const storedItemSchema = scoredItemSchema.extend({
-  // Posts classified before this field existed have none.
+  // Posts classified before these fields existed have none.
   why: z.string().default(""),
+  timeCost: z.enum(TIME_COSTS).default("short"),
   images: z.array(z.string()).default([]),
   // Parallel to "rewards": the icon for each reward, or null.
   rewardImages: z.array(z.string().nullable()).default([]),

@@ -23,7 +23,25 @@ export function sameTitle(a: string, b: string): boolean {
   if (x === y) return true;
   const shorter = x.length < y.length ? x : y;
   const longer = x.length < y.length ? y : x;
-  return shorter.length >= 8 && longer.includes(shorter);
+  if (shorter.length >= 8 && longer.includes(shorter)) return true;
+  // Two posts rarely word a title identically: "Winter Countdown Check-in" in
+  // the notice is "Winter Countdown Daily Check-in" in the patch notes. When
+  // every word of one title appears in the other, they name the same thing.
+  const [fewer, more] = [titleWords(a), titleWords(b)].sort((p, q) => p.size - q.size);
+  return fewer.size >= 2 && [...fewer].every((word) => more.has(word));
+}
+
+// Words that carry no identity: "Winter Countdown Event" is "Winter Countdown".
+const TITLE_FILLER = new Set(["the", "a", "an", "of", "and", "event", "events"]);
+
+function titleWords(value: string): Set<string> {
+  return new Set(
+    value
+      .toLowerCase()
+      .replace(/[’']/g, "")
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word && !TITLE_FILLER.has(word)),
+  );
 }
 
 /**

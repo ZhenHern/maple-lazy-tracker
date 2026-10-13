@@ -2,7 +2,13 @@
 
 import { useMemo, useRef, useState } from "react";
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
-import { resolveTier } from "@/lib/tiering";
+import {
+  DEFAULT_PLAYTIME,
+  planDay,
+  plannedMinutes,
+  PLAYTIMES,
+  type Playtime,
+} from "@/lib/tiering";
 import type { Priority, Profile, Tier, TrackerItem } from "@/lib/types";
 import { usePreviousVisit } from "@/lib/use-last-visit";
 import { useLocalStorage } from "@/lib/use-local-storage";
@@ -80,6 +86,10 @@ export function sanitizeProfile(stored: unknown): Profile {
   return PROFILES.find((profile) => profile === stored) ?? "casual";
 }
 
+function sanitizePlaytime(stored: unknown): Playtime {
+  return PLAYTIMES.find((playtime) => playtime === stored) ?? DEFAULT_PLAYTIME;
+}
+
 function sanitizePriorities(stored: unknown): Priority[] {
   return Array.isArray(stored) ? PRIORITIES.filter((priority) => stored.includes(priority)) : [];
 }
@@ -142,6 +152,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
     "lazy-tracker:priorities",
     sanitizePriorities,
   );
+  const [playtime, setPlaytime] = useLocalStorage("lazy-tracker:playtime", sanitizePlaytime);
   const now = useNow();
   const previousVisit = usePreviousVisit();
   const [tab, setTab] = useState<SectionKey>("must_do");
@@ -149,6 +160,20 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const logRef = useRef<HTMLElement>(null);
   const pickerRef = useRef<HTMLElement>(null);
+
+  // Ended quests take no part in the day's plan.
+  const running = useMemo(
+    () =>
+      allItems.filter(
+        (item) => !(now !== null && item.endsAt !== null && Date.parse(item.endsAt) <= now),
+      ),
+    [allItems, now],
+  );
+  // The tier of every running quest for this player and this much playtime.
+  const plans = useMemo(
+    () => planDay(running, profile, priorities, playtime, now),
+    [running, profile, priorities, playtime, now],
+  );
 
   const groups = useMemo(() => {
     const grouped: Record<SectionKey, TrackerItem[]> = {
@@ -158,20 +183,23 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
       ended: [],
     };
     for (const item of [...allItems].sort(byDeadline)) {
-      const ended = now !== null && item.endsAt !== null && Date.parse(item.endsAt) <= now;
-      grouped[ended ? "ended" : resolveTier(item, profile, priorities)].push(item);
+      grouped[plans.get(item.id)?.tier ?? "ended"].push(item);
     }
     return grouped;
-  }, [allItems, profile, priorities, now]);
+  }, [allItems, plans]);
 
   const job = PROFILE_INFO[profile];
   const rough = useMemo(() => mostlyRough(allItems), [allItems]);
 
   const npcLines = useMemo(() => {
     const must = groups.must_do.length;
+    const minutes = plannedMinutes(running, plans, now);
     const lines = [
       `Hey there, ${job.name}! ${plural(allItems.length, "thing")} are running in Maple World, ` +
         `but only ${must} ${must === 1 ? "is a Must Do" : "are Must Do"} for you. I sorted the rest so you can slack off.`,
+      playtime === 0
+        ? `Your Must Do list is about ${minutes} minutes a day. You set no time limit, so nothing was cut.`
+        : `Your Must Do list is about ${minutes} minutes a day, inside the ${playtime} you gave me. One-minute claims are always in.`,
     ];
     if (now !== null) {
       const dated = [...groups.must_do, ...groups.if_free]
@@ -191,7 +219,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
       "Change your job or what you care about below, and I'll re-sort every quest on the spot.",
     );
     return lines;
-  }, [allItems.length, groups, job.name, now]);
+  }, [allItems.length, groups, job.name, now, running, plans, playtime]);
 
   function showTab(next: SectionKey) {
     setTab(next);
@@ -242,6 +270,8 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
           <ProfilePicker
             profile={profile}
             priorities={priorities}
+            playtime={playtime}
+            onPlaytimeChange={setPlaytime}
             onProfileChange={setProfile}
             onPrioritiesChange={setPriorities}
           />
@@ -284,7 +314,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
             {/* A plain link: the server builds the file for the chosen job and priorities. */}
             <a
               className="font-bold underline"
-              href={`/api/calendar?profile=${profile}&priorities=${priorities.join(",")}`}
+              href={`/api/calendar?profile=${profile}&priorities=${priorities.join(",")}&playtime=${playtime}`}
             >
               Add the deadlines to your calendar
             </a>{" "}
@@ -342,6 +372,7 @@ export function QuestLog({ items: allItems, updated }: QuestLogProps) {
                       profile={profile}
                       now={now}
                       index={index}
+                      planNote={plans.get(item.id)?.note ?? null}
                       isNew={
                         previousVisit !== null && Date.parse(item.source.publishedAt) > previousVisit
                       }

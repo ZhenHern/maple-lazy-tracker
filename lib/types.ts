@@ -3,6 +3,7 @@ import type { Rating } from "@/lib/classifier/models";
 import type {
   PRIORITIES,
   PROFILES,
+  TIME_COSTS,
   scoredItemSchema,
   storedItemSchema,
   storedPostSchema,
@@ -14,6 +15,7 @@ export type { Rating };
 export type Tier = (typeof TIERS)[number];
 export type Profile = (typeof PROFILES)[number];
 export type Priority = (typeof PRIORITIES)[number];
+export type TimeCost = (typeof TIME_COSTS)[number];
 
 /** Gemini's reply: an item with a 0-100 score per axis. */
 export type ScoredItem = z.infer<typeof scoredItemSchema>;
@@ -38,6 +40,8 @@ export interface ItemSource {
 /** What the UI shows: scores resolved to tiers, plus where the item came from. */
 export type TrackerItem = Omit<StoredItem, "value"> & {
   value: z.infer<typeof tieredItemSchema>["value"];
+  /** The raw 0-100 scores behind the tiers, used to fit quests into a playtime. */
+  scores: StoredItem["value"];
   source: ItemSource;
 };
 
