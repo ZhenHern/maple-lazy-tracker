@@ -49,7 +49,7 @@ export interface IngestOptions {
 /**
  * Attaches pictures to each item. Reward icons come first from the post itself
  * (Nexon names its icon files after the item), then from the other recent
- * posts (`iconPool`), then from maplestory.io by exact item name. The remaining
+ * posts (`iconPool`), then from maplestory.io by item name. The remaining
  * pictures in the item's section become its gallery, largest first.
  */
 export async function withImages(
