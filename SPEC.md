@@ -93,11 +93,13 @@ PATH B: Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `lib/db/store.ts`, `supabase-store.ts`, `file-store.ts`, `feedback-store.ts` | The `PostStore` interface with its Supabase and local-file versions (`.data/`, with `data/seed` as fallback), and where feedback is saved |
 | `lib/feedback.ts`, `lib/site.ts`, `lib/types.ts` | The feedback schema shared by form and server; site name, address and storage key of the theme; shared types |
 | `lib/use-local-storage.ts`, `lib/use-now.ts`, `lib/use-last-visit.ts` | Hydration-safe hooks for browser storage, the clock, and the "New" marker |
-| `components/` | `QuestLog` (the stateful client component), `QuestItem`, `ProfilePicker`, `QuestTools`, `SchedulePanel`, `NpcDialog`, `StatusBar`, `Countdown`, `ArchiveLog`, `SiteHeader` and footer, `ThemeToggle`, `FeedbackForm`, `EasterEggs`, `ZoomImage`, `PixelSprite`, `Scenery` |
+| `components/` | `QuestLog` (the stateful client component), `QuestItem`, `ProfilePicker`, `QuestTools`, `SchedulePanel`, `NpcDialog`, `StatusBar`, `Countdown`, `ArchiveLog`, `SiteHeader` and footer, `ThemeToggle`, `FeedbackForm`, `EasterEggs`, `ZoomImage`, `PixelSprite`, `Scenery`, and the arcade layer: `DayPlan`, `JobChangeBanner`, `Hotkeys`, `SoundToggle`, `ArcadeFx` |
+| `lib/day-plan.ts`, `lib/sfx.ts` | `planBar()` and `laziness()`: the numbers behind "Today's Plan" (pure code, tested in `tests/day-plan.test.ts`); the 8-bit sound blips and the key of the Sounds switch |
 | `supabase/schema.sql` | The three tables to create in Supabase |
 | `scripts/push-to-supabase.mjs` | Copies locally graded posts into Supabase. Used once, for the first deploy |
-| `tests/` | 15 Vitest files: quota ledger, classifier and grounding rules, schedule parser, ingest flow, Supabase store, tiering, ongoing rules, calendar, review, icon and reward-name matching, feedback schema |
+| `tests/` | 16 Vitest files: quota ledger, classifier and grounding rules, schedule parser, ingest flow, Supabase store, tiering, day plan, ongoing rules, calendar, review, icon and reward-name matching, feedback schema |
 | `.claude/agents/mapler.md` | The Mapler: a reviewer agent that reads the site as each kind of player and reports wrong placements. It never edits code or spends AI quota |
+| `.claude/agents/code-reviewer.md` | The code reviewer: checks a change against the project's rules, runs lint, types, tests and build, and reports ranked findings. Its memory in `.claude/agent-memory/code-reviewer/` counts recurring issues; a hook (`.claude/hooks/review-memory-only.mjs`) lets it write only there |
 
 ### Key design decisions
 
@@ -269,6 +271,7 @@ create table feedback (                         -- messages from /feedback
 | `lazy-tracker:theme` | `"light"` or `"dark"`. Absent: follow the device |
 | `lazy-tracker:visits` | Previous and current visit times, for the "New" marker |
 | `lazy-tracker:pokes` | How often the Lazy Shroom was poked, for its titles |
+| `lazy-tracker:sound` | `true` when the visitor switched Sounds on. Absent: off |
 
 ### Environment variables
 
@@ -329,6 +332,12 @@ Raising `PROMPT_VERSION` is how the daily job knows which posts to re-grade.
 - **Rough ratings.** When most of the list was rated by a backup model, one notice above the tabs replaces the per-quest badges.
 - **Feedback.** `/feedback` (wrong rating, bug, idea, other); a quest card links to it with the quest's name filled in. `POST /api/feedback` validates with the shared Zod schema, refuses other origins, catches simple bots with a hidden field, limits one address to 5 messages per 10 minutes, and inserts into the `feedback` table. Without Supabase, messages are appended to `.data/feedback.jsonl`.
 - **Lazy Shroom.** The NPC summarises the day in a few lines. Poking it shows damage numbers; 25 and 100 pokes earn a title; it has a line for visitors up past midnight. The Konami code plays a level-up banner (`components/easter-eggs.tsx`).
+- **Arcade layer.** Game feel on top of the page, all read-only (nothing is tracked per player) and none of it touches the pictures that carry information:
+  - *Today's Plan*: an MP-style bar with one block per Must Do quest, sized by its daily minutes against the chosen playtime; a block or chip jumps to that quest's card. A laziness meter shows the share of the list that is If Free or Skip.
+  - *Quest frames*: Must Do cards get a gold inner glow; a quest ending within three days pulses red. Glows are inset, so they sit under the pictures.
+  - *Class-change banner* when the job is changed.
+  - *Hotkeys* (`?` opens the list; keys avoid the Konami code's arrows, B and A).
+  - *Click sparks* on controls and, when Sounds is on, 8-bit blips. Sounds are off by default (`lazy-tracker:sound`). Reduced motion turns the sparks and banner off.
 - **Icons.** The tab icon and the phone home-screen icon are the Lazy Shroom, drawn from the same pixel grid as the sprite; `app/manifest.ts` lets the site be added to a home screen.
 
 ## 6. Checks on the model's answer (`lib/classifier/grounding.ts`)

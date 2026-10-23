@@ -131,8 +131,14 @@ export function QuestItem({
   );
 
   return (
-    <li className="quest-enter" style={{ "--order": Math.min(index, 10) } as CSSProperties}>
-      <details className="quest">
+    // The id lets "Today's Plan" jump straight to this quest (see quest-log.tsx).
+    <li
+      id={`quest-${item.id}`}
+      className="quest-enter"
+      style={{ "--order": Math.min(index, 10) } as CSSProperties}
+    >
+      {/* data-urgent drives the pulsing red frame of a quest about to end. */}
+      <details className="quest" data-urgent={urgent ? "true" : undefined}>
         <summary className="quest-head">
           {thumbnail ? (
             // Hovering shows the picture larger. A click still opens the quest.

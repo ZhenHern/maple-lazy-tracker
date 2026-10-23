@@ -244,13 +244,20 @@ export function planDay(
   return plans;
 }
 
+/**
+ * The quests that fill today's playtime: Must Do, open now, and more than a
+ * reward claim. The plan bar, the NPC's minute count and the review page all
+ * read this one list, so they cannot disagree.
+ */
+export function plannedItems(items: TrackerItem[], plans: Map<string, Plan>): TrackerItem[] {
+  return items.filter((item) => {
+    const plan = plans.get(item.id);
+    return plan?.tier === "must_do" && plan.note !== "soon" && plan.note !== "claim";
+  });
+}
+
 /** Minutes a day the Must Do quests of a plan add up to, rounded. */
 export function plannedMinutes(items: TrackerItem[], plans: Map<string, Plan>): number {
-  const total = items
-    .filter((item) => {
-      const plan = plans.get(item.id);
-      return plan?.tier === "must_do" && plan.note !== "soon" && plan.note !== "claim";
-    })
-    .reduce((sum, item) => sum + dailyMinutes(item), 0);
+  const total = plannedItems(items, plans).reduce((sum, item) => sum + dailyMinutes(item), 0);
   return Math.round(total);
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dailyMinutes, planDay, plannedMinutes } from "@/lib/tiering";
+import { dailyMinutes, planDay, plannedItems, plannedMinutes } from "@/lib/tiering";
 import type { Tier, TimeCost, TrackerItem } from "@/lib/types";
 
 const NOW = Date.parse("2026-10-13T00:00:00Z");
@@ -241,5 +241,23 @@ describe("claim-only quests", () => {
       claimUntil: "2026-10-24T23:59:00Z",
     });
     expect(planDay([ended], "casual", ["progression"], 15, NOW).get("junk")?.tier).toBe("skip");
+  });
+});
+
+describe("plannedItems", () => {
+  it("lists only the Must Do quests that are open now and take playtime", () => {
+    const items = [
+      quest("today", "must_do", 80, "short"),
+      quest("maybe", "if_free", 50, "short"),
+      quest("opens-later", "must_do", 99, "medium", { startsAt: "2026-10-28T00:00:00Z" }),
+      quest("claim-left", "if_free", 50, "short", {
+        endsAt: "2026-10-10T23:59:00Z",
+        claimUntil: "2026-10-24T23:59:00Z",
+      }),
+    ];
+    const plans = planDay(items, "casual", ["progression"], 60, NOW);
+    expect(plannedItems(items, plans).map((item) => item.id)).toEqual(["today"]);
+    // The minute total is built on the same list.
+    expect(plannedMinutes(items, plans)).toBe(Math.round(dailyMinutes(items[0])));
   });
 });

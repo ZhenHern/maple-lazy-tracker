@@ -1,11 +1,14 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PRIORITIES, PROFILES } from "@/lib/classifier/schema";
+import type { PlanEntry } from "@/lib/day-plan";
 import {
   DEFAULT_PLAYTIME,
   closesAt,
+  dailyMinutes,
   planDay,
+  plannedItems,
   plannedMinutes,
   PLAYTIMES,
   type Playtime,
@@ -15,11 +18,15 @@ import { usePreviousVisit } from "@/lib/use-last-visit";
 import { useLocalStorage } from "@/lib/use-local-storage";
 import { useNow } from "@/lib/use-now";
 import { ENDING_SOON, formatRemaining } from "./countdown";
+import { DayPlan } from "./day-plan";
+import { Hotkeys } from "./hotkeys";
+import { JobChangeBanner } from "./job-change";
 import { NpcDialog } from "./npc-dialog";
 import { QuestTools } from "./quest-tools";
 import { PixelSprite, type SpriteName } from "./pixel-sprite";
 import { PROFILE_INFO, ProfilePicker } from "./profile-picker";
 import { QuestItem } from "./quest-item";
+import { SoundToggle } from "./sound-toggle";
 import { StatusBar } from "./status-bar";
 
 type SectionKey = Tier | "soon" | "ended";
@@ -105,6 +112,10 @@ function sanitizePriorities(stored: unknown): Priority[] {
   return Array.isArray(stored) ? PRIORITIES.filter((priority) => stored.includes(priority)) : [];
 }
 
+// How long a card glows after Today's Plan jumps to it. Matches the
+// quest-flash animation in globals.css.
+const FLASH_MS = 1100;
+
 // Soonest deadline first; items with no end date go last.
 function byDeadline(a: TrackerItem, b: TrackerItem): number {
   return (a.endsAt ?? "9999").localeCompare(b.endsAt ?? "9999");
@@ -177,6 +188,11 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const logRef = useRef<HTMLElement>(null);
   const pickerRef = useRef<HTMLElement>(null);
+  // How often the job was changed, to replay the "class change" banner.
+  const [jobChanges, setJobChanges] = useState(0);
+  // The quest "Today's Plan" asked to show. A fresh object each time, so
+  // choosing the same quest twice still scrolls to it twice.
+  const [jump, setJump] = useState<{ id: string } | null>(null);
 
   // Ended quests take no part in the day's plan.
   const running = useMemo(
@@ -207,6 +223,37 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
     }
     return grouped;
   }, [allItems, plans]);
+
+  // The Must Do quests that fill the day, with the minutes each one costs.
+  const planEntries = useMemo<PlanEntry[]>(
+    () =>
+      plannedItems(running, plans).map((item) => ({
+        id: item.id,
+        title: item.title,
+        minutes: dailyMinutes(item),
+      })),
+    [running, plans],
+  );
+
+  // Once the list has re-rendered for the chosen quest, open it and scroll to it.
+  // This only touches the page; it sets no state.
+  useEffect(() => {
+    if (!jump) return;
+    const card = document.getElementById(`quest-${jump.id}`);
+    if (!card) return;
+    card.querySelector("details")?.setAttribute("open", "");
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    card.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "center" });
+    // A short glow shows which card it was (.quest-flash in globals.css). The
+    // class is removed on a timer, not on animationend: that event never fires
+    // when reduced motion turns animations off. Removing it first restarts the
+    // glow when the same card is chosen twice in a row.
+    card.classList.remove("quest-flash");
+    void card.offsetWidth;
+    card.classList.add("quest-flash");
+    const timer = window.setTimeout(() => card.classList.remove("quest-flash"), FLASH_MS);
+    return () => window.clearTimeout(timer);
+  }, [jump]);
 
   const job = PROFILE_INFO[profile];
   const rough = useMemo(() => mostlyRough(allItems), [allItems]);
@@ -255,6 +302,32 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
     setCategory("all");
   }
 
+  // Choosing another job replays the banner; choosing the same one does nothing.
+  function changeJob(next: Profile) {
+    if (next !== profile) setJobChanges((count) => count + 1);
+    setProfile(next);
+  }
+
+  // From "Today's Plan": the quest may sit behind a search or in another tab,
+  // so both are reset first. The effect above then finds the card and opens it.
+  function jumpToQuest(id: string) {
+    clearFilters();
+    setTab("must_do");
+    setJump({ id });
+  }
+
+  // "Soon" and "Ended" only get a tab once something is in them.
+  function tabShown(key: SectionKey): boolean {
+    return (key !== "ended" && key !== "soon") || groups[key].length > 0;
+  }
+  const visibleTabs = SECTIONS.filter(({ key }) => tabShown(key)).map(({ key }) => key);
+
+  // The hotkeys 1-5 pick a tab by its position among the tabs that are showing.
+  function showTabAt(position: number) {
+    const key = visibleTabs[position - 1];
+    if (key) showTab(key);
+  }
+
   // Arrow keys move between tabs, the standard keyboard pattern for a tab list.
   function onTabKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
@@ -283,6 +356,8 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
 
   return (
     <div className="grid gap-4 sm:gap-5">
+      <JobChangeBanner stamp={jobChanges} name={job.name} sprite={job.sprite} />
+
       <NpcDialog lines={npcLines} onShowMustDo={() => showTab("must_do")} />
 
       <section className="window scroll-mt-4" aria-label="Your settings" ref={pickerRef}>
@@ -296,11 +371,22 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
             priorities={priorities}
             playtime={playtime}
             onPlaytimeChange={setPlaytime}
-            onProfileChange={setProfile}
+            onProfileChange={changeJob}
             onPrioritiesChange={setPriorities}
           />
         </div>
       </section>
+
+      <DayPlan
+        entries={planEntries}
+        playtime={playtime}
+        counts={{
+          must_do: groups.must_do.length,
+          if_free: groups.if_free.length,
+          skip: groups.skip.length,
+        }}
+        onJump={jumpToQuest}
+      />
 
       <section className="window scroll-mt-4" aria-label="Quest log" ref={logRef}>
         <h2 className="window-title">
@@ -311,6 +397,7 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
           <div className="grid min-w-0 gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
             <input
               type="search"
+              id="quest-search"
               className="search"
               placeholder="Search quests or rewards..."
               aria-label="Search quests or rewards"
@@ -336,6 +423,11 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
 
           <QuestTools mustDo={groups.must_do} jobName={job.name} playtime={playtime} now={clock} />
 
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <SoundToggle />
+            <Hotkeys tabCount={visibleTabs.length} onTab={showTabAt} />
+          </div>
+
           <p className="text-xs text-ink-soft">
             {/* A plain link: the server builds the file for the chosen job and priorities. */}
             <a
@@ -350,7 +442,7 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
           <div className="min-w-0">
             <div className="tabs" role="tablist" aria-label="Tiers" onKeyDown={onTabKeyDown}>
               {SECTIONS.map(({ key, title }) => {
-                if ((key === "ended" || key === "soon") && groups[key].length === 0) return null;
+                if (!tabShown(key)) return null;
                 return (
                   <button
                     key={key}
@@ -389,8 +481,8 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
               </p>
 
               {visible.length > 0 ? (
-                // The key remounts the list on a tab change so quests animate in.
-                <ul key={tab} className="grid gap-2">
+                // The key remounts the list on a tab or job change so quests animate in.
+                <ul key={`${tab}:${profile}`} className="grid gap-2">
                   {visible.map((item, index) => (
                     <QuestItem
                       key={item.id}
