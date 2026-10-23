@@ -70,7 +70,7 @@ PATH B: Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `app/feedback/page.tsx`, `components/feedback-form.tsx` | The feedback page and its form |
 | `app/api/cron/ingest/route.ts` | The scheduled refresh, protected by `CRON_SECRET` |
 | `app/api/feedback/route.ts` | Receives the feedback form: validates, refuses other origins, traps bots, rate-limits, saves |
-| `app/api/status/route.ts` | Health check for the operator: store, rating counts, posts on an old prompt, quota per model. No secrets |
+| `app/api/status/route.ts` | Health check for the operator: store, rating counts, posts on an old prompt, quota per model, and `lastRun` (when the daily job last ran, whether it worked, a one-line summary, and its last success). A `lastRun.lastSuccessAt` more than a day old means the cron has stopped. No secrets |
 | `app/api/calendar/route.ts`, `lib/calendar.ts` | Quest end dates as an iCalendar file for a chosen job, priorities and playtime |
 | `app/api/dev/ingest/route.ts` | The daily run by hand. `&images` re-picks pictures, `&recheck` re-runs the grounding checks, both without an AI call. Development only (404 in production) |
 | `app/api/dev/try/route.ts`, `lib/dev/trial.ts` | The prompt lab: run the current prompt on chosen posts without saving, then optionally promote the result. Development only |
@@ -78,7 +78,8 @@ PATH B: Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `app/icon.svg`, `app/apple-icon.tsx`, `app/manifest.ts` | The Lazy Shroom as tab icon and phone home-screen icon, and the web manifest |
 | `app/robots.ts`, `app/sitemap.ts`, `app/opengraph-image.tsx`, `app/error.tsx`, `app/not-found.tsx` | robots.txt, sitemap.xml, the share picture, and the pages shown on a failure or a wrong address |
 | `app/layout.tsx`, `app/globals.css` | Fonts, metadata, the script that sets day or night before the first paint; theme tokens and all component styles |
-| `lib/ingest.ts` | Path A in one function: scrape, queue, classify in batches, ground, attach pictures, save |
+| `lib/ingest.ts` | Path A in one function: scrape, queue, classify in batches, ground, attach pictures, save. `recordRun()` saves how each run went |
+| `lib/run-log.ts` | The run record (`meta` row `last-run`): last attempt, ok or not, summary such as "14 checked, 0 changed", last success. The home page's "Last checked" date is the last success; "list changed" is the newest rating, which moves only when Nexon posts or edits |
 | `lib/tracker.ts` | Cached reads: `getOngoing()` for the home page, `getArchive()` and `getArchivedPost()` for the archive |
 | `lib/ongoing.ts` | The rules for what is shown: running or ended, quest or news or schedule, duplicates across posts. Pure code, shared by the home page, the calendar and the prompt lab |
 | `lib/tiering.ts` | `resolveTier()`: job + priorities to one tier. `planDay()`: fits quests into the daily playtime. `isTask()`, `isSchedule()` |
@@ -97,7 +98,7 @@ PATH B: Visitor ─> Server Component ─> cached read of Supabase ─> HTML
 | `lib/day-plan.ts`, `lib/sfx.ts` | `planBar()` and `laziness()`: the numbers behind "Today's Plan" (pure code, tested in `tests/day-plan.test.ts`); the 8-bit sound blips and the key of the Sounds switch |
 | `supabase/schema.sql` | The three tables to create in Supabase |
 | `scripts/push-to-supabase.mjs` | Copies locally graded posts into Supabase. Used once, for the first deploy |
-| `tests/` | 16 Vitest files: quota ledger, classifier and grounding rules, schedule parser, ingest flow, Supabase store, tiering, day plan, ongoing rules, calendar, review, icon and reward-name matching, feedback schema |
+| `tests/` | 17 Vitest files: run log, quota ledger, classifier and grounding rules, schedule parser, ingest flow, Supabase store, tiering, day plan, ongoing rules, calendar, review, icon and reward-name matching, feedback schema |
 | `.claude/agents/mapler.md` | The Mapler: a reviewer agent that reads the site as each kind of player and reports wrong placements. It never edits code or spends AI quota |
 | `.claude/agents/code-reviewer.md` | The code reviewer: checks a change against the project's rules, runs lint, types, tests and build, and reports ranked findings. Its memory in `.claude/agent-memory/code-reviewer/` counts recurring issues; a hook (`.claude/hooks/review-memory-only.mjs`) lets it write only there |
 
@@ -242,7 +243,7 @@ create table posts (
   created_at     timestamptz not null default now()
 );
 
-create table meta (                             -- holds the quota ledger ('gemini-quota')
+create table meta (                             -- quota ledger ('gemini-quota'), run record ('last-run')
   key         text primary key,
   value       jsonb not null,
   updated_at  timestamptz not null default now()

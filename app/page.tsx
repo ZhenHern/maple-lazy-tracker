@@ -68,7 +68,7 @@ function formatDay(iso: string): string {
 // Reads the cached list (see getOngoing). No AI call ever happens here: the
 // daily cron does the classifying, visitors only ever read its results.
 async function Tracker() {
-  const { items, news, schedules, sources, updatedAt, builtAt } = await getOngoing();
+  const { items, news, schedules, sources, updatedAt, checkedAt, builtAt } = await getOngoing();
 
   if (items.length === 0) {
     return (
@@ -97,7 +97,8 @@ async function Tracker() {
     <div className="grid gap-4 sm:gap-5">
       <QuestLog
         items={items}
-        updated={updatedAt ? formatDay(updatedAt) : null}
+        checked={checkedAt ? formatDay(checkedAt) : null}
+        changed={updatedAt ? formatDay(updatedAt) : null}
         builtAt={builtAt}
       />
 

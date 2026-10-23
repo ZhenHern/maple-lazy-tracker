@@ -2,9 +2,10 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { calibrate } from "@/lib/classifier/calibrate";
 import { ratingOf, type Rating } from "@/lib/classifier/models";
-import { readAllPosts } from "@/lib/db/store";
+import { getStore, readAllPosts } from "@/lib/db/store";
 import { nexonImagesEnabled } from "@/lib/images";
 import { buildOngoing, type OngoingTracker } from "@/lib/ongoing";
+import { parseRunLog, RUN_LOG_KEY } from "@/lib/run-log";
 import { isTask } from "@/lib/tiering";
 import type { PostSummary, StoredItem, StoredPost, TrackerItem } from "@/lib/types";
 
@@ -28,7 +29,18 @@ export async function getOngoing(): Promise<OngoingTracker> {
   cacheTag(POSTS_TAG);
   cacheLife("hours");
 
-  return buildOngoing(await readAllPosts(), Date.now(), nexonImagesEnabled());
+  const [posts, runLog] = await Promise.all([readAllPosts(), readRunLog()]);
+  return buildOngoing(posts, Date.now(), nexonImagesEnabled(), runLog?.lastSuccessAt ?? null);
+}
+
+// The run log is extra information: if it cannot be read, the page still shows
+// the list, with only the rating date.
+async function readRunLog() {
+  try {
+    return parseRunLog(await getStore().readMeta(RUN_LOG_KEY));
+  } catch {
+    return null;
+  }
 }
 
 /** One stored post as the archive lists it. */

@@ -9,6 +9,7 @@ import { getStore, writePost } from "@/lib/db/store";
 import { groundItems } from "@/lib/classifier/grounding";
 import { matchRewardImage, pickImages, sectionImages } from "@/lib/images";
 import { isEffect, rewardName, singular } from "@/lib/reward-name";
+import { nextRunLog, parseRunLog, RUN_LOG_KEY, type RunOutcome } from "@/lib/run-log";
 import { findItemIcon, latestGmsVersion } from "@/lib/scraper/maplestory-io";
 import { fetchImageSizes, fetchPost, listTrackedPosts } from "@/lib/scraper/nexon";
 import type { PostSummary, ScoredItem, ScrapedPost, StoredItem, StoredPost } from "@/lib/types";
@@ -365,4 +366,19 @@ export async function ingest({
     requests,
     quota: describeLedger(quota.ledger, [...primaryModels(), ...fallbackModels()], Date.now()),
   };
+}
+
+/**
+ * Saves how a run went, for the page's "Last checked" date and /api/status.
+ * Never throws: a run must not be reported as failed because its log could not
+ * be written.
+ */
+export async function recordRun(outcome: RunOutcome): Promise<void> {
+  try {
+    const store = getStore();
+    const previous = parseRunLog(await store.readMeta(RUN_LOG_KEY));
+    await store.writeMeta(RUN_LOG_KEY, nextRunLog(previous, outcome, new Date().toISOString()));
+  } catch (error) {
+    console.warn(`[ingest] could not save the run log: ${String(error)}`);
+  }
 }

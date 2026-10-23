@@ -164,13 +164,15 @@ export function RoughNotice({ items }: { items: TrackerItem[] }) {
 
 interface QuestLogProps {
   items: TrackerItem[];
-  /** Human-readable date the data was last refreshed, or null. */
-  updated: string | null;
+  /** Date the daily job last checked Nexon, or null when no run is recorded. */
+  checked: string | null;
+  /** Date a post on the list was last rated, or null. It moves only when Nexon posts or edits. */
+  changed: string | null;
   /** When the server built the list, in ms. Stands in for the clock until it is known. */
   builtAt: number;
 }
 
-export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
+export function QuestLog({ items: allItems, checked, changed, builtAt }: QuestLogProps) {
   const [profile, setProfile] = useLocalStorage("lazy-tracker:profile", sanitizeProfile);
   const [priorities, setPriorities] = useLocalStorage(
     "lazy-tracker:priorities",
@@ -391,7 +393,14 @@ export function QuestLog({ items: allItems, updated, builtAt }: QuestLogProps) {
       <section className="window scroll-mt-4" aria-label="Quest log" ref={logRef}>
         <h2 className="window-title">
           Quest Log
-          {updated && <span className="window-note">Last checked {updated}</span>}
+          {(checked || changed) && (
+            <span className="window-note">
+              {/* Checking happens daily; the list only changes when Nexon posts. */}
+              {checked && `Last checked ${checked}`}
+              {checked && changed && " · "}
+              {changed && `${checked ? "list changed" : "List changed"} ${changed}`}
+            </span>
+          )}
         </h2>
         <div className="window-body grid gap-3">
           <div className="grid min-w-0 gap-2 sm:grid-cols-[1fr_auto] sm:items-center">

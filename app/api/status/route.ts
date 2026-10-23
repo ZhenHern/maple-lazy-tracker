@@ -3,6 +3,7 @@ import { fallbackModels, primaryModels, ratingOf } from "@/lib/classifier/models
 import { PROMPT_VERSION } from "@/lib/classifier/prompt";
 import { describeLedger, emptyLedger, ledgerSchema } from "@/lib/classifier/quota";
 import { getStore } from "@/lib/db/store";
+import { parseRunLog, RUN_LOG_KEY } from "@/lib/run-log";
 
 // GET /api/status
 //
@@ -17,6 +18,7 @@ export async function GET() {
     const store = getStore();
     const posts = await store.readAllPosts();
     const ledger = ledgerSchema.safeParse(await store.readMeta("gemini-quota"));
+    const lastRun = parseRunLog(await store.readMeta(RUN_LOG_KEY));
     const count = (rating: string) =>
       posts.filter((post) => ratingOf(post.model) === rating).length;
 
@@ -31,6 +33,9 @@ export async function GET() {
         outdatedPrompt: posts.filter((post) => post.promptVersion !== PROMPT_VERSION).length,
         withErrors: posts.filter((post) => post.error !== null).length,
         lastClassifiedAt: posts.map((post) => post.classifiedAt).sort().at(-1) ?? null,
+        // The daily job: when it last ran, whether it worked, and what it found.
+        // A lastSuccessAt more than a day old means the job has stopped.
+        lastRun,
         promptVersion: PROMPT_VERSION,
         quota: describeLedger(
           ledger.success ? ledger.data : emptyLedger(),

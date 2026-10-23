@@ -40,8 +40,16 @@ export interface OngoingTracker {
   schedules: ScheduleInfo[];
   /** Official posts that contributed at least one ongoing item. */
   sources: PostSummary[];
-  /** When the newest contributing post was classified, or null if there is no data. */
+  /**
+   * When the newest contributing post was classified, or null if there is no
+   * data. It moves only when Nexon publishes or edits a post.
+   */
   updatedAt: string | null;
+  /**
+   * When the daily job last checked Nexon successfully, or null if no run has
+   * been recorded (local seed data, or before the first run).
+   */
+  checkedAt: string | null;
   /**
    * When this list was built, in ms. The page plans the day with it until the
    * browser's own clock is available, so server and browser agree on which
@@ -224,6 +232,7 @@ export function buildOngoing(
   allPosts: StoredPost[],
   now: number,
   showImages: boolean,
+  checkedAt: string | null = null,
 ): OngoingTracker {
   const { items, news, schedules, contributing } = selectOngoing(allPosts, now, showImages);
   return {
@@ -258,6 +267,7 @@ export function buildOngoing(
       }))
       .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
     updatedAt: contributing.map((post) => post.classifiedAt).sort().at(-1) ?? null,
+    checkedAt,
     builtAt: now,
   };
 }

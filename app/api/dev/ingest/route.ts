@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
-import { ingest } from "@/lib/ingest";
+import { ingest, recordRun } from "@/lib/ingest";
 import { POSTS_TAG } from "@/lib/tracker";
 
 // Classifying several posts can take a few minutes when models are busy.
@@ -26,11 +26,13 @@ export async function GET(request: NextRequest) {
     const refreshImages = request.nextUrl.searchParams.has("images");
     const recheck = request.nextUrl.searchParams.has("recheck");
     const report = await ingest({ maxRequests: limit, refreshImages, recheck });
+    await recordRun({ ok: true, report });
     // Tell Next.js the cached list is out of date, so the next visit rebuilds it.
     revalidateTag(POSTS_TAG, "max");
     return NextResponse.json(report);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    await recordRun({ ok: false, error: message });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
